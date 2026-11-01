@@ -799,6 +799,8 @@ nav button{font-size:9.5px}
 .gtiers{display:flex;justify-content:space-between;margin-top:4px}.gtiers span{font-size:10px;font-weight:800;opacity:.5}.gtiers span.on{opacity:1;color:#ffd34d}
 .gboard{margin-top:8px;font-size:12px}.gboard div{display:flex;justify-content:space-between;padding:3px 2px;border-top:1px solid #ffffff14}.gboard .me{color:#ffd34d}
 .dcban{display:flex;align-items:center;gap:10px;background:linear-gradient(135deg,#5865f2,#3c45a5);color:#fff;text-decoration:none;border-radius:14px;padding:11px 12px;margin:0 0 10px;box-shadow:0 8px 20px -10px #5865f2}.dcic{font-size:24px}
+.cloudbox{background:var(--bg2);border:1px solid var(--line);border-radius:14px;padding:11px 12px;margin-bottom:10px}.cloudbox.on{border-color:#5865f288}
+.dcbtn{background:#5865f2!important;color:#fff!important;box-shadow:0 8px 20px -10px #5865f2!important}.clav{width:38px;height:38px;border-radius:50%;object-fit:cover;background:#5865f2;display:flex;align-items:center;justify-content:center;flex:none}
 </style>
 <link rel="manifest" href="manifest.webmanifest"><meta name="theme-color" content="#09090c"><link rel="icon" href="icon-192.png"><link rel="apple-touch-icon" href="icon-192.png"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="description" content="Shōkan · jeu gratuit de cartes anime : ouvre des mangas, collectionne, combats, guildes et arène."></head>
 <body>
@@ -1088,7 +1090,7 @@ function render(){dailyReset();try{achCheck()}catch(_){}({home:rHome,coll:rColl,
 // ================= ÉCRAN BOOSTERS =================
 function counts(){const k={C:0,R:0,E:0,L:0,M:0,D:0,X:0};Object.values(S.coll).forEach(c=>k[c.rarity]++);return k}
 function sec(no,t,jp){return`<div class="sec"><span class="no">${no}</span><span class="t">${t}</span><span class="jp">${jp}</span></div>`}
-function rHome(){const k=counts(),ev=EV(),tot=Object.keys(S.coll).length;
+function rHome(){setTimeout(()=>document.querySelectorAll("#main .cloudslot").forEach(el=>{if(CL.user)el.innerHTML="";else cloudBind(el)}),0);const k=counts(),ev=EV(),tot=Object.keys(S.coll).length;
  $("main").innerHTML=`<div class="event" style="margin-top:10px"><b>${ev.n}</b> <span class="muted">· ${ev.d}</span></div>
  ${sec("01","Choisis ton booster","ブースター")}
  <div class="packs" id="packs">${PACKS.map(p=>`<div class="pcard ${p.id===(S.pack||"mix")?"on":""}" data-pk="${p.id}" style="background:${packBg(p)}"><span class="pkj">${p.kj}</span><span class="pn">${p.name}</span></div>`).join("")}</div>
@@ -1101,7 +1103,7 @@ function rHome(){const k=counts(),ev=EV(),tot=Object.keys(S.coll).length;
  ${sec("03","Chances par carte","確率")}
  <div class="box">${RAR.slice().reverse().map(r=>`<div class="oddrow"><span style="color:var(--${r.id});font-weight:700">${r.name}</span><div class="bar"><i style="width:${Math.max(3,Math.sqrt(r.odds/55)*100)}%;background:var(--${r.id})"></i></div><span style="text-align:right;font-weight:700">${r.odds} %</span></div>`).join("")}
  <div class="muted" style="margin-top:8px;font-size:12px">Compteur Mythique : ${S.pity} / ${PITY}</div></div>
- ${discordBox()}<div class="foot">Démo non officielle, gratuite et sans but commercial.<br>Données et images : <a href="https://anilist.co" target="_blank">AniList</a>. Les personnages appartiennent à leurs auteurs et studios.<br><span id="reset" style="text-decoration:underline">Effacer ma progression</span></div>`;
+ <div class="cloudslot">${CL.user?"":cloudBox()}</div>${discordBox()}<div class="foot">Démo non officielle, gratuite et sans but commercial.<br>Données et images : <a href="https://anilist.co" target="_blank">AniList</a>. Les personnages appartiennent à leurs auteurs et studios.<br><span id="reset" style="text-decoration:underline">Effacer ma progression</span></div>`;
  $("pack").onclick=()=>openPack(false);$("btnOpen").onclick=()=>openPack(false);$("btnBuy").onclick=()=>openPack(true);
  $("main").querySelectorAll("[data-multi]").forEach(b=>b.onclick=()=>openMulti(b.dataset.multi==="all"?S.boosters:+b.dataset.multi));setTimeout(prefetchPack,400);$("main").querySelectorAll("[data-sum]").forEach(b=>b.onclick=()=>{S.summon=b.dataset.sum;save();sfx.select();rHome()});
  const pks=$("packs");pks.querySelectorAll("[data-pk]").forEach(c=>c.onclick=()=>{if(busy)return;S.pack=c.dataset.pk;save();const sl=pks.scrollLeft;rHome();updateTop();$("packs").scrollLeft=sl;sfx.select()});
@@ -1299,14 +1301,14 @@ function showProfile(){initProfile();const P=S.prof,p=$("picker"),all=Object.val
  <div class="pcard2 bn-${(S.guild&&S.guild.equip&&S.guild.equip.banner)||"none"}"><div class="pav" id="pAv">${av?`<img src="${esc(av.img)}" referrerpolicy="no-referrer">`:"召"}</div>
   <div style="flex:1;min-width:0"><div class="pname"><span id="pName">${esc(P.name)}</span> <button class="pedit" id="pEdit">✏️</button></div><div class="ptitle">${esc(myTitle())}</div>${S.guild?`<div class="pguild" style="--gc:${S.guild.color}">${S.guild.emblem} ${esc(S.guild.name)} · niv. ${S.guild.lvl}${S.guild.leader?" · Chef":""}</div>`:""}
   <div class="plvl"><b>Niv. ${P.lvl}</b><div class="xpbar" style="flex:1"><i style="width:${pct}%"></i></div></div><div class="muted" style="font-size:11px">${fmt(P.xp)} / ${fmt(pNeed(P.lvl))} XP · prochain cadeau au niveau ${P.lvl+1}</div></div></div>
- <div class="row2" style="margin-top:12px"><button class="btn ghost sm" id="pAch">🏆 Succès · ${ACH.filter(a=>(S.ach||{})[a.id]).length}/${ACH.length}</button><button class="btn ghost sm" id="pPass">🎟️ Passe · palier ${passLvl()}</button></div>
+ <div class="cloudslot" style="margin-top:12px">${cloudBox()}</div><div class="row2" style="margin-top:12px"><button class="btn ghost sm" id="pAch">🏆 Succès · ${ACH.filter(a=>(S.ach||{})[a.id]).length}/${ACH.length}</button><button class="btn ghost sm" id="pPass">🎟️ Passe · palier ${passLvl()}</button></div>
  <div class="sec" style="margin-top:16px"><span class="no">01</span><span class="t">Mes cartes préférées</span><span class="jp">お気に入り</span></div>
  <div class="pfav">${[0,1,2].map(i=>fav[i]?`<div data-pf="${fav[i].id}">${cardHTML(fav[i],{lv:1})}</div>`:`<div class="pslot">＋<small>Ajoute une carte avec ⭐ dans sa fiche</small></div>`).join("")}</div>
  <div class="sec"><span class="no">02</span><span class="t">Statistiques</span><span class="jp">記録</span></div>
  <div class="pstats">${[["🎴",S.opened,"boosters ouverts"],["📚",all.length,"persos uniques"],["⚔️",S.wins||0,"victoires"],["🗼",S.tower||0,"record de la tour"],["😱",S.fakeouts||0,"fake outs"],["👑",all.filter(c=>c.master).length,"cartes maîtrisées"]].map(([i,v,l])=>`<div><b>${i} ${fmt(v)}</b><span>${l}</span></div>`).join("")}</div>
  <div class="box" style="font-size:13px">${RAR.slice().reverse().map(r=>`<span style="color:var(--${r.id});font-weight:800">${r.name} ${cnt[r.id]||0}</span>`).join(" · ")}${best?`<div class="muted" style="margin-top:6px">Meilleure carte : <b style="color:var(--${best.rarity})">${esc(best.name)}</b></div>`:""}</div>
  <div class="muted" style="text-align:center;margin:14px 0 30px;font-size:11.5px">Joueur depuis le ${new Date(P.since).toLocaleDateString("fr-FR")} · Touche ton avatar pour le changer</div></div>`;
- $("pClose").onclick=()=>{p.style.display="none";updateTop()};$("pAch").onclick=showAch;$("pPass").onclick=showPass;
+ $("pClose").onclick=()=>{p.style.display="none";updateTop()};$("pAch").onclick=showAch;cloudBind(p);$("pPass").onclick=showPass;
  $("pEdit").onclick=()=>modal(`<h3>Ton pseudo</h3><input id="pnIn" maxlength="18" value="${esc(P.name)}" style="width:100%;background:var(--bg);border:1px solid var(--line);border-radius:10px;color:var(--ink);font-size:16px;padding:10px;user-select:text">`,[["Annuler"],["Valider",()=>{const v=($("pnIn").value||"").trim().slice(0,18);if(v)P.name=v;save();showProfile()}]]);
  $("pAv").onclick=()=>{p.style.display="none";pickCard("Choisis ton avatar",c=>{P.avatar=c.id;save();updateTop();showProfile()})};
  p.querySelectorAll("[data-pf]").forEach(d=>d.onclick=()=>{p.style.display="none";NAV=[];showDetail(d.dataset.pf)})}
@@ -1883,6 +1885,49 @@ function loreCine(ch,boss,done){const o=$("lore"),shots=loreShots(ch,boss);let i
 async function replayLore(ch){try{const an=await chapterData(ch);const boss=an.chars.slice().sort((a,b)=>b.fav-a.fav)[0];$("picker").style.display="none";loreCine(ch,boss,()=>showStory())}catch(e){toast("Impossible de charger la cinématique")}}
 
 
+
+// ================= COMPTE EN LIGNE (connexion Discord + sauvegarde cloud via Supabase) =================
+const SB_URL="https://sjlltaywapuitfzninqk.supabase.co",SB_KEY="sb_publishable_TQ6BEQxffQIdJhfLw0JfSA_xQ1hwBqe";
+const CL={sb:null,user:null,ready:false,dirty:false,t:null,last:0,busy:false,err:""};
+function sbLoad(){return new Promise(res=>{if(window.supabase)return res(true);const s=document.createElement("script");s.src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js";s.onload=()=>res(!!window.supabase);s.onerror=()=>res(false);document.head.appendChild(s);setTimeout(()=>res(!!window.supabase),9000)})}
+async function cloudInit(){if(/^(file|about|data):/.test(location.protocol)&&!window.supabase)return;if(!(await sbLoad()))return;
+ try{CL.sb=window.supabase.createClient(SB_URL,SB_KEY,{auth:{persistSession:true,detectSessionInUrl:true,flowType:"pkce"}})}catch(e){return}
+ CL.ready=true;const {data}=await CL.sb.auth.getSession();CL.user=data&&data.session?data.session.user:null;
+ CL.sb.auth.onAuthStateChange((ev,sess)=>{const was=CL.user;CL.user=sess?sess.user:null;if(!was&&CL.user)cloudOnLogin();cloudUI()});
+ if(location.search.includes("code=")||location.hash.includes("access_token"))history.replaceState(null,"",location.pathname);
+ if(CL.user)cloudOnLogin();cloudUI()}
+function cloudName(){const m=(CL.user&&CL.user.user_metadata)||{};return m.full_name||m.name||m.user_name||m.preferred_username||"Joueur"}
+function cloudAvatar(){const m=(CL.user&&CL.user.user_metadata)||{};return m.avatar_url||m.picture||""}
+async function cloudLogin(){if(!CL.ready){toast("Connexion indisponible ici · ouvre le jeu depuis son lien internet");return}
+ const {error}=await CL.sb.auth.signInWithOAuth({provider:"discord",options:{redirectTo:location.origin+location.pathname}});if(error)toast("Erreur de connexion : "+error.message)}
+async function cloudLogout(){if(!CL.ready)return;await cloudPush(true);await CL.sb.auth.signOut();CL.user=null;toast("Déconnecté. Ta partie reste sur ce téléphone.");cloudUI()}
+function cloudSummary(d){const c=d&&d.coll?Object.keys(d.coll).length:0;return`niveau ${(d&&d.prof&&d.prof.lvl)||1} · ${c} perso${c>1?"s":""} · ${(d&&d.opened)||0} boosters ouverts`}
+async function cloudOnLogin(){if(CL.busy)return;CL.busy=true;try{
+ const {data,error}=await CL.sb.from("saves").select("data,updated_at").eq("user_id",CL.user.id).maybeSingle();if(error)throw error;
+ initProfile();if(!S.prof.discord){S.prof.discord=cloudName();if(/^Otaku\d+$/.test(S.prof.name))S.prof.name=cloudName().slice(0,18)}
+ if(!data){await cloudPush(true);notify("☁️","Compte Discord connecté : ta partie est sauvegardée en ligne !");return}
+ const remote=data.data,mine=S.cloudId===CL.user.id;
+ if(mine&&(S.cloudT||0)>=new Date(data.updated_at).getTime()-2000){await cloudPush(true);return}
+ const localEmpty=Object.keys(S.coll).length<=0&&S.opened<1;
+ if(localEmpty||mine&&(S.cloudT||0)<new Date(data.updated_at).getTime()){cloudApply(remote,data.updated_at);return}
+ modal(`<h3>☁️ Deux sauvegardes trouvées</h3><p class="muted" style="text-align:left">Ton compte Discord a déjà une partie en ligne.<br><br>☁️ <b>En ligne</b> : ${cloudSummary(remote)}<br>📱 <b>Ce téléphone</b> : ${cloudSummary(S)}<br><br>Laquelle veux-tu garder ? L'autre sera remplacée.</p>`,
+  [["📱 Ce téléphone",()=>cloudPush(true).then(()=>toast("☁️ Partie du téléphone envoyée en ligne"))],["☁️ En ligne",()=>cloudApply(remote,data.updated_at)]])}
+ catch(e){CL.err=e.message||String(e);console.warn("cloud",e);toast("☁️ Sauvegarde en ligne indisponible pour l'instant")}finally{CL.busy=false;cloudUI()}}
+function cloudApply(remote,t){try{localStorage.setItem("otaku_v1",JSON.stringify(Object.assign({},remote,{cloudId:CL.user.id,cloudT:new Date(t).getTime()})))}catch(_){}toast("☁️ Partie récupérée !");setTimeout(()=>location.reload(),500)}
+async function cloudPush(force){if(!CL.ready||!CL.user)return;if(!force&&!CL.dirty)return;CL.dirty=false;clearTimeout(CL.t);
+ const now=Date.now();S.cloudId=CL.user.id;S.cloudT=now;try{localStorage.setItem("otaku_v1",JSON.stringify(S))}catch(_){}
+ const {error}=await CL.sb.from("saves").upsert({user_id:CL.user.id,data:S,name:(S.prof&&S.prof.name)||cloudName(),updated_at:new Date(now).toISOString()});
+ if(error){CL.err=error.message;CL.dirty=true;console.warn("cloud push",error)}else{CL.last=now;CL.err=""}cloudUI()}
+function cloudDirty(){if(!CL.user)return;CL.dirty=true;clearTimeout(CL.t);CL.t=setTimeout(()=>cloudPush(false),15000)}
+save=(f=>function(){f();cloudDirty()})(save);
+document.addEventListener("visibilitychange",()=>{if(document.visibilityState==="hidden"&&CL.dirty)cloudPush(false)});
+function cloudBox(){if(!CL.ready&&!CL.user)return`<div class="cloudbox"><b>☁️ Sauvegarde en ligne</b><div class="muted" style="font-size:12px;margin-top:3px">Disponible quand tu joues depuis le lien du jeu : yatamoru76.github.io/shokan</div></div>`;
+ if(!CL.user)return`<div class="cloudbox"><b>☁️ Sauvegarde en ligne</b><div class="muted" style="font-size:12px;margin:3px 0 8px">Connecte ton compte Discord pour ne jamais perdre ta partie et la retrouver sur n'importe quel appareil.</div><button class="btn dcbtn" data-cl="in">🎮 Se connecter avec Discord</button></div>`;
+ const av=cloudAvatar();return`<div class="cloudbox on"><div style="display:flex;align-items:center;gap:10px">${av?`<img src="${esc(av)}" class="clav" referrerpolicy="no-referrer">`:'<div class="clav">🎮</div>'}<div style="flex:1;min-width:0"><b>${esc(cloudName())}</b><div class="muted" style="font-size:12px">${CL.err?"⚠️ "+esc(CL.err):CL.last?"☁️ Sauvegardé "+ago(CL.last):"☁️ Compte Discord connecté"}</div></div></div>
+ <div class="row2" style="margin-top:8px"><button class="btn sm" data-cl="push">☁️ Sauvegarder maintenant</button><button class="btn ghost sm" data-cl="out">Se déconnecter</button></div></div>`}
+function cloudBind(root){(root||document).querySelectorAll("[data-cl]").forEach(b=>b.onclick=async()=>{const k=b.dataset.cl;if(k==="in")cloudLogin();else if(k==="out")cloudLogout();else{b.disabled=true;await cloudPush(true);toast(CL.err?"⚠️ Échec : "+CL.err:"☁️ Partie sauvegardée en ligne")}})}
+function cloudUI(){document.querySelectorAll(".cloudslot").forEach(el=>{el.innerHTML=cloudBox();cloudBind(el)});const c=$("cCloud");if(c){c.style.display=CL.ready?"":"none";c.textContent=CL.user?"☁️":"☁️"; c.classList.toggle("off",!CL.user)}}
+
 // ================= RÉCOMPENSES GÉNÉRIQUES =================
 async function drawRarity(rid){const r=RAR[RI[rid]];return charAt(r.min+Math.floor(Math.random()*(r.max-r.min+1)),r)}
 async function giveRw(rw,why){S.boosters+=rw.boosters||0;S.shards+=rw.shards||0;S.oni+=rw.oni||0;S.frag+=rw.frag||0;let card=null;
@@ -2369,7 +2414,7 @@ document.addEventListener("pointerdown",()=>{if(!M_.started){M_.started=true;mus
 document.addEventListener("visibilitychange",()=>{if(!AC)return;document.hidden?AC.suspend():AC.resume()});
 
 // ================= DÉMARRAGE =================
-load();dailyReset();tickBoost();initOpener();setMusicChip();applyDeco();$("cBell").onclick=showNotifs;$("cGift").onclick=showGifts;$("logoBtn").onclick=showProfile;initProfile();render();
+load();dailyReset();tickBoost();initOpener();setMusicChip();applyDeco();$("cBell").onclick=showNotifs;$("cGift").onclick=showGifts;$("logoBtn").onclick=showProfile;initProfile();render();setTimeout(cloudInit,300);
 setInterval(()=>{const b=S.boosters;tickBoost();if(S.boosters!==b){save();if(view==="home")render()}try{mkTick()}catch(e){console.error(e)}try{notifWatch()}catch(e){}try{guildTick()}catch(e){console.error(e)}if(view==="mk")mkTimers();updateTop()},1000);
 document.addEventListener("visibilitychange",()=>{if(document.hidden)save()});
 </script>
