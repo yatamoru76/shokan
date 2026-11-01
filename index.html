@@ -801,6 +801,8 @@ nav button{font-size:9.5px}
 .dcban{display:flex;align-items:center;gap:10px;background:linear-gradient(135deg,#5865f2,#3c45a5);color:#fff;text-decoration:none;border-radius:14px;padding:11px 12px;margin:0 0 10px;box-shadow:0 8px 20px -10px #5865f2}.dcic{font-size:24px}
 .cloudbox{background:var(--bg2);border:1px solid var(--line);border-radius:14px;padding:11px 12px;margin-bottom:10px}.cloudbox.on{border-color:#5865f288}
 .dcbtn{background:#5865f2!important;color:#fff!important;box-shadow:0 8px 20px -10px #5865f2!important}.clav{width:38px;height:38px;border-radius:50%;object-fit:cover;background:#5865f2;display:flex;align-items:center;justify-content:center;flex:none}
+.pcard.wimg{box-shadow:inset 0 0 0 2px hsla(var(--ph),90%,60%,.6)}.pcard.wimg .pkj{opacity:.38;font-size:46px;top:auto;bottom:16px;text-shadow:0 2px 12px #000}
+.pack .art.wimg .kj{opacity:.35}
 </style>
 <link rel="manifest" href="manifest.webmanifest"><meta name="theme-color" content="#09090c"><link rel="icon" href="icon-192.png"><link rel="apple-touch-icon" href="icon-192.png"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="description" content="Shōkan · jeu gratuit de cartes anime : ouvre des mangas, collectionne, combats, guildes et arène."></head>
 <body>
@@ -946,6 +948,15 @@ const PACKS=[
  {id:"psy",name:"Psychologique",kj:"心",h:275,genre:"Psychological",d:"Jeux d'esprit et thrillers."},
  {id:"horror",name:"Horreur",kj:"怖",h:0,genre:"Horror",d:"Frissons garantis."}];
 const PK=id=>PACKS.find(p=>p.id===id)||PACKS[0];
+// personnage emblématique de chaque catégorie (image AniList)
+const MASC={mix:"Goku",shonen:"Naruto Uzumaki",seinen:"Guts",shojo:"Usagi Tsukino",josei:"Nana Oosaki",isekai:"Rimuru Tempest",fantasy:"Frieren",mecha:"Lelouch Lamperouge",scifi:"Spike Spiegel",sport:"Shouyou Hinata",romance:"Kaguya Shinomiya",comedy:"Saitama",sol:"Hitori Gotou",psy:"Light Yagami",horror:"Ken Kaneki"};
+let MIMG={};try{const c=JSON.parse(localStorage.getItem("shk_masc")||"null");if(c&&Date.now()-c.t<20*86400000)MIMG=c.m}catch(_){}
+async function loadMascots(){if(DEMO||Object.keys(MIMG).length>=Object.keys(MASC).length)return;
+ const q="query{"+Object.entries(MASC).map(([k,n])=>`${k}:Page(perPage:1){characters(search:${JSON.stringify(n)},sort:FAVOURITES_DESC){image{large}}}`).join(" ")+"}";
+ try{const r=await fetch(API,{method:"POST",headers:{"Content-Type":"application/json",Accept:"application/json"},body:JSON.stringify({query:q})});if(!r.ok)return;const j=await r.json();
+  for(const k in MASC){const c=j.data&&j.data[k]&&j.data[k].characters[0];if(c&&c.image&&c.image.large)MIMG[k]=c.image.large}
+  try{localStorage.setItem("shk_masc",JSON.stringify({t:Date.now(),m:MIMG}))}catch(_){}if(view==="home"){const sl=$("packs")&&$("packs").scrollLeft;rHome();if($("packs"))$("packs").scrollLeft=sl}}catch(_){}}
+function packArt(p,pos){const im=MIMG[p.id];return im?`linear-gradient(180deg,hsla(${p.h},90%,55%,.15) 0,#0000 30%,hsla(${p.h},85%,18%,.95) 92%),url('${im.replace(/'/g,"%27")}') center ${pos||"18%"}/cover no-repeat,${packBg(p)}`:packBg(p)}
 function packBg(p){return`radial-gradient(circle at 70% 18%,hsl(${p.h+20},100%,78%) 0,transparent 30%),linear-gradient(160deg,hsl(${p.h},90%,60%),hsl(${p.h},85%,52%) 35%,hsl(${p.h-10},80%,32%) 75%,hsl(${p.h-15},85%,14%))`}
 const QT=`query($p:Int,$g:[String],$t:[String]){Page(page:$p,perPage:40){media(type:ANIME,sort:POPULARITY_DESC,isAdult:false,genre_in:$g,tag_in:$t,genre_not_in:["Ecchi","Hentai"]){title{romaji english} characters(sort:FAVOURITES_DESC,perPage:8){nodes{id name{full} image{large} favourites}}}}}`;
 const TPOOL={};
@@ -1090,11 +1101,11 @@ function render(){dailyReset();try{achCheck()}catch(_){}({home:rHome,coll:rColl,
 // ================= ÉCRAN BOOSTERS =================
 function counts(){const k={C:0,R:0,E:0,L:0,M:0,D:0,X:0};Object.values(S.coll).forEach(c=>k[c.rarity]++);return k}
 function sec(no,t,jp){return`<div class="sec"><span class="no">${no}</span><span class="t">${t}</span><span class="jp">${jp}</span></div>`}
-function rHome(){setTimeout(()=>document.querySelectorAll("#main .cloudslot").forEach(el=>{if(CL.user)el.innerHTML="";else cloudBind(el)}),0);const k=counts(),ev=EV(),tot=Object.keys(S.coll).length;
+function rHome(){if(!rHome.m){rHome.m=1;setTimeout(loadMascots,600)}setTimeout(()=>document.querySelectorAll("#main .cloudslot").forEach(el=>{if(CL.user)el.innerHTML="";else cloudBind(el)}),0);const k=counts(),ev=EV(),tot=Object.keys(S.coll).length;
  $("main").innerHTML=`<div class="event" style="margin-top:10px"><b>${ev.n}</b> <span class="muted">· ${ev.d}</span></div>
  ${sec("01","Choisis ton booster","ブースター")}
- <div class="packs" id="packs">${PACKS.map(p=>`<div class="pcard ${p.id===(S.pack||"mix")?"on":""}" data-pk="${p.id}" style="background:${packBg(p)}"><span class="pkj">${p.kj}</span><span class="pn">${p.name}</span></div>`).join("")}</div>
- <div class="pack" id="pack"><div class="art" style="background:${packBg(PK(S.pack))}"><span class="kj">${PK(S.pack).kj}</span></div><div class="inf"><div class="bn">${PK(S.pack).name}</div><div class="muted">${PK(S.pack).d}</div>
+ <div class="packs" id="packs">${PACKS.map(p=>`<div class="pcard ${p.id===(S.pack||"mix")?"on":""} ${MIMG[p.id]?"wimg":""}" data-pk="${p.id}" style="--ph:${p.h};background:${packArt(p)}"><span class="pkj">${p.kj}</span><span class="pn">${p.name}</span></div>`).join("")}</div>
+ <div class="pack" id="pack"><div class="art ${MIMG[PK(S.pack).id]?"wimg":""}" style="background:${packArt(PK(S.pack),"15%")}"><span class="kj">${PK(S.pack).kj}</span></div><div class="inf"><div class="bn">${PK(S.pack).name}</div><div class="muted">${PK(S.pack).d}</div>
  <div class="tags"><span class="tag">5 cartes</span><span class="tag a">Rare garantie</span><span class="tag">Mythique sûre en ${PITY}</span></div><div class="muted" id="tmr" style="margin-top:auto;font-size:12px"></div></div></div>
  <div class="row2" style="margin-top:10px"><button class="btn" id="btnOpen" style="flex:1.4"></button><button class="btn ghost" id="btnBuy">${PACKCOST} 💠</button></div><div class="multi"><span class="muted">Ouvrir d'un coup :</span><button class="btn ghost sm" data-multi="5">×5</button><button class="btn ghost sm" data-multi="10">×10</button><button class="btn ghost sm" data-multi="all">Tout</button></div><div class="sumtog"><span class="muted">Invocation :</span><button class="${(S.summon||"manga")==="manga"?"on":""}" data-sum="manga">📚 Manga</button><button class="${S.summon==="booster"?"on":""}" data-sum="booster">🎴 Booster</button></div><div class="err" id="err"></div>
  ${sec("02","Ta collection","コレクション")}
