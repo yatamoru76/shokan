@@ -1317,6 +1317,7 @@ header .hsp{flex:1}
 .btn .ji{color:inherit}
 .emo{filter:grayscale(1) sepia(.6) saturate(1.5) brightness(1.08);font-style:normal}
 .wallet .ji{color:var(--gold);margin:0 3px 0 0}
+.mver{text-align:center;font:600 11px Inter;color:#5a534a;margin:16px 0 4px;letter-spacing:.06em}
 </style>
 
 </head>
@@ -3563,7 +3564,7 @@ function showMore(){const gn=(S.gifts||[]).length,fp=(typeof FR!=="undefined"&&F
    ${R("話","#5865f2","Discord","Rejoindre la communauté Shōkan","discord")}</div>
   <div class="mgrp">Réglages</div><div class="mlist">
    ${R("設","#4b5563","Paramètres","Compte, sauvegarde, code cadeau","set")}
-   ${R("音","#4b5563",M_&&M_.on?"Musique activée":"Musique coupée","Toucher pour changer","music")}</div>`;
+   ${R("音","#4b5563",M_&&M_.on?"Musique activée":"Musique coupée","Toucher pour changer","music")}</div><div class="mver">Version ${window.SHK_VER||"locale"}</div>`;
  $("more").classList.add("on");$("more").querySelector(".shbg").onclick=hideMore;
  $("moreIn").querySelectorAll("[data-a]").forEach(b=>b.onclick=()=>{const a=b.dataset.a;sfx.select&&sfx.select();
   if(a==="music"){$("cMusic").click();showMore();return}
