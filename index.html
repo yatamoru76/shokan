@@ -559,6 +559,19 @@ header .chip{padding:3px 6px;font-size:11px}
 #logoBtn{cursor:pointer}
 .logo .mk img{width:100%;height:100%;object-fit:cover;object-position:top;border-radius:9px}
 .logo .mk{overflow:hidden}
+.pcard2.creator{position:relative;overflow:hidden;border:2px solid transparent!important;background:linear-gradient(135deg,#2e1d05,#1a0f24 60%,#0d1428) padding-box,linear-gradient(90deg,#ffd76a,#ff9a3c,#ff5ea8,#a46bff,#4de1ff,#ffd76a) border-box!important;background-size:100% 100%,300% 100%!important;animation:crB 5s linear infinite;box-shadow:0 0 22px rgba(255,200,80,.35),0 0 50px rgba(164,107,255,.18)}
+@keyframes crB{to{background-position:0 0,300% 0}}
+.pcard2.creator::before{content:"";position:absolute;inset:0;pointer-events:none;background:linear-gradient(110deg,transparent 30%,rgba(255,240,200,.28) 45%,transparent 60%);background-size:250% 100%;animation:crS 3.2s ease-in-out infinite}
+@keyframes crS{0%{background-position:150% 0}100%{background-position:-100% 0}}
+.pcard2.creator::after{content:"";position:absolute;inset:0;pointer-events:none;background:radial-gradient(2px 2px at 12% 25%,#fff8d0,transparent),radial-gradient(1.5px 1.5px at 78% 18%,#fff,transparent),radial-gradient(2px 2px at 90% 75%,#ffe08a,transparent),radial-gradient(1.5px 1.5px at 40% 85%,#d8c2ff,transparent),radial-gradient(2px 2px at 60% 40%,#fff,transparent);animation:crT 1.8s ease-in-out infinite alternate}
+@keyframes crT{from{opacity:.25}to{opacity:1}}
+.pcard2.creator>*{position:relative;z-index:1}
+.pcard2.creator .pav{border-color:#ffd76a!important;box-shadow:0 0 0 2px #2e1d05,0 0 18px #ffc94a}
+.pcard2.creator .pname,.pcard2.creator .pname #pName{background:linear-gradient(90deg,#fff3c4,#ffd76a,#ff9ad0,#c7a8ff,#fff3c4);background-size:200% 100%;-webkit-background-clip:text;background-clip:text;color:transparent;animation:crN 3s linear infinite}
+@keyframes crN{to{background-position:200% 0}}
+.crbadge{display:inline-flex;align-items:center;gap:5px;margin:2px 0 4px;padding:3px 10px;border-radius:99px;font-size:11px;font-weight:900;letter-spacing:.06em;color:#2a1600;background:linear-gradient(90deg,#ffe9a3,#ffc94a,#ffe9a3);background-size:200% 100%;animation:crN 2.5s linear infinite;box-shadow:0 0 12px rgba(255,201,74,.6)}
+.crbadge small{font-weight:700;opacity:.75}
+.crown{display:inline-block;animation:crC 2s ease-in-out infinite}@keyframes crC{50%{transform:translateY(-2px) rotate(-6deg)}}
 .pcard2{display:flex;gap:14px;align-items:center;background:linear-gradient(135deg,#2b100b,#141419);border:1px solid var(--line);border-radius:18px;padding:14px}
 .pav{width:76px;height:76px;flex:none;border-radius:18px;background:var(--acc);display:flex;align-items:center;justify-content:center;font-family:"Noto Sans JP";font-size:34px;font-weight:900;overflow:hidden;border:2px solid #ffffff33;cursor:pointer}
 .pav img{width:100%;height:100%;object-fit:cover;object-position:top}
@@ -1436,8 +1449,8 @@ function showProfile(){initProfile();const P=S.prof,p=$("picker"),all=Object.val
  const best=all.slice().sort((a,b)=>RI[b.rarity]-RI[a.rarity]||a.rank-b.rank)[0],av=P.avatar&&S.coll[P.avatar],fav=P.fav.map(id=>S.coll[id]).filter(Boolean),pct=Math.min(100,P.xp/pNeed(P.lvl)*100);
  p.style.display="flex";p.innerHTML=`<div style="width:100%;max-width:420px">
  <div style="display:flex;justify-content:space-between;margin:4px 0"><button class="btn ghost sm" style="width:auto" id="pSet">⚙️ Paramètres · 🎁 Code</button><button class="btn ghost sm" style="width:auto" id="pClose">Fermer</button></div>
- <div class="pcard2 bn-${(S.guild&&S.guild.equip&&S.guild.equip.banner)||"none"}"><div class="pav" id="pAv">${av?`<img src="${esc(av.img)}" referrerpolicy="no-referrer">`:"召"}</div>
-  <div style="flex:1;min-width:0"><div class="pname"><span id="pName">${esc(P.name)}</span> <button class="pedit" id="pEdit">✏️</button></div><div class="ptitle">${esc(myTitle())}</div>${S.guild?`<div class="pguild" style="--gc:${S.guild.color}">${S.guild.emblem} ${esc(S.guild.name)} · niv. ${S.guild.lvl}${S.guild.leader?" · Chef":""}</div>`:""}
+ <div class="pcard2 bn-${(S.guild&&S.guild.equip&&S.guild.equip.banner)||"none"} ${IS_ADMIN?"creator":""}"><div class="pav" id="pAv">${av?`<img src="${esc(av.img)}" referrerpolicy="no-referrer">`:"召"}</div>
+  <div style="flex:1;min-width:0"><div class="pname"><span id="pName">${esc(P.name)}</span> <button class="pedit" id="pEdit">✏️</button></div>${IS_ADMIN?`<div class="crbadge"><span class="crown">👑</span> CRÉATEUR DE SHŌKAN <small>創造者</small></div>`:""}<div class="ptitle">${esc(myTitle())}</div>${S.guild?`<div class="pguild" style="--gc:${S.guild.color}">${S.guild.emblem} ${esc(S.guild.name)} · niv. ${S.guild.lvl}${S.guild.leader?" · Chef":""}</div>`:""}
   <div class="plvl"><b>Niv. ${P.lvl}</b><div class="xpbar" style="flex:1"><i style="width:${pct}%"></i></div></div><div class="muted" style="font-size:11px">${fmt(P.xp)} / ${fmt(pNeed(P.lvl))} XP · prochain cadeau au niveau ${P.lvl+1}</div></div></div>
  <div class="cloudslot" style="margin-top:12px">${cloudBox()}</div><div class="row2" style="margin-top:12px"><button class="btn ghost sm" id="pAch">🏆 Succès · ${ACH.filter(a=>(S.ach||{})[a.id]).length}/${ACH.length}</button><button class="btn ghost sm" id="pPass">🎟️ Passe · palier ${passLvl()}</button></div><button class="btn ghost sm" id="pFr" style="margin-top:8px">👥 Amis & combats amicaux</button>
  <div class="sec" style="margin-top:16px"><span class="no">01</span><span class="t">Mes cartes préférées</span><span class="jp">お気に入り</span></div>
@@ -2411,10 +2424,11 @@ async function showFriends(){const p=$("picker");p.style.display="flex";
 async function showPlayer(uid){const p=$("picker");p.style.display="flex";p.innerHTML=`<div class="muted" style="padding:40px">Chargement du profil…</div>`;
  let x=null;try{const r=await CL.sb.from("players").select("*").eq("user_id",uid).maybeSingle();x=r.data}catch(_){}
  if(!x){p.innerHTML=`<div style="max-width:420px;text-align:center;padding:30px"><p class="muted">Profil introuvable.</p><button class="btn ghost" id="ppBack">Retour</button></div>`;$("ppBack").onclick=showFriends;return}
+ let isCr=false;try{const r2=await CL.sb.from("admins").select("user_id").eq("user_id",uid).maybeSingle();isCr=!!(r2&&r2.data)}catch(_){}
  const pr=x.profile||{},st=pr.stats||{},cnt=pr.cnt||{},fr=(FR.rows||[]).find(r=>r.requester===uid||r.addressee===uid),isFr=fr&&fr.status==="accepted";
  p.innerHTML=`<div style="width:100%;max-width:420px"><div style="display:flex;justify-content:space-between;margin:4px 0"><button class="btn ghost sm" style="width:auto" id="ppBack">← Amis</button><button class="btn ghost sm" style="width:auto" id="ppClose">Fermer</button></div>
- <div class="pcard2 bn-${pr.banner||"none"}"><div class="pav">${x.avatar?`<img src="${esc(x.avatar)}" referrerpolicy="no-referrer">`:"召"}</div>
-  <div style="flex:1;min-width:0"><div class="pname">${esc(x.name||"Joueur")}</div><div class="ptitle">${esc(x.title||"")}</div>${pr.guild?`<div class="pguild" style="--gc:${pr.guild.color}">${pr.guild.emblem} ${esc(pr.guild.name)} · niv. ${pr.guild.lvl}</div>`:""}
+ <div class="pcard2 bn-${pr.banner||"none"} ${isCr?"creator":""}"><div class="pav">${x.avatar?`<img src="${esc(x.avatar)}" referrerpolicy="no-referrer">`:"召"}</div>
+  <div style="flex:1;min-width:0"><div class="pname">${esc(x.name||"Joueur")}</div>${isCr?`<div class="crbadge"><span class="crown">👑</span> CRÉATEUR DE SHŌKAN <small>創造者</small></div>`:""}<div class="ptitle">${esc(x.title||"")}</div>${pr.guild?`<div class="pguild" style="--gc:${pr.guild.color}">${pr.guild.emblem} ${esc(pr.guild.name)} · niv. ${pr.guild.lvl}</div>`:""}
   <div class="plvl"><b>Niv. ${x.lvl||1}</b><span class="muted" style="font-size:12px">⚡ ${fmt(x.power||0)}${pr.arena!=null?" · "+arank(pr.arena).ic+" "+fmt(pr.arena)+" pts":""}</span></div></div></div>
  ${isFr?`<div class="row2" style="margin-top:10px"><button class="btn sm" id="ppAuto" ${x.team&&x.team.length&&S.team.length?"":"disabled"}>⚔️ Combat auto</button><button class="btn gold sm" id="ppLive" ${S.team.length?"":"disabled"}>🔴 Combat en direct</button></div>`:fr?'<div class="muted" style="text-align:center;margin-top:8px">⏳ Demande d\'ami en attente</div>':`<button class="btn sm" id="ppAdd" style="margin-top:10px">+ Ajouter en ami</button>`}
  ${pr.stats?`<div class="sec" style="margin-top:16px"><span class="no">01</span><span class="t">Vitrine</span><span class="jp">お気に入り</span></div>
