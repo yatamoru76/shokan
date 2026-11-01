@@ -1190,6 +1190,44 @@ header .hsp{flex:1}
  #nav button .lb{display:inline!important;font:600 14px Inter}
  .altar .circ{width:180px;height:180px}
 }
+
+/* ambiance par booster */
+.altar{--tc:hsl(var(--h) 72% 56%);--tg:hsl(var(--h) 62% 64%);border-color:hsl(var(--h) 55% 50% / .45)!important;background:radial-gradient(75% 55% at 50% 30%,hsl(var(--h) 70% 42% / .32),transparent 72%),linear-gradient(#171513ee,#100f0dee),var(--wave) 0 0/48px 24px!important;transition:border-color .4s}
+.altar .torii{background:var(--tc)!important;box-shadow:0 0 18px var(--tc)}
+.altar .circ svg path{stroke:var(--tg)!important}
+.altar .circ span{color:hsl(var(--h) 40% 92%);text-shadow:0 0 30px hsl(var(--h) 80% 55% / .55)}
+.altar .chg{color:var(--tg)!important}
+.altar .mode.on{border-color:var(--tc)!important;background:hsl(var(--h) 60% 20% / .55)!important}
+.altar .btn.go{background:var(--tc)!important;box-shadow:0 10px 26px -12px var(--tc)!important}
+.altar>*{position:relative;z-index:1}.altar>.amb{position:absolute;inset:0;z-index:0;pointer-events:none;overflow:hidden}
+.amb i{position:absolute;display:block;animation:linear infinite}
+.a-dust i{width:3px;height:3px;border-radius:50%;background:hsl(42 80% 70%);box-shadow:0 0 6px hsl(42 90% 60%);animation-name:rise;opacity:.7}
+.a-ember i{width:4px;height:4px;border-radius:50%;background:hsl(var(--hh) 95% 60%);box-shadow:0 0 8px hsl(var(--hh) 95% 55%);animation-name:rise}
+.a-rain i{width:1px;height:26px;background:linear-gradient(transparent,hsl(210 60% 75% / .55));animation-name:rain;transform:rotate(12deg)}
+.a-petal i{width:10px;height:7px;border-radius:70% 10% 70% 10%;background:hsl(340 80% 80% / .85);animation-name:fall}
+.a-leaf i{width:10px;height:6px;border-radius:70% 10% 70% 10%;background:hsl(var(--hh) 55% 55% / .8);animation-name:fall}
+.a-confetti i{width:6px;height:9px;background:hsl(calc(var(--hh) * 7) 85% 62%);animation-name:fall}
+.a-bokeh i{width:calc(46px * var(--s));height:calc(46px * var(--s));border-radius:50%;background:radial-gradient(circle,hsl(var(--hh) 70% 70% / .22),transparent 70%);animation-name:float}
+.a-spark i,.a-star i{width:3px;height:3px;background:#fff;border-radius:50%;box-shadow:0 0 8px hsl(var(--hh) 90% 70%);animation-name:tw}
+.a-star i{width:2px;height:2px}
+.a-speed i{left:-40%!important;width:40%;height:1px;background:linear-gradient(90deg,transparent,hsl(var(--hh) 80% 70% / .6),transparent);animation-name:speed}
+.a-grid{background:linear-gradient(hsl(195 80% 60% / .08) 1px,transparent 1px) 0 0/22px 22px,linear-gradient(90deg,hsl(195 80% 60% / .08) 1px,transparent 1px) 0 0/22px 22px}
+.a-grid::after{content:"";position:absolute;left:0;right:0;height:40px;background:linear-gradient(transparent,hsl(195 90% 60% / .12),transparent);animation:scan 4s linear infinite}
+.a-ripple i{left:50%!important;top:30%!important;width:20px;height:20px;margin:-10px;border-radius:50%;border:1px solid hsl(275 70% 70% / .5);animation-name:ripple}
+.a-fog i{width:160%;height:120px;left:-30%!important;border-radius:50%;background:radial-gradient(ellipse,hsl(0 60% 30% / .25),transparent 70%);animation-name:fog}
+.a-fog{animation:flick 5s infinite}
+@keyframes rise{from{transform:translateY(60px) scale(var(--s));opacity:0}20%{opacity:.9}to{transform:translateY(-260px) scale(var(--s));opacity:0}}
+@keyframes rain{from{transform:translate(0,-120px) rotate(12deg)}to{transform:translate(-60px,520px) rotate(12deg)}}
+@keyframes fall{from{transform:translate(0,-200px) rotate(0)}to{transform:translate(70px,560px) rotate(540deg)}}
+@keyframes float{50%{transform:translate(18px,-22px) scale(1.15)}}
+@keyframes tw{0%,100%{opacity:0;transform:scale(.4)}50%{opacity:1;transform:scale(calc(1.4 * var(--s)))}}
+@keyframes speed{to{transform:translateX(380%)}}
+@keyframes scan{from{top:-40px}to{top:100%}}
+@keyframes ripple{from{transform:scale(1);opacity:.8}to{transform:scale(14);opacity:0}}
+@keyframes fog{50%{transform:translateX(20%)}}
+@keyframes flick{0%,100%{opacity:1}47%{opacity:1}48%{opacity:.4}49%{opacity:1}}
+.altar .arr{position:absolute!important;top:82px;width:38px;height:38px;border-radius:50%;border:1px solid hsl(var(--h) 50% 50% / .45);background:#0e0d0caa;color:var(--tg);font:600 22px/1 Inter;z-index:2!important;display:flex;align-items:center;justify-content:center;padding:0 0 3px}
+.altar .arr.l{left:14px}.altar .arr.r{right:14px}
 </style>
 
 </head>
@@ -3389,13 +3427,17 @@ function v2Head(){const H=HEADS[view];if(!H)return;const m=$("main");const old=m
  const d=document.createElement("div");d.className="ptop";d.innerHTML=`<div class="nobori">${H[0]}<small>${H[3]}</small></div><div class="pt"><h1>${H[1]}</h1><p>${H[2]}</p>${extra}</div>`;m.prepend(d)}
 ["rColl","rTeam","rAdv","rMarket","rGuild","rEvt","rHome"].forEach(n=>{const f=window[n]||eval(n);const w=function(){const r=f.apply(this,arguments);try{v2Head()}catch(e){console.warn(e)}return r};eval(n+"=w")});
 const ONO=["ドン","ゴゴゴ","バーン","ドドド"];
+const AMB={mix:"dust",shonen:"ember",seinen:"rain",shojo:"petal",josei:"bokeh",isekai:"spark",fantasy:"spark",mecha:"grid",scifi:"star",sport:"speed",romance:"petal",comedy:"confetti",sol:"leaf",psy:"ripple",horror:"fog"};
+function ambHTML(t,h){const R=(a,b)=>a+Math.random()*(b-a);let n={dust:16,ember:16,rain:28,petal:12,bokeh:9,spark:14,grid:0,star:22,speed:10,confetti:16,leaf:10,ripple:3,fog:3}[t]||0,s="";
+ for(let i=0;i<n;i++){const st=`left:${R(0,100)}%;top:${R(0,100)}%;animation-delay:-${R(0,8).toFixed(2)}s;animation-duration:${R(t==="rain"?.7:3,t==="rain"?1.3:t==="ripple"?6:9).toFixed(2)}s;--s:${R(.6,1.4).toFixed(2)};--hh:${(h+R(-25,25))|0}`;s+=`<i style="${st}"></i>`}
+ return`<div class="amb a-${t}">${s}</div>`}
 function rHub(){const P=PK(S.pack),ev=EV(),st=storyState(),A=arenaState(),R=arank(A.pts);const all=Object.values(S.coll);initProfile();
  const spct=Math.min(100,Math.round(Object.keys(st.done).length/(CHAP*STAGES*3)*100));
  const mis=QUESTS.filter(q=>S.daily.claimed[q.k]).length,PS=passState(),pl=passLvl(),left=PITY-S.pity;
  const recent=all.slice(-5).reverse(),team=teamCards(),md=sumMode();
  const ENSO=`<svg viewBox="0 0 150 150"><path d="M75 12 A63 63 0 1 1 30 31" fill="none" stroke="#c9a45c" stroke-width="7" stroke-linecap="round" opacity=".9"/><path d="M75 20 A55 55 0 1 1 36 37" fill="none" stroke="#c9a45c" stroke-width="1.5" opacity=".35"/></svg>`;
  $("main").innerHTML=`<div class="greet">おかえり<b>${esc(S.prof.name)}</b></div>
- <div class="altar"><div class="torii"></div><div class="circ">${ENSO}<span>${P.kj}</span></div><h2>${esc(P.name)}</h2><div class="pd">${esc(P.d)}</div><button class="chg" id="hPick">Changer de booster ›</button>
+ <div class="altar" style="--h:${P.h}">${ambHTML(AMB[P.id]||"dust",P.h)}<div class="torii"></div><button class="arr l" data-d="-1">‹</button><button class="arr r" data-d="1">›</button><div class="circ">${ENSO}<span>${P.kj}</span></div><h2>${esc(P.name)}</h2><div class="pd">${esc(P.d)}</div><button class="chg" id="hPick">Changer de booster ›</button>
   <div class="modes">${["ink","manga","booster"].map(k=>`<button class="mode ${md===k?"on":""}" data-m="${k}"><i>${SUMS[k].ic}</i><b>${SUMS[k].n}</b><small>${{ink:"Calligraphie notée",manga:"Série au choix",booster:"Rapide, ×5 / ×10"}[k]}</small></button>`).join("")}</div>
   <button class="btn go" id="hOpen">Invoquer · ${SUMS[md].n}</button></div>
  <div class="duo"><div class="pn p2" id="hStory" style="--kc:#d6452f"><span class="k2">物</span><span class="t2">Histoire</span><div class="h2">${st.fin?"Terminée":"Chapitre "+(st.ch+1)}</div><div class="s2">${st.fin?"Rejoue en difficulté supérieure":esc(CH_NAMES[Math.min(st.ch,CHAP-1)])}</div><div class="xpbar"><i style="width:${spct}%"></i></div><span class="go">Continuer ›</span></div>
@@ -3417,6 +3459,7 @@ function rHub(){const P=PK(S.pack),ev=EV(),st=storyState(),A=arenaState(),R=aran
  setTimeout(()=>document.querySelectorAll("#main .cloudslot").forEach(el=>{if(CL.user)el.innerHTML="";else cloudBind(el)}),0);
  const go=v=>{view=v;setNav();render();$("main").scrollTop=0};
  $("main").querySelectorAll("[data-m]").forEach(b=>b.onclick=()=>{S.summon=b.dataset.m;save();sfx.select&&sfx.select();rHub()});
+ $("main").querySelectorAll(".arr").forEach(b=>b.onclick=()=>{const i=PACKS.findIndex(x=>x.id===(S.pack||"mix"));S.pack=PACKS[(i+ +b.dataset.d+PACKS.length)%PACKS.length].id;save();sfx.select&&sfx.select();rHub()});
  $("hOpen").onclick=()=>{go("home");setTimeout(()=>openPack(false),60)};$("hPick").onclick=()=>go("home");
  $("hStory").onclick=showStory;$("hArena").onclick=showArena;
  $("main").querySelectorAll("[data-q]").forEach(el=>el.onclick=()=>{const q=el.dataset.q;if(q==="pass")showPass();else if(q==="tower")towerPrompt();else if(q==="pity")go("home");else go(q)});
