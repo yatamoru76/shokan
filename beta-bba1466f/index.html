@@ -3584,7 +3584,7 @@ function rHub(){const P=PK(S.pack),ev=EV(),st=storyState(),A=arenaState(),R=aran
  $("main").innerHTML=`<div class="greet">おかえり<b>${esc(S.prof.name)}</b></div>
  <div class="altar" style="--h:${P.h}">${ambHTML(AMB[P.id]||"dust",P.h)}<div class="torii"></div><button class="arr l" data-d="-1">‹</button><button class="arr r" data-d="1">›</button><div class="circ">${ENSO}<span>${P.kj}</span></div><h2>${esc(P.name)}</h2><div class="pd">${esc(P.d)}</div><button class="chg" id="hPick">Changer de booster ›</button>
   <div class="modes">${["ink","manga","booster"].map(k=>`<button class="mode ${md===k?"on":""}" data-m="${k}"><i>${SUMS[k].ic}</i><b>${SUMS[k].n}</b><small>${{ink:"Calligraphie notée",manga:"Série au choix",booster:"Rapide, ×5 / ×10"}[k]}</small></button>`).join("")}</div>
-  <button class="btn go" id="hOpen">Invoquer · ${SUMS[md].n}</button></div>
+  <button class="btn go" id="hOpen">${S.boosters>0?"Invoquer · "+SUMS[md].n:"Prochain booster dans "+fmtT(S.nextAt-Date.now())}</button></div>
  <div class="duo"><div class="pn p2" id="hStory" style="--kc:#d6452f"><span class="k2">物</span><span class="t2">Histoire</span><div class="h2">${st.fin?"Terminée":"Chapitre "+(st.ch+1)}</div><div class="s2">${st.fin?"Rejoue en difficulté supérieure":esc(CH_NAMES[Math.min(st.ch,CHAP-1)])}</div><div class="xpbar"><i style="width:${spct}%"></i></div><span class="go">Continuer ›</span></div>
   <div class="pn p3" id="hArena" style="--kc:#c9a45c"><span class="k2">闘</span><span class="t2">Arène</span><div class="h2">${R.ic} ${esc(R.n)}</div><div class="s2">${fmt(A.pts)} points</div><span class="go">Combattre ›</span></div></div>
  ${sec("一","Aujourd'hui","今日")}
@@ -3605,7 +3605,7 @@ function rHub(){const P=PK(S.pack),ev=EV(),st=storyState(),A=arenaState(),R=aran
  const go=v=>{view=v;setNav();render();$("main").scrollTop=0};
  $("main").querySelectorAll("[data-m]").forEach(b=>b.onclick=()=>{S.summon=b.dataset.m;save();sfx.select&&sfx.select();rHub()});
  $("main").querySelectorAll(".arr").forEach(b=>b.onclick=()=>{const i=PACKS.findIndex(x=>x.id===(S.pack||"mix"));S.pack=PACKS[(i+ +b.dataset.d+PACKS.length)%PACKS.length].id;save();sfx.select&&sfx.select();rHub()});
- $("hOpen").onclick=()=>{go("home");setTimeout(()=>openPack(false),60)};$("hPick").onclick=()=>go("home");
+ $("hOpen").onclick=()=>{go("home");if(S.boosters>0)setTimeout(()=>openPack(false),60)};$("hPick").onclick=()=>go("home");
  $("hStory").onclick=showStory;$("hArena").onclick=showArena;
  $("main").querySelectorAll("[data-q]").forEach(el=>el.onclick=()=>{const q=el.dataset.q;if(q==="pass")showPass();else if(q==="tower")towerPrompt();else if(q==="pity")go("home");else go(q)});
  $("main").querySelectorAll(".tile").forEach(el=>el.onclick=()=>{const t=el.dataset.t;if(t==="raid")go("evt");else go(t.slice(2))});
