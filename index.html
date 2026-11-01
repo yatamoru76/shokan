@@ -896,6 +896,29 @@ nav button{font-size:9.5px}
 .frrow{display:flex;align-items:center;gap:8px;background:var(--bg2);border:1px solid var(--line);border-radius:14px;padding:8px 10px;margin-bottom:7px}.frrow.res{border-style:dashed}
 .frn{flex:1;min-width:0;display:flex;flex-direction:column}.frn b{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.frn span{font-size:11.5px}
 .frcode{font-family:ui-monospace,monospace;letter-spacing:.1em;color:#ffd34d}.frx{padding:6px 10px!important}
+#live{position:absolute;inset:0;z-index:48;display:none;flex-direction:column;background:radial-gradient(circle at 50% 45%,#2a120c,#09090c 70%);padding:10px;gap:8px}
+#live.on{display:flex}
+.lvhead{display:flex;justify-content:space-between;align-items:center;gap:8px;font-size:13px;font-weight:800}.lvhead b{color:#ffd34d}
+.lvrow{display:flex;justify-content:center;gap:6px;flex-wrap:nowrap}
+.lvu{width:18.5%;max-width:96px;position:relative;cursor:pointer;transition:transform .15s,opacity .3s}
+.lvu.dead{opacity:.25;filter:grayscale(1);pointer-events:none}
+.lvu.sel{transform:translateY(-10px)}.lvu.sel .lvc{box-shadow:0 0 0 3px #ffd34d,0 0 22px #ffd34d}
+.lvu.tgt .lvc{box-shadow:0 0 0 2px #ff3d6e;animation:tgt 1s infinite alternate}@keyframes tgt{to{box-shadow:0 0 0 3px #ff3d6e,0 0 18px #ff3d6e}}
+.lvc{position:relative;aspect-ratio:2.5/3.6;border-radius:10px;overflow:hidden;border:2px solid var(--rc,#555);background:#222}
+.lvc.C{--rc:var(--C)}.lvc.R{--rc:var(--R)}.lvc.E{--rc:var(--E)}.lvc.L{--rc:var(--L)}.lvc.M{--rc:var(--M)}.lvc.D{--rc:var(--D)}.lvc.X{--rc:var(--X)}
+.lvc img{width:100%;height:100%;object-fit:cover;display:block}
+.lvel{position:absolute;top:3px;right:3px;font-size:10px;background:#000a;border-radius:6px;padding:0 3px}.lvsh{position:absolute;top:3px;left:3px;font-size:12px}
+.lvhp,.lven{height:5px;border-radius:9px;background:#ffffff1c;margin-top:3px;overflow:hidden}.lvhp i{display:block;height:100%;background:linear-gradient(90deg,#34d399,#a3f7bf)}.lven i{display:block;height:100%;background:#4da3ff}.lven.full i{background:#ffd34d;box-shadow:0 0 8px #ffd34d}
+.lvnm{font-size:9.5px;font-weight:700;text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:2px}
+.lvlog{flex:1;display:flex;flex-direction:column;justify-content:center;align-items:center;font-size:12.5px;font-weight:700;text-align:center;gap:3px;min-height:60px}
+.lvbar{background:#141419;border:1px solid var(--line);border-radius:16px;padding:10px;display:flex;flex-direction:column;gap:8px}
+.lvhint{text-align:center;font-size:13px}.lvres{text-align:center;font-weight:900;font-size:22px}
+.lvdmg{position:absolute;left:0;right:0;top:20%;text-align:center;font-weight:900;font-size:18px;color:#fff;text-shadow:0 2px 6px #000,0 0 10px #ff3d6e;animation:dmg .9s forwards;pointer-events:none;z-index:3}
+.lvdmg.crit{font-size:23px;color:#ffd34d}.lvdmg.heal{color:#3bff9c;text-shadow:0 2px 6px #000}
+#lvflash{position:absolute;inset:0;background:#fff;opacity:0;pointer-events:none}#lvflash.on{animation:flash .45s}
+.lvwait{margin:auto;display:flex;flex-direction:column;align-items:center;gap:8px}
+.lvsp{width:46px;height:46px;border-radius:50%;border:4px solid #ffffff22;border-top-color:var(--acc);animation:spin .9s linear infinite}
+@media (min-width:900px){#live{padding:20px 12%}.lvu{max-width:130px}.lvnm{font-size:11px}}
 </style>
 <link rel="manifest" href="manifest.webmanifest"><meta name="theme-color" content="#09090c"><link rel="icon" href="icon-192.png"><link rel="apple-touch-icon" href="icon-192.png"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="description" content="Shōkan · jeu gratuit de cartes anime : ouvre des mangas, collectionne, combats, guildes et arène."></head>
 <body>
@@ -922,6 +945,7 @@ nav button{font-size:9.5px}
  <div id="dlg" class="ovl"></div>
  <div id="shelf" class="ovl"></div>
  <div id="lore"></div>
+ <div id="live"></div>
  <div id="battle" class="ovl"><div id="bbg"></div>
   <div id="bhead"><span id="btitle"></span><span id="bround"></span></div>
   <div class="bside" id="bEnemy"></div>
@@ -2138,7 +2162,7 @@ function cloudBox(){if(!CL.ready&&!CL.user)return`<div class="cloudbox"><b>☁�
  const av=cloudAvatar();return`<div class="cloudbox on"><div style="display:flex;align-items:center;gap:10px">${av?`<img src="${esc(av)}" class="clav" referrerpolicy="no-referrer">`:'<div class="clav">🎮</div>'}<div style="flex:1;min-width:0"><b>${esc(cloudName())}</b><div class="muted" style="font-size:12px">${CL.err?"⚠️ "+esc(CL.err):CL.last?"☁️ Sauvegardé "+ago(CL.last):"☁️ Compte Discord connecté"}</div></div></div>
  <div class="row2" style="margin-top:8px"><button class="btn sm" data-cl="push">☁️ Sauvegarder maintenant</button><button class="btn ghost sm" data-cl="out">Se déconnecter</button></div></div>`}
 function cloudBind(root){(root||document).querySelectorAll("[data-cl]").forEach(b=>b.onclick=async()=>{const k=b.dataset.cl;if(k==="in")cloudLogin();else if(k==="out")cloudLogout();else{b.disabled=true;await cloudPush(true);toast(CL.err?"⚠️ Échec : "+CL.err:"☁️ Partie sauvegardée en ligne")}})}
-function cloudUI(){const cf=$("cFriends");if(cf){cf.style.display=CL.ready?"":"none";if(CL.user&&!cloudUI.fb){cloudUI.fb=1;friendBadge();pushPlayer();setInterval(friendBadge,60000)}}document.querySelectorAll(".cloudslot").forEach(el=>{el.innerHTML=cloudBox();cloudBind(el)});const c=$("cCloud");if(c){c.style.display=CL.ready?"":"none";c.textContent=CL.user?"☁️":"☁️"; c.classList.toggle("off",!CL.user)}}
+function cloudUI(){const cf=$("cFriends");if(cf){cf.style.display=CL.ready?"":"none";if(CL.user&&!cloudUI.fb){cloudUI.fb=1;friendBadge();pushPlayer();lvInbox();setInterval(friendBadge,60000)}}document.querySelectorAll(".cloudslot").forEach(el=>{el.innerHTML=cloudBox();cloudBind(el)});const c=$("cCloud");if(c){c.style.display=CL.ready?"":"none";c.textContent=CL.user?"☁️":"☁️"; c.classList.toggle("off",!CL.user)}}
 
 
 // ================= PARAMÈTRES + CODES CADEAUX =================
@@ -2363,14 +2387,15 @@ async function showFriends(){const p=$("picker");p.style.display="flex";
  <div class="frsearch"><input id="frQ" type="search" placeholder="🔍 Chercher un joueur (pseudo ou code ami)" value="${esc(FR.q)}" autocomplete="off"></div><div id="frRes"></div>
  ${inc.length?`<div class="sec"><span class="no">📩</span><span class="t">Demandes reçues</span><span class="jp">申請</span></div>${inc.map(r=>{const o=pl[other(r)];return`<div class="frrow">${frAv(o)}<div class="frn"><b>${esc(o?o.name:"Joueur")}</b><span class="muted">${esc(o&&o.title||"")}</span></div><button class="btn sm" style="width:auto" data-fa="${r.id}">✓</button><button class="btn ghost sm" style="width:auto" data-fd="${r.id}">✕</button></div>`}).join("")}`:""}
  <div class="sec"><span class="no">⚔️</span><span class="t">Mes amis</span><span class="jp">友達</span></div>
- <div class="muted" style="font-size:12px;margin:-4px 2px 8px">Combat amical : sans points de classement · récompense ${fd.left>0?`+25 💠 (encore ${fd.left}/5 aujourd'hui)`:"du jour déjà prise"}</div>
- ${acc.length?acc.map(r=>{const o=pl[other(r)];return`<div class="frrow">${frAv(o)}<div class="frn"><b>${esc(o?o.name:"Joueur")}</b><span class="muted">${o?`Niv. ${o.lvl||1} · ⚡ ${fmt(o.power||0)}`:""}</span></div><button class="btn sm" style="width:auto" data-ff="${other(r)}" ${o&&o.team&&o.team.length&&S.team.length?"":"disabled"}>⚔️ Combat</button><button class="btn ghost sm frx" style="width:auto" data-fd="${r.id}" title="Retirer">✕</button></div>`}).join(""):'<div class="box muted" style="text-align:center;font-size:12.5px">Pas encore d\'amis. Cherche le pseudo d\'un pote juste au-dessus !</div>'}
+ <div class="muted" style="font-size:12px;margin:-4px 2px 8px">⚔️ Auto : contre son équipe, combat automatique · 🔴 Direct : en même temps que lui, tour par tour, tu choisis qui attaque qui. Sans points de classement · récompense ${fd.left>0?`+25 💠 (encore ${fd.left}/5 aujourd'hui)`:"du jour déjà prise"}</div>
+ ${acc.length?acc.map(r=>{const o=pl[other(r)];return`<div class="frrow">${frAv(o)}<div class="frn"><b>${esc(o?o.name:"Joueur")}</b><span class="muted">${o?`Niv. ${o.lvl||1} · ⚡ ${fmt(o.power||0)}`:""}</span></div><button class="btn sm" style="width:auto" data-ff="${other(r)}" ${o&&o.team&&o.team.length&&S.team.length?"":"disabled"} title="Contre son équipe (automatique)">⚔️ Auto</button><button class="btn gold sm" style="width:auto" data-fl="${other(r)}" ${S.team.length?"":"disabled"} title="En direct, tour par tour">🔴 Direct</button><button class="btn ghost sm frx" style="width:auto" data-fd="${r.id}" title="Retirer">✕</button></div>`}).join(""):'<div class="box muted" style="text-align:center;font-size:12.5px">Pas encore d\'amis. Cherche le pseudo d\'un pote juste au-dessus !</div>'}
  ${out.length?`<div class="sec"><span class="no">⏳</span><span class="t">Demandes envoyées</span><span class="jp">送信</span></div>${out.map(r=>{const o=pl[other(r)];return`<div class="frrow">${frAv(o)}<div class="frn"><b>${esc(o?o.name:"Joueur")}</b><span class="muted">En attente…</span></div><button class="btn ghost sm" style="width:auto" data-fd="${r.id}">Annuler</button></div>`}).join("")}`:""}
  <div style="height:30px"></div></div>`;
  $("frClose").onclick=()=>{p.style.display="none";updateTop()};
  const q=$("frQ");q.oninput=()=>{FR.q=q.value;clearTimeout(FR.t);FR.t=setTimeout(frSearch,350)};if(FR.q)frSearch();
  p.querySelectorAll("[data-fa]").forEach(b=>b.onclick=async()=>{b.disabled=true;const {error}=await CL.sb.from("friends").update({status:"accepted"}).eq("id",+b.dataset.fa);if(error)toast("⚠️ "+error.message);else{toast("👥 Ami ajouté !");sfx.coin()}showFriends()});
  p.querySelectorAll("[data-fd]").forEach(b=>b.onclick=async()=>{b.disabled=true;await CL.sb.from("friends").delete().eq("id",+b.dataset.fd);showFriends()});
+ p.querySelectorAll("[data-fl]").forEach(b=>b.onclick=()=>{const o=pl[b.dataset.fl]||{user_id:b.dataset.fl,name:"Ton ami"};p.style.display="none";lvInvite(o)});
  p.querySelectorAll("[data-ff]").forEach(b=>b.onclick=()=>{const o=pl[b.dataset.ff];if(!o||!o.team)return;const en=o.team.map(c=>{const f=mkFoe(c,1,false);f.maxhp=c.hp;f.atk=c.atk;f.spd=c.spd;return f});p.style.display="none";
   startBattle({type:"friendly",friend:o,enemies:en,title:"🤝 Combat amical · "+o.name,loc:"arena"})})}
 async function frSearch(){const el=$("frRes");if(!el)return;const q=FR.q.trim();if(q.length<2){el.innerHTML="";return}el.innerHTML='<div class="muted" style="padding:8px">Recherche…</div>';
@@ -2385,6 +2410,82 @@ async function frSearch(){const el=$("frRes");if(!el)return;const q=FR.q.trim();
 function fDaily(){S.fr=S.fr||{day:"",n:0};if(S.fr.day!==today()){S.fr={day:today(),n:0}}return{left:5-S.fr.n}}
 function friendlyEnd(c,won){const f=fDaily();let rw="";if(won&&f.left>0){S.fr.n++;S.shards+=25;rw="<p>+25 💠</p>"}save();
  return`<p>🤝 Combat amical contre <b>${esc(c.friend.name||"ton ami")}</b></p><p class="muted">Aucun point de classement en jeu.</p>${rw}`}
+
+
+// ================= COMBAT AMICAL EN DIRECT (tour par tour, temps réel via Supabase Realtime) =================
+const LV={ch:null,inbox:null,mid:null,host:false,side:null,st:null,sel:null,act:"atk",tick:null,opp:null,lastSeen:0};
+const LV_TURN=30000;
+function lvInbox(){if(!pvpOn()||LV.inbox)return;LV.inbox=CL.sb.channel("u-"+CL.user.id,{config:{broadcast:{self:false}}})
+ .on("broadcast",{event:"invite"},({payload:p})=>{if(LV.mid)return;sfx.select();modal(`<h3>⚔️ Défi en direct !</h3><div style="display:flex;align-items:center;gap:10px;justify-content:center;margin:8px 0">${frAv(p.from)}<b>${esc(p.from.name)}</b></div><p class="muted">te défie en combat amical en direct (tour par tour).</p>`,[["Refuser",()=>lvSend("u-"+p.from.id,"decline",{mid:p.mid})],["⚔️ Accepter",()=>lvAccept(p)]])})
+ .on("broadcast",{event:"accept"},({payload:p})=>{if(LV.mid===p.mid&&LV.host&&!LV.st)lvStart(p)})
+ .on("broadcast",{event:"decline"},({payload:p})=>{if(LV.mid===p.mid){LV.mid=null;$("modal").style.display="none";toast("❌ Défi refusé");lvClose()}})
+ .subscribe()}
+function lvSend(chName,ev,payload){const c=CL.sb.channel(chName,{config:{broadcast:{self:false}}});c.subscribe(s=>{if(s==="SUBSCRIBED"){c.send({type:"broadcast",event:ev,payload});setTimeout(()=>CL.sb.removeChannel(c),1500)}})}
+function lvUnits(team){return(team||[]).slice(0,5).map(c=>{const e=elOf(c),k=clsOf(c);return{name:c.name,img:c.img,rarity:c.rarity,el:e.id,cls:k.id,hp:c.hp,maxhp:c.hp,atk:c.atk,spd:c.spd,en:0,sh:0}})}
+function lvMe(){initProfile();return{id:CL.user.id,name:S.prof.name,avatar:cloudAvatar()||null}}
+async function lvInvite(friend){if(!S.team.length){toast("Ajoute des persos à ton équipe");return}lvInbox();LV.mid=Math.random().toString(36).slice(2,10);LV.host=true;LV.side="h";LV.st=null;LV.opp={id:friend.user_id,name:friend.name,avatar:friend.avatar};LV.myTeam=defenseTeam();
+ lvJoin();lvSend("u-"+friend.user_id,"invite",{mid:LV.mid,from:lvMe()});
+ modal(`<h3>⚔️ Défi envoyé</h3><p class="muted">En attente de <b>${esc(friend.name)}</b>… Il doit avoir le jeu ouvert et être connecté.</p>`,[["Annuler",()=>{lvSend("u-"+friend.user_id,"decline",{mid:LV.mid});LV.mid=null;lvClose()}]]);
+ setTimeout(()=>{if(LV.mid&&!LV.st&&LV.host){$("modal").style.display="none";toast("⌛ Pas de réponse de "+friend.name);LV.mid=null;lvClose()}},45000)}
+function lvAccept(p){if(!S.team.length){toast("Ajoute des persos à ton équipe");return}LV.mid=p.mid;LV.host=false;LV.side="g";LV.st=null;LV.opp=p.from;lvJoin();
+ setTimeout(()=>lvSend("u-"+p.from.id,"accept",{mid:p.mid,team:defenseTeam(),who:lvMe()}),400);lvShow();lvRender();clearInterval(LV.tick);LV.tick=setInterval(lvTick,1000)}
+function lvJoin(){if(LV.ch)CL.sb.removeChannel(LV.ch);LV.ch=CL.sb.channel("m-"+LV.mid,{config:{broadcast:{self:false}}})
+ .on("broadcast",{event:"state"},({payload})=>{if(!LV.host){const prev=LV.st;LV.st=payload;LV.lastSeen=Date.now();lvAnim(prev,payload);lvRender()}})
+ .on("broadcast",{event:"act"},({payload})=>{if(LV.host&&LV.st&&LV.st.turn==="g"&&!LV.st.over){lvResolve("g",payload.u,payload.t,payload.k)}})
+ .on("broadcast",{event:"ping"},()=>{LV.lastSeen=Date.now()})
+ .on("broadcast",{event:"quit"},()=>{if(LV.st&&!LV.st.over){LV.st.over=LV.side;LV.st.log.unshift("🏳️ L'adversaire a quitté le combat.");if(LV.host)lvPush();lvRender();lvEnd()}})
+ .subscribe(s=>{if(s==="SUBSCRIBED"&&LV.host&&LV.st)lvPush()})}
+function lvStart(p){$("modal").style.display="none";LV.opp=Object.assign(LV.opp||{},p.who||{});const h=lvUnits(LV.myTeam),g=lvUnits(p.team);
+ const sh=h.reduce((a,u)=>a+u.spd,0),sg=g.reduce((a,u)=>a+u.spd,0);LV.st={h,g,names:{h:lvMe().name,g:(p.who&&p.who.name)||LV.opp.name},turn:sh>=sg?"h":"g",n:1,log:["⚔️ Le combat commence !"],over:null,deadline:Date.now()+LV_TURN,last:null};
+ lvShow();lvPush();lvRender();clearInterval(LV.tick);LV.tick=setInterval(lvTick,1000)}
+function lvPush(){if(LV.ch&&LV.st)LV.ch.send({type:"broadcast",event:"state",payload:LV.st})}
+function lvTick(){if(!LV.st)return;if(LV.ch)LV.ch.send({type:"broadcast",event:"ping",payload:{}});lvRender(true);
+ if(LV.host&&!LV.st.over&&Date.now()>LV.st.deadline){const s=LV.st.turn,me=LV.st[s],foe=LV.st[s==="h"?"g":"h"];const u=me.findIndex(x=>x.hp>0),t=foe.findIndex(x=>x.hp>0);if(u>=0&&t>=0){LV.st.log.unshift("⌛ Temps écoulé : attaque automatique.");lvResolve(s,u,t,"atk")}}
+ if(LV.lastSeen&&Date.now()-LV.lastSeen>25000&&LV.st&&!LV.st.over){LV.st.over=LV.side;LV.st.log.unshift("📡 L'adversaire s'est déconnecté.");lvRender();lvEnd()}}
+function lvResolve(side,ui,ti,kind){const st=LV.st,me=st[side],foe=st[side==="h"?"g":"h"],u=me[ui];if(!u||u.hp<=0)return;let t=foe[ti];if(kind!=="ult"&&(!t||t.hp<=0))t=foe.find(x=>x.hp>0);
+ const ev={side,ui,kind,hits:[]};const adv=(a,b)=>ADV[a.el]===b.el?1.3:ADV[b.el]===a.el?.8:1;
+ const hit=(x,m)=>{const crit=Math.random()<(u.cls==="ass"?.25:.1),a=adv(u,x);let d=Math.round(u.atk*m*3*a*(crit?1.8:1)*(.9+Math.random()*.2));let ab=0;if(x.sh>0){ab=Math.min(x.sh,d);x.sh-=ab;d-=ab}x.hp=Math.max(0,x.hp-d);x.en=Math.min(100,x.en+12);ev.hits.push({ti:foe.indexOf(x),d,crit,a,ab})};
+ if(kind==="ult"&&u.en>=100){u.en=0;
+  if(u.cls==="mag"){foe.filter(x=>x.hp>0).forEach(x=>hit(x,1.15))}
+  else if(u.cls==="hea"){me.filter(x=>x.hp>0).forEach(x=>{const h=Math.round(u.maxhp*.3);x.hp=Math.min(x.maxhp,x.hp+h);ev.hits.push({heal:me.indexOf(x),d:h})})}
+  else if(u.cls==="tnk"){me.filter(x=>x.hp>0).forEach(x=>{x.sh=Math.min(Math.round(x.maxhp*.3),x.sh+Math.round(u.maxhp*.25));ev.hits.push({shield:me.indexOf(x)})})}
+  else hit(t,u.cls==="ass"?3.2:2.6);st.log.unshift(`💥 ${u.name} lance son ULTIME !`)}
+ else{kind="atk";hit(t,1);u.en=Math.min(100,u.en+(RI[u.rarity]>=3?34:25));st.log.unshift(`${u.name} attaque ${t.name} (${fmt(ev.hits[0].d)})`)}
+ ev.kind=kind;st.last=ev;st.log=st.log.slice(0,6);
+ if(!foe.some(x=>x.hp>0))st.over=side;else if(!me.some(x=>x.hp>0))st.over=side==="h"?"g":"h";
+ else{st.turn=side==="h"?"g":"h";st.n++;st.deadline=Date.now()+LV_TURN}
+ const prev=JSON.parse(JSON.stringify(st));lvPush();lvAnim(null,st);lvRender();if(st.over)lvEnd()}
+function lvShow(){const o=$("live");o.classList.add("on");if(typeof music==="function")music("battle")}
+function lvClose(){const o=$("live");o.classList.remove("on");o.innerHTML="";clearInterval(LV.tick);if(LV.ch){try{CL.sb.removeChannel(LV.ch)}catch(_){}LV.ch=null}LV.st=null;LV.mid=null;LV.sel=null;LV.lastSeen=0;if(typeof render==="function")render()}
+function lvAnim(prev,st){const ev=st&&st.last;if(!ev)return;setTimeout(()=>{const foeSide=ev.side===LV.side?"opp":"me",meSide=ev.side===LV.side?"me":"opp";
+ const src=document.querySelector(`#live .lvu[data-s="${meSide}"][data-i="${ev.ui}"]`);if(src)src.animate([{transform:"none"},{transform:`translateY(${meSide==="me"?-26:26}px) scale(1.08)`},{transform:"none"}],{duration:320});
+ ev.hits.forEach(h=>{const sel=h.heal!==undefined?`[data-s="${meSide}"][data-i="${h.heal}"]`:h.shield!==undefined?`[data-s="${meSide}"][data-i="${h.shield}"]`:`[data-s="${foeSide}"][data-i="${h.ti}"]`;const el=document.querySelector("#live .lvu"+sel);if(!el)return;
+  const d=document.createElement("div");d.className="lvdmg"+(h.crit?" crit":"")+(h.heal!==undefined?" heal":"");d.textContent=h.heal!==undefined?"+"+fmt(h.d):h.shield!==undefined?"🛡️":fmt(h.d)+(h.crit?" !":"");el.appendChild(d);setTimeout(()=>d.remove(),900);
+  if(h.heal===undefined&&h.shield===undefined){el.animate([{transform:"none",filter:"brightness(3)"},{transform:"translateX(-6px)"},{transform:"translateX(6px)"},{transform:"none",filter:"none"}],{duration:300})}});
+ if(ev.kind==="ult"){const f=$("lvflash");f.classList.remove("on");void f.offsetWidth;f.classList.add("on");sfx.ult();shakeLive()}else sfx.hit()},40)}
+function shakeLive(){const o=$("live");o.animate([{transform:"none"},{transform:"translate(8px,-4px)"},{transform:"translate(-8px,4px)"},{transform:"none"}],{duration:260})}
+function lvRender(onlyTimer){const o=$("live");if(!o.classList.contains("on"))return;const st=LV.st;
+ if(!st){o.innerHTML=`<div class="lvwait"><div class="lvsp"></div><b>Connexion au combat…</b><span class="muted">${esc(LV.opp?LV.opp.name:"")}</span><button class="btn ghost sm" id="lvQuit" style="width:auto;margin-top:14px">Quitter</button></div>`;$("lvQuit").onclick=()=>{lvQuit()};return}
+ const me=st[LV.side],op=st[LV.side==="h"?"g":"h"],my=st.turn===LV.side&&!st.over,left=Math.max(0,Math.ceil((st.deadline-Date.now())/1000));
+ if(onlyTimer){const t=$("lvT");if(t)t.textContent=st.over?"":(my?"Ton tour":"Tour adverse")+" · "+left+" s";return}
+ if(LV.sel!==null&&(!me[LV.sel]||me[LV.sel].hp<=0))LV.sel=null;if(my&&LV.sel===null)LV.sel=me.findIndex(x=>x.hp>0);
+ const unit=(u,i,s)=>{const E=ELS.find(e=>e.id===u.el),K=CLS.find(k=>k.id===u.cls);return`<div class="lvu ${u.hp<=0?"dead":""} ${s==="me"&&LV.sel===i&&my?"sel":""} ${s==="opp"&&my&&LV.sel!==null&&u.hp>0?"tgt":""}" data-s="${s}" data-i="${i}">
+  <div class="lvc ${u.rarity}"><img src="${esc(u.img)}" referrerpolicy="no-referrer" draggable="false"><span class="lvel">${E?E.ic:""}${K?K.ic:""}</span>${u.sh>0?'<span class="lvsh">🛡️</span>':""}</div>
+  <div class="lvhp"><i style="width:${u.hp/u.maxhp*100}%"></i></div><div class="lven ${u.en>=100?"full":""}"><i style="width:${u.en}%"></i></div><div class="lvnm">${esc(u.name)}</div></div>`};
+ const su=LV.sel!==null?me[LV.sel]:null,canU=su&&su.en>=100&&RI[su.rarity]>=3;
+ o.innerHTML=`<div class="lvhead"><span>🤝 ${esc(st.names[LV.side==="h"?"g":"h"])}</span><b id="lvT">${st.over?"":(my?"Ton tour":"Tour adverse")+" · "+left+" s"}</b><button class="btn ghost sm" id="lvQuit" style="width:auto">🏳️</button></div>
+ <div class="lvrow">${op.map((u,i)=>unit(u,i,"opp")).join("")}</div>
+ <div class="lvlog">${st.log.slice(0,3).map((l,i)=>`<div style="opacity:${1-i*.3}">${esc(l)}</div>`).join("")}</div>
+ <div class="lvrow">${me.map((u,i)=>unit(u,i,"me")).join("")}</div>
+ <div class="lvbar">${st.over?`<div class="lvres">${st.over===LV.side?"🏆 VICTOIRE !":"💀 DÉFAITE…"}</div><button class="btn" id="lvOk">Continuer</button>`:my?`<div class="lvhint">${su?`<b>${esc(su.name)}</b> : choisis une cible en haut`:"Choisis ton perso"}</div><div class="row2"><button class="btn ${LV.act==="atk"?"":"ghost"} sm" id="lvAtk">⚔️ Attaque</button><button class="btn ${LV.act==="ult"?"gold":"ghost"} sm" id="lvUlt" ${canU?"":"disabled"}>💥 Ultime${su&&RI[su.rarity]<3?" (L+)":su?" "+Math.floor(su.en)+"%":""}</button></div>`:`<div class="lvhint">⏳ ${esc(st.names[st.turn])} réfléchit…</div>`}</div><div id="lvflash"></div>`;
+ $("lvQuit").onclick=()=>modal("<h3>Abandonner ?</h3><p class='muted'>Ton adversaire gagnera le combat.</p>",[["Non"],["🏳️ Abandonner",lvQuit]]);
+ const ok=$("lvOk");if(ok)ok.onclick=lvClose;
+ if(my){o.querySelectorAll('.lvu[data-s="me"]').forEach(el=>el.onclick=()=>{const i=+el.dataset.i;if(me[i].hp<=0)return;LV.sel=i;LV.act="atk";sfx.select();lvRender()});
+  const go=(ti)=>{if(LV.sel===null)return;const k=LV.act;if(k==="ult"&&!(su&&su.en>=100))return;if(LV.host)lvResolve(LV.side,LV.sel,ti,k);else{LV.ch.send({type:"broadcast",event:"act",payload:{u:LV.sel,t:ti,k}});LV.st.turn="x";lvRender()}LV.act="atk"};
+  o.querySelectorAll('.lvu[data-s="opp"]').forEach(el=>el.onclick=()=>{const i=+el.dataset.i;if(op[i].hp<=0)return;go(i)});
+  $("lvAtk").onclick=()=>{LV.act="atk";lvRender()};const ub=$("lvUlt");if(ub)ub.onclick=()=>{if(!canU)return;if(su.cls==="mag"||su.cls==="hea"||su.cls==="tnk"){LV.act="ult";go(op.findIndex(x=>x.hp>0))}else{LV.act="ult";lvRender();toast("💥 Choisis la cible de l'ultime")}}}}
+function lvQuit(){if(LV.ch)LV.ch.send({type:"broadcast",event:"quit",payload:{}});if(LV.st&&!LV.st.over){LV.st.over=LV.side==="h"?"g":"h"}lvClose()}
+function lvEnd(){clearInterval(LV.tick);const won=LV.st.over===LV.side;if(won){S.wins++;const f=fDaily();if(f.left>0){S.fr.n++;S.shards+=25;toast("🏆 Victoire en direct ! +25 💠")}else toast("🏆 Victoire en direct !");sfx.win()}else sfx.lose();pxp(won?25:10);save();updateTop()}
 
 // ================= RAID DE GUILDE =================
 const GBOSS=[{n:"Dragon de l'Éclipse",kj:"龍",el:"dark",c1:"#7b2cff",c2:"#ff4dd2",t:0},{n:"Hydre des Abysses",kj:"蛇",el:"water",c1:"#0b6bd6",c2:"#3bffd9",t:1},{n:"Phénix Écarlate",kj:"鳳",el:"fire",c1:"#ff4a1c",c2:"#ffd34d",t:2},{n:"Colosse du Tonnerre",kj:"雷",el:"thunder",c1:"#e8b400",c2:"#7fe3ff",t:3}];
