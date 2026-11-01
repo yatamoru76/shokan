@@ -865,7 +865,7 @@ nav button{font-size:9.5px}
 @keyframes lfin{from{opacity:0;transform:scale(1.08)}}@keyframes lfout{to{opacity:0}}
 .lfbar{position:absolute;left:0;right:0;height:16%;background:#000;z-index:3;display:flex;flex-direction:column;align-items:center;justify-content:center}.lfbar.t{top:0}.lfbar.b{bottom:0}
 .lfstage{position:absolute;inset:0;display:flex;align-items:center;justify-content:center}
-.lfvid{position:absolute;left:50%;top:50%;width:178vh;height:100vh;transform:translate(-50%,-50%);max-width:none;opacity:0;transition:opacity .4s;pointer-events:none}
+.lfvid{position:absolute;left:50%;top:50%;width:178vh;height:100vh;transform:translate(-50%,-50%) scale(1.18);max-width:none;opacity:0;transition:opacity .4s;pointer-events:none}
 #lfin.vid .lfvid{opacity:1}.lfvid iframe{width:100%;height:100%;border:0;pointer-events:none}
 .lffall{position:relative;display:flex;align-items:center;justify-content:center;transition:opacity .4s}
 #lfin.vid .lffall{opacity:0}
@@ -1317,7 +1317,7 @@ async function startScene(c){stopScene();const d=$("detail");const box=d.querySe
  const st=30+Math.floor(Math.random()*25);
  YTP=new YT.Player(holder,{videoId:c.trailer,playerVars:{autoplay:1,mute:1,controls:0,playsinline:1,rel:0,modestbranding:1,iv_load_policy:3,disablekb:1,fs:0,cc_load_policy:0,showinfo:0,start:st,end:st+10},
   events:{onReady:e=>{try{e.target.mute()}catch(_){}},
-   onStateChange:e=>{if(e.data===1)box.classList.add("on");if(e.data===2)box.classList.remove("on");if(e.data===0){try{e.target.loadVideoById({videoId:c.trailer,startSeconds:st,endSeconds:st+10})}catch(_){}}},onError:()=>{stopScene();box.classList.remove("on")}}})}
+   onStateChange:e=>{clearTimeout(box._sh);if(e.data===1)box._sh=setTimeout(()=>box.classList.add("on"),900);else box.classList.remove("on");if(e.data===0){try{e.target.loadVideoById({videoId:c.trailer,startSeconds:st,endSeconds:st+10})}catch(_){}}},onError:()=>{stopScene();box.classList.remove("on")}}})}
 
 // ================= FONDS ANIMÉS (Mythique, Divin, Cosmos) =================
 let FX=null;
@@ -1844,7 +1844,7 @@ async function legendaryFinish(u){if(B.skip||!u||!u.card)return;const c=u.card,o
  o.onclick=finish;let to=setTimeout(finish,(vid?Math.max(4,e-s)*1000+2600:3200)/Math.max(1,speed>2?2:1));
  if(vid&&sceneOn()){try{await loadYT();const h=document.createElement("div");$("lfVid").appendChild(h);
   LFP=new YT.Player(h,{videoId:vid,playerVars:{autoplay:1,mute:1,controls:0,playsinline:1,rel:0,modestbranding:1,iv_load_policy:3,disablekb:1,fs:0,start:s,end:e},
-   events:{onReady:ev=>{try{ev.target.playVideo()}catch(_){}},onStateChange:ev=>{if(ev.data===1){o.classList.add("vid");try{ev.target.unMute();ev.target.setVolume(70)}catch(_){}}if(ev.data===0)finish()},onError:()=>{o.classList.remove("vid")}}})}catch(_){}}
+   events:{onStateChange:ev=>{clearTimeout(o._sh);if(ev.data===1){try{ev.target.unMute();ev.target.setVolume(70)}catch(_){}o._sh=setTimeout(()=>o.classList.add("vid"),900)}else o.classList.remove("vid");if(ev.data===0)finish()},onError:()=>{o.classList.remove("vid")}}})}catch(_){}}
  await end;clearTimeout(to)}
 
 // ================= IMPACTS D'ULTIME (après la cinématique manga) =================
