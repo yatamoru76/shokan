@@ -2454,7 +2454,7 @@ function lvInbox(){if(!pvpOn()||LV.inbox||typeof CL.sb.channel!=="function")retu
  .on("broadcast",{event:"decline"},({payload:p})=>{if(LV.mid===p.mid){LV.mid=null;$("modal").style.display="none";toast("❌ Défi refusé");lvClose()}})
  .subscribe()}
 function lvSend(chName,ev,payload){const c=CL.sb.channel(chName,{config:{broadcast:{self:false}}});c.subscribe(s=>{if(s==="SUBSCRIBED"){c.send({type:"broadcast",event:ev,payload});setTimeout(()=>CL.sb.removeChannel(c),1500)}})}
-function lvUnits(team){return(team||[]).slice(0,5).map(c=>{const e=elOf(c),k=clsOf(c);return{name:c.name,img:c.img,rarity:c.rarity,el:e.id,cls:k.id,hp:c.hp,maxhp:c.hp,atk:c.atk,spd:c.spd,en:0,sh:0}})}
+function lvUnits(team){return(team||[]).slice(0,5).map(c=>{const e=elOf(c),k=clsOf(c);return{cid:c.id,name:c.name,img:c.img,rarity:c.rarity,el:e.id,cls:k.id,hp:c.hp,maxhp:c.hp,atk:c.atk,spd:c.spd,en:0,sh:0}})}
 function lvMe(){initProfile();return{id:CL.user.id,name:S.prof.name,avatar:cloudAvatar()||null}}
 async function lvInvite(friend){if(!S.team.length){toast("Ajoute des persos à ton équipe");return}lvInbox();LV.mid=Math.random().toString(36).slice(2,10);LV.host=true;LV.side="h";LV.st=null;LV.opp={id:friend.user_id,name:friend.name,avatar:friend.avatar};LV.myTeam=defenseTeam();
  lvJoin();lvSend("u-"+friend.user_id,"invite",{mid:LV.mid,from:lvMe()});
@@ -2463,7 +2463,8 @@ async function lvInvite(friend){if(!S.team.length){toast("Ajoute des persos à t
 function lvAccept(p){if(!S.team.length){toast("Ajoute des persos à ton équipe");return}LV.mid=p.mid;LV.host=false;LV.side="g";LV.st=null;LV.opp=p.from;lvJoin();
  setTimeout(()=>lvSend("u-"+p.from.id,"accept",{mid:p.mid,team:defenseTeam(),who:lvMe()}),400);lvShow();lvRender();clearInterval(LV.tick);LV.tick=setInterval(lvTick,1000)}
 function lvJoin(){if(LV.ch)CL.sb.removeChannel(LV.ch);LV.ch=CL.sb.channel("m-"+LV.mid,{config:{broadcast:{self:false}}})
- .on("broadcast",{event:"state"},({payload})=>{if(!LV.host){const prev=LV.st;LV.st=payload;LV.lastSeen=Date.now();lvAnim(prev,payload);lvRender()}})
+ .on("broadcast",{event:"state"},({payload})=>{if(!LV.host){const prev=LV.st;LV.st=payload;LV.lastSeen=Date.now();const ev=payload.last,isNew=ev&&(!prev||!prev.last||prev.n!==payload.n||JSON.stringify(prev.last)!==JSON.stringify(ev));
+   if(isNew&&ev.kind==="ult"){lvUltShow(ev,payload).then(()=>{lvRender();lvAnim(prev,payload);if(payload.over)lvEnd()})}else{if(isNew)lvAnim(prev,payload);lvRender();if(payload.over&&!(prev&&prev.over))lvEnd()}}})
  .on("broadcast",{event:"act"},({payload})=>{if(LV.host&&LV.st&&LV.st.turn==="g"&&!LV.st.over){lvResolve("g",payload.u,payload.t,payload.k)}})
  .on("broadcast",{event:"ping"},()=>{LV.lastSeen=Date.now()})
  .on("broadcast",{event:"quit"},()=>{if(LV.st&&!LV.st.over){LV.st.over=LV.side;LV.st.log.unshift("🏳️ L'adversaire a quitté le combat.");if(LV.host)lvPush();lvRender();lvEnd()}})
@@ -2486,8 +2487,19 @@ function lvResolve(side,ui,ti,kind){const st=LV.st,me=st[side],foe=st[side==="h"
  else{kind="atk";hit(t,1);u.en=Math.min(100,u.en+(RI[u.rarity]>=3?34:25));st.log.unshift(`${u.name} attaque ${t.name} (${fmt(ev.hits[0].d)})`)}
  ev.kind=kind;st.last=ev;st.log=st.log.slice(0,6);
  if(!foe.some(x=>x.hp>0))st.over=side;else if(!me.some(x=>x.hp>0))st.over=side==="h"?"g":"h";
- else{st.turn=side==="h"?"g":"h";st.n++;st.deadline=Date.now()+LV_TURN}
- const prev=JSON.parse(JSON.stringify(st));lvPush();lvAnim(null,st);lvRender();if(st.over)lvEnd()}
+ else{st.turn=side==="h"?"g":"h";st.n++;st.deadline=Date.now()+LV_TURN+(kind==="ult"?7000:0)}
+ lvPush();if(kind==="ult"){lvUltShow(ev,st).then(()=>{lvRender();lvAnim(null,st);if(st.over)lvEnd()})}else{lvAnim(null,st);lvRender();if(st.over)lvEnd()}}
+async function lvUltShow(ev,st){const u=st[ev.side][ev.ui];if(!u)return;const mine=ev.side===LV.side,E=ELS.find(e=>e.id===u.el)||ELS[0],K=CLS.find(k=>k.id===u.cls)||CLS[0];
+ const unit={name:u.name,img:u.img,rarity:u.rarity,el:E,cls:K,side:mine?"a":"e",card:{id:u.cid||hash(u.name.length),name:u.name,series:""}};
+ const tmpB=!B;if(tmpB)B={skip:false,allies:[],enemies:[],cfg:{type:"live"}};const live=$("live"),cine=$("cine"),bfx=$("bfx"),veil=$("bveil"),home=cine.parentNode;LV.busy=true;
+ try{live.appendChild(cine);await cinematic(unit);
+  const lf=$("lvflash");if(lf){lf.style.background=E.c;lf.classList.remove("on");void lf.offsetWidth;lf.classList.add("on");setTimeout(()=>lf.style.background="#fff",500)}
+  const atk=ev.hits.some(h=>h.ti!==undefined&&h.heal===undefined&&h.shield===undefined);
+  if(atk&&USIG[E.id]){live.appendChild(veil);live.appendChild(bfx);FXS.W=live.clientWidth;FXS.H=live.clientHeight;bfx.width=FXS.W;bfx.height=FXS.H;const g=bfx.getContext("2d");try{Object.defineProperty(g,"shadowBlur",{set(){},get(){return 0},configurable:true})}catch(_){}FXS.ctx=g;g.setTransform(1,0,0,1,0,0);FXS.veil={};FXS.list=[];
+   const lr=live.getBoundingClientRect(),pos=el=>{if(!el)return{x:FXS.W/2,y:FXS.H/2};const r=(el.querySelector(".lvc")||el).getBoundingClientRect();return{x:r.left-lr.left+r.width/2,y:r.top-lr.top+r.height/2}};
+   const ms=mine?"me":"opp",os=mine?"opp":"me",src=pos(live.querySelector(`.lvu[data-s="${ms}"][data-i="${ev.ui}"]`)),T=ev.hits.filter(h=>h.ti!==undefined).map(h=>pos(live.querySelector(`.lvu[data-s="${os}"][data-i="${h.ti}"]`))),big=RI[u.rarity]>=4;
+   ultVeil(E.id,1700);const d=USIG[E.id](src,T,big);await sleep(d);await sleep(70);shakeLive();T.forEach(t=>{shockwave(E.id,t.x,t.y,big);fxAdd(EFX[E.id](t.x,t.y,true))});await sleep(650)}
+ }catch(e){console.warn(e)}finally{cine.classList.remove("on");if(home){home.appendChild(cine);home.appendChild(veil);home.appendChild(bfx)}veil.classList.remove("on");if(FXS.raf){cancelAnimationFrame(FXS.raf);FXS.raf=0}FXS.list=[];try{FXS.ctx&&FXS.ctx.clearRect(0,0,FXS.W,FXS.H)}catch(_){}if(tmpB)B=null;LV.busy=false}}
 function lvShow(){const o=$("live");o.classList.add("on");if(typeof music==="function")music("battle")}
 function lvClose(){const o=$("live");o.classList.remove("on");o.innerHTML="";clearInterval(LV.tick);if(LV.ch){try{CL.sb.removeChannel(LV.ch)}catch(_){}LV.ch=null}LV.st=null;LV.mid=null;LV.sel=null;LV.lastSeen=0;if(typeof render==="function")render()}
 function lvAnim(prev,st){const ev=st&&st.last;if(!ev)return;setTimeout(()=>{const foeSide=ev.side===LV.side?"opp":"me",meSide=ev.side===LV.side?"me":"opp";
@@ -2497,7 +2509,7 @@ function lvAnim(prev,st){const ev=st&&st.last;if(!ev)return;setTimeout(()=>{cons
   if(h.heal===undefined&&h.shield===undefined){el.animate([{transform:"none",filter:"brightness(3)"},{transform:"translateX(-6px)"},{transform:"translateX(6px)"},{transform:"none",filter:"none"}],{duration:300})}});
  if(ev.kind==="ult"){const f=$("lvflash");f.classList.remove("on");void f.offsetWidth;f.classList.add("on");sfx.ult();shakeLive()}else sfx.hit()},40)}
 function shakeLive(){const o=$("live");o.animate([{transform:"none"},{transform:"translate(8px,-4px)"},{transform:"translate(-8px,4px)"},{transform:"none"}],{duration:260})}
-function lvRender(onlyTimer){const o=$("live");if(!o.classList.contains("on"))return;const st=LV.st;
+function lvRender(onlyTimer){const o=$("live");if(!o.classList.contains("on"))return;const st=LV.st;if(LV.busy&&!onlyTimer)return;
  if(!st){o.innerHTML=`<div class="lvwait"><div class="lvsp"></div><b>Connexion au combat…</b><span class="muted">${esc(LV.opp?LV.opp.name:"")}</span><button class="btn ghost sm" id="lvQuit" style="width:auto;margin-top:14px">Quitter</button></div>`;$("lvQuit").onclick=()=>{lvQuit()};return}
  const me=st[LV.side],op=st[LV.side==="h"?"g":"h"],my=st.turn===LV.side&&!st.over,left=Math.max(0,Math.ceil((st.deadline-Date.now())/1000));
  if(onlyTimer){const t=$("lvT");if(t)t.textContent=st.over?"":(my?"Ton tour":"Tour adverse")+" · "+left+" s";return}
@@ -2513,7 +2525,7 @@ function lvRender(onlyTimer){const o=$("live");if(!o.classList.contains("on"))re
  <div class="lvbar">${st.over?`<div class="lvres">${st.over===LV.side?"🏆 VICTOIRE !":"💀 DÉFAITE…"}</div><button class="btn" id="lvOk">Continuer</button>`:my?`<div class="lvhint">${su?`<b>${esc(su.name)}</b> : choisis une cible en haut`:"Choisis ton perso"}</div><div class="row2"><button class="btn ${LV.act==="atk"?"":"ghost"} sm" id="lvAtk">⚔️ Attaque</button><button class="btn ${LV.act==="ult"?"gold":"ghost"} sm" id="lvUlt" ${canU?"":"disabled"}>💥 Ultime${su&&RI[su.rarity]<3?" (L+)":su?" "+Math.floor(su.en)+"%":""}</button></div>`:`<div class="lvhint">⏳ ${esc(st.names[st.turn])} réfléchit…</div>`}</div><div id="lvflash"></div>`;
  $("lvQuit").onclick=()=>modal("<h3>Abandonner ?</h3><p class='muted'>Ton adversaire gagnera le combat.</p>",[["Non"],["🏳️ Abandonner",lvQuit]]);
  const ok=$("lvOk");if(ok)ok.onclick=lvClose;
- if(my){o.querySelectorAll('.lvu[data-s="me"]').forEach(el=>el.onclick=()=>{const i=+el.dataset.i;if(me[i].hp<=0)return;LV.sel=i;LV.act="atk";sfx.select();lvRender()});
+ if(my&&!LV.busy){o.querySelectorAll('.lvu[data-s="me"]').forEach(el=>el.onclick=()=>{const i=+el.dataset.i;if(me[i].hp<=0)return;LV.sel=i;LV.act="atk";sfx.select();lvRender()});
   const go=(ti)=>{if(LV.sel===null)return;const k=LV.act;if(k==="ult"&&!(su&&su.en>=100))return;if(LV.host)lvResolve(LV.side,LV.sel,ti,k);else{LV.ch.send({type:"broadcast",event:"act",payload:{u:LV.sel,t:ti,k}});LV.st.turn="x";lvRender()}LV.act="atk"};
   o.querySelectorAll('.lvu[data-s="opp"]').forEach(el=>el.onclick=()=>{const i=+el.dataset.i;if(op[i].hp<=0)return;go(i)});
   $("lvAtk").onclick=()=>{LV.act="atk";lvRender()};const ub=$("lvUlt");if(ub)ub.onclick=()=>{if(!canU)return;if(su.cls==="mag"||su.cls==="hea"||su.cls==="tnk"){LV.act="ult";go(op.findIndex(x=>x.hp>0))}else{LV.act="ult";lvRender();toast("💥 Choisis la cible de l'ultime")}}}}
