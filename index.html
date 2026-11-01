@@ -798,6 +798,7 @@ nav button{font-size:9.5px}
 .ghp span{position:relative;display:block;text-align:center;font-size:10.5px;font-weight:800;line-height:18px;text-shadow:0 1px 2px #000}
 .gtiers{display:flex;justify-content:space-between;margin-top:4px}.gtiers span{font-size:10px;font-weight:800;opacity:.5}.gtiers span.on{opacity:1;color:#ffd34d}
 .gboard{margin-top:8px;font-size:12px}.gboard div{display:flex;justify-content:space-between;padding:3px 2px;border-top:1px solid #ffffff14}.gboard .me{color:#ffd34d}
+.dcban{display:flex;align-items:center;gap:10px;background:linear-gradient(135deg,#5865f2,#3c45a5);color:#fff;text-decoration:none;border-radius:14px;padding:11px 12px;margin:0 0 10px;box-shadow:0 8px 20px -10px #5865f2}.dcic{font-size:24px}
 </style>
 <link rel="manifest" href="manifest.webmanifest"><meta name="theme-color" content="#09090c"><link rel="icon" href="icon-192.png"><link rel="apple-touch-icon" href="icon-192.png"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="description" content="Shōkan · jeu gratuit de cartes anime : ouvre des mangas, collectionne, combats, guildes et arène."></head>
 <body>
@@ -1100,7 +1101,7 @@ function rHome(){const k=counts(),ev=EV(),tot=Object.keys(S.coll).length;
  ${sec("03","Chances par carte","確率")}
  <div class="box">${RAR.slice().reverse().map(r=>`<div class="oddrow"><span style="color:var(--${r.id});font-weight:700">${r.name}</span><div class="bar"><i style="width:${Math.max(3,Math.sqrt(r.odds/55)*100)}%;background:var(--${r.id})"></i></div><span style="text-align:right;font-weight:700">${r.odds} %</span></div>`).join("")}
  <div class="muted" style="margin-top:8px;font-size:12px">Compteur Mythique : ${S.pity} / ${PITY}</div></div>
- <div class="foot">Démo non officielle, gratuite et sans but commercial.<br>Données et images : <a href="https://anilist.co" target="_blank">AniList</a>. Les personnages appartiennent à leurs auteurs et studios.<br><span id="reset" style="text-decoration:underline">Effacer ma progression</span></div>`;
+ ${discordBox()}<div class="foot">Démo non officielle, gratuite et sans but commercial.<br>Données et images : <a href="https://anilist.co" target="_blank">AniList</a>. Les personnages appartiennent à leurs auteurs et studios.<br><span id="reset" style="text-decoration:underline">Effacer ma progression</span></div>`;
  $("pack").onclick=()=>openPack(false);$("btnOpen").onclick=()=>openPack(false);$("btnBuy").onclick=()=>openPack(true);
  $("main").querySelectorAll("[data-multi]").forEach(b=>b.onclick=()=>openMulti(b.dataset.multi==="all"?S.boosters:+b.dataset.multi));setTimeout(prefetchPack,400);$("main").querySelectorAll("[data-sum]").forEach(b=>b.onclick=()=>{S.summon=b.dataset.sum;save();sfx.select();rHome()});
  const pks=$("packs");pks.querySelectorAll("[data-pk]").forEach(c=>c.onclick=()=>{if(busy)return;S.pack=c.dataset.pk;save();const sl=pks.scrollLeft;rHome();updateTop();$("packs").scrollLeft=sl;sfx.select()});
@@ -1477,7 +1478,7 @@ function raidRank(){return(new Date().getDay()*3)%10+1}
 async function raidBoss(){const rk=raidRank(),r=RAR.find(x=>rk>=x.min&&rk<=x.max);const c=await charAt(rk,r);const P=enemyP(8+Math.min(40,Object.values(S.prog).length));
  const f=mkFoe(c,P,true);const tm=teamCards().map(stats);const avgHp=tm.length?tm.reduce((a,x)=>a+x.hp,0)/tm.length:1000;f.maxhp=Math.round(P*400);f.atk=Math.round(Math.max(P*.6,avgHp*.16));f.raid=true;f.titan=true;return f}
 function rEvt(){dailyReset();const ev=EV(),rbc=pageCache[1]&&pageCache[1][raidRank()-1],rbName=rbc?rbc.name:"un personnage légendaire";
- $("main").innerHTML=`${sec("01","Événements","イベント")}${rPassBanner()}<div class="achban" id="achBtn"><span>🏆 <b>Succès</b> · ${ACH.filter(a=>(S.ach||{})[a.id]).length}/${ACH.length}</span>${achReady()?'<b class="achnew">À récupérer !</b>':'<span class="muted">Voir ▸</span>'}</div><div class="event" style="font-size:14px">🎉 <b>${ev.n}</b> : ${ev.d}<div class="muted" style="color:#cfc6f5;margin-top:3px">Change tous les jours à minuit.</div></div>
+ $("main").innerHTML=`${sec("01","Événements","イベント")}${rPassBanner()}<div class="achban" id="achBtn"><span>🏆 <b>Succès</b> · ${ACH.filter(a=>(S.ach||{})[a.id]).length}/${ACH.length}</span>${achReady()?'<b class="achnew">À récupérer !</b>':'<span class="muted">Voir ▸</span>'}</div>${discordBox()}<div class="event" style="font-size:14px">🎉 <b>${ev.n}</b> : ${ev.d}<div class="muted" style="color:#cfc6f5;margin-top:3px">Change tous les jours à minuit.</div></div>
  <div class="box"><b>🎁 Récompense de connexion</b><div class="muted">1 booster + 20 💠 + 2 🍙 chaque jour.</div><button class="btn sm" id="login" style="margin-top:8px" ${S.daily.login?"disabled":""}>${S.daily.login?"Déjà récupérée, reviens demain":"Récupérer"}</button></div>
  <div class="box"><b>⚔️ Raid : ${esc(rbName)} géant</b><div class="muted">Un boss géant que tu ne peux pas vaincre : inflige un maximum de dégâts en 12 tours. Plus tu frappes fort, plus tu gagnes.<br>Essais : ${raidMax()-S.raid.tries} / ${raidMax()} · Record du jour : ${fmt(S.raid.best)}</div>
  <button class="btn sm gold" id="raid" style="margin-top:8px" ${S.raid.tries>=raidMax()||!S.team.length?"disabled":""}>⚔️ Attaquer le Titan</button></div>
@@ -1894,7 +1895,9 @@ function rwLabel(rw){return[rw.card?"🎴 1 carte "+RAR[RI[rw.card]].name+" gara
 function myTitle(){initProfile();return S.prof.title||eqTitle()||ptitle(S.prof.lvl)}
 
 // ================= PASSE SAISONNIER (gratuit) =================
-const SEASON_LEN=28*86400000,SEASON_EPOCH=Date.UTC(2026,9,5);
+const DISCORD="https://discord.gg/txsMTWrdZ";
+function discordBox(){return`<a class="dcban" href="${DISCORD}" target="_blank" rel="noopener"><span class="dcic">💬</span><span style="flex:1"><b>Rejoins le Discord Shōkan</b><br><span style="font-size:12px;opacity:.85">Montre tes tirages, échange des cartes, propose des idées</span></span><span style="font-size:20px">▸</span></a>`}
+const SEASON_LEN=28*86400000,SEASON_EPOCH=Date.UTC(2026,10,1);
 const SEASONS=[{n:"Lune d'automne",kj:"月",c:"#ff9a3d",c2:"#7b2cff"},{n:"Neige éternelle",kj:"雪",c:"#7fe3ff",c2:"#2d4bff"},{n:"Éveil du dragon",kj:"龍",c:"#3bff9c",c2:"#0b6b5a"},{n:"Fleurs de cerisier",kj:"桜",c:"#ff7ab6",c2:"#7b2c6a"},{n:"Orage d'été",kj:"雷",c:"#ffd34d",c2:"#c43c00"},{n:"Nuit étoilée",kj:"星",c:"#9b86ff",c2:"#141450"}];
 const PT=40,PXPT=150,PXP={open:30,win:20,raid:25,lvl:10,arena:30,graid:45,quest:50,login:60};
 function seasonId(){return Math.max(0,Math.floor((Date.now()-SEASON_EPOCH)/SEASON_LEN))}
