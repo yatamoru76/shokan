@@ -1275,10 +1275,10 @@ function stopScene(){clearInterval(YTloop);YTloop=null;if(YTP){try{YTP.destroy()
 async function startScene(c){stopScene();const d=$("detail");const box=d.querySelector(".dvid");if(!box||!c.trailer||!sceneOn()||RI[c.rarity]<4)return;
  try{await loadYT()}catch(_){return}if(!box.isConnected||d.dataset.cid!==String(c.id))return;
  const holder=document.createElement("div");box.appendChild(holder);let start=0;
- YTP=new YT.Player(holder,{videoId:c.trailer,playerVars:{autoplay:1,mute:1,controls:0,playsinline:1,rel:0,modestbranding:1,iv_load_policy:3,disablekb:1,fs:0,cc_load_policy:0},
-  events:{onReady:e=>{try{e.target.mute();const du=e.target.getDuration()||90;start=Math.max(5,du*(.3+Math.random()*.25));e.target.seekTo(start,true);e.target.playVideo()}catch(_){}
-    YTloop=setInterval(()=>{try{if(YTP&&YTP.getCurrentTime()>start+9)YTP.seekTo(start,true)}catch(_){}},400)},
-   onStateChange:e=>{if(e.data===1)box.classList.add("on");if(e.data===0&&YTP){YTP.seekTo(start,true);YTP.playVideo()}},onError:()=>{stopScene();box.classList.remove("on")}}})}
+ const st=30+Math.floor(Math.random()*25);
+ YTP=new YT.Player(holder,{videoId:c.trailer,playerVars:{autoplay:1,mute:1,controls:0,playsinline:1,rel:0,modestbranding:1,iv_load_policy:3,disablekb:1,fs:0,cc_load_policy:0,showinfo:0,start:st,end:st+10},
+  events:{onReady:e=>{try{e.target.mute()}catch(_){}},
+   onStateChange:e=>{if(e.data===1)box.classList.add("on");if(e.data===2)box.classList.remove("on");if(e.data===0){try{e.target.loadVideoById({videoId:c.trailer,startSeconds:st,endSeconds:st+10})}catch(_){}}},onError:()=>{stopScene();box.classList.remove("on")}}})}
 
 // ================= FONDS ANIMÉS (Mythique, Divin, Cosmos) =================
 let FX=null;
