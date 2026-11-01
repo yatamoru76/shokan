@@ -937,6 +937,23 @@ nav button{font-size:9.5px}
 .adcc .card .ov .sr,.adcc .card .ce,.adcc .card .lv{display:none}
 .adg{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px}.adg label{font-size:12px;font-weight:700;display:flex;flex-direction:column;gap:3px}.adg input{width:100%;box-sizing:border-box;min-width:0;background:var(--bg);border:1px solid var(--line);border-radius:8px;color:var(--ink);font-size:15px;padding:7px}
 .frhit{display:flex;align-items:center;gap:8px;flex:1;min-width:0;cursor:pointer}.ppteam{display:grid;grid-template-columns:repeat(5,1fr);gap:5px}.ppteam .card .ov .sr,.ppteam .card .ce{display:none}.ppteam .card .nm{font-size:9px}
+#inkS{z-index:27;background:radial-gradient(circle,#ffffff0b 1px,transparent 1.3px) 0 0/8px 8px,#0b0b0d;justify-content:center;gap:12px;padding:16px}
+.ishint{font-weight:800;font-size:15px;text-align:center;min-height:22px;color:#f2f2f4}
+.ispaper{position:relative;width:min(88vw,380px);height:min(110vw,470px);background:#fbfaf6;border-radius:4px;box-shadow:0 0 0 1px #0004,0 24px 60px -10px #000,inset 0 0 60px #e9e3d466;touch-action:none;overflow:hidden}
+.ispaper::before{content:"";position:absolute;inset:0;background:radial-gradient(circle,#0000000a 1px,transparent 1.2px) 0 0/5px 5px;pointer-events:none}
+.ispaper canvas{position:absolute;inset:0;touch-action:none;cursor:crosshair}
+.ispaper.shake{animation:isShake .45s}@keyframes isShake{20%{transform:translate(-6px,2px) rotate(-1deg)}40%{transform:translate(6px,-2px) rotate(1deg)}60%{transform:translate(-4px,1px)}80%{transform:translate(3px,0)}}
+.isflood{position:absolute;inset:0;opacity:0;transform:scale(.2);border-radius:50%;pointer-events:none;transition:all .65s cubic-bezier(.2,.8,.3,1)}
+.isflood.on{opacity:1;transform:scale(1.9);border-radius:0}
+.ispack{position:absolute;left:50%;top:50%;width:58%;aspect-ratio:5/7;transform:translate(-50%,-50%) scale(0) rotate(-14deg);transition:transform .55s cubic-bezier(.2,1.4,.4,1);cursor:pointer;z-index:3}
+.ispack.on{transform:translate(-50%,-50%) scale(1) rotate(-3deg);animation:isFloat 2.4s ease-in-out .6s infinite}
+@keyframes isFloat{50%{transform:translate(-50%,-53%) scale(1.02) rotate(2deg)}}
+.ispack.big .ispk{box-shadow:0 0 0 3px #fff,0 0 50px 10px var(--gc),0 20px 40px #000a}
+.ispack.pop{animation:isPop .5s forwards}@keyframes isPop{40%{transform:translate(-50%,-50%) scale(1.15) rotate(0)}100%{transform:translate(-50%,-50%) scale(1.6);opacity:0}}
+.ispk{position:absolute;inset:0;border-radius:12px;background-size:cover!important;box-shadow:0 0 0 3px #fff,0 0 30px 4px var(--gc),0 20px 40px #000a;display:flex;flex-direction:column;align-items:center;justify-content:center;color:#fff;overflow:hidden}
+.ispk .kj{font:900 76px/1 "Noto Sans JP";text-shadow:0 4px 20px #0008}.ispk .nm{font-weight:900;font-size:17px;margin-top:8px;text-shadow:0 2px 8px #000a}.ispk .ct{position:absolute;bottom:10px;font-size:11px;font-weight:800;letter-spacing:.12em;background:#0007;padding:3px 10px;border-radius:99px}
+.isbar{width:min(88vw,380px);height:6px;background:#ffffff1a;border-radius:3px;overflow:hidden}.isbar i{display:block;height:100%;width:0;background:#151515;transition:width .15s,background .4s}
+.isleg{display:flex;flex-wrap:wrap;justify-content:center;gap:4px 10px;max-width:400px;font-size:11px;color:#9a9aa4}.isleg span{display:flex;align-items:center;gap:4px}.isleg i{width:12px;height:12px;border-radius:50%;box-shadow:0 0 0 1px #fff3}
 </style>
 
 <style id="v4css">
@@ -1134,6 +1151,7 @@ header .hsp{flex:1}
  <div id="mscene" class="ovl"></div>
  <div id="dlg" class="ovl"></div>
  <div id="shelf" class="ovl"></div>
+ <div id="inkS" class="ovl"></div>
  <div id="lore"></div>
  <div id="live"></div>
  <div id="battle" class="ovl"><div id="bbg"></div>
@@ -1321,7 +1339,8 @@ function showMultiReveal(packs){const cards=packs.flat().sort((a,b)=>RI[b.rarity
 
 // ================= OUVERTURE DU BOOSTER (déchirure + physique) =================
 const OP={};
-function showOpener(P,paid,multi){if((S.summon||"manga")==="manga")return showShelf(P,paid,multi);const sp=PK(S.pack||"mix");$("pk").querySelectorAll(".pk-body,.pk-lid").forEach(e=>e.style.backgroundImage=packBg(sp));$("pk").querySelector(".kj").textContent=sp.kj;$("pk").querySelector(".t1").innerHTML=sp.name.replace(" ","<br>");$("pk").querySelector(".t2").textContent=multi?multi+" BOOSTERS · "+multi*5+" CARTES":"5 CARTES · オタク";Object.assign(OP,{P,paid,multi:multi||0,x:0,y:0,vx:0,vy:0,rx:0,ry:0,tx:0,ty:0,hx:0,hy:0,prog:0,lift:0,minX:null,maxX:null,mode:null,done:false,t0:performance.now(),lastSnd:0,lid:null});
+function sumMode(){return S.summon||(typeof BETA!=="undefined"?"ink":"manga")}
+function showOpener(P,paid,multi){if(sumMode()==="ink"&&typeof BETA!=="undefined")return showInk(P,paid,multi);if(sumMode()!=="booster")return showShelf(P,paid,multi);const sp=PK(S.pack||"mix");$("pk").querySelectorAll(".pk-body,.pk-lid").forEach(e=>e.style.backgroundImage=packBg(sp));$("pk").querySelector(".kj").textContent=sp.kj;$("pk").querySelector(".t1").innerHTML=sp.name.replace(" ","<br>");$("pk").querySelector(".t2").textContent=multi?multi+" BOOSTERS · "+multi*5+" CARTES":"5 CARTES · オタク";Object.assign(OP,{P,paid,multi:multi||0,x:0,y:0,vx:0,vy:0,rx:0,ry:0,tx:0,ty:0,hx:0,hy:0,prog:0,lift:0,minX:null,maxX:null,mode:null,done:false,t0:performance.now(),lastSnd:0,lid:null});
  const o=$("opener");o.style.display="flex";o.classList.remove("out");const pk=$("pk");pk.classList.remove("drop");
  const lid=pk.querySelector(".pk-lid");lid.style.transform="";lid.style.opacity=1;pk.querySelector(".pk-glow").style.opacity=0;
  pk.querySelector(".tear").innerHTML="";$("ophint").style.opacity=1;$("opwait").style.display="none";sfx.packIn();
@@ -1419,7 +1438,7 @@ function rHome(){if(!rHome.m){rHome.m=1;setTimeout(loadMascots,1500)}setTimeout(
  <div class="packs" id="packs">${PACKS.map(p=>`<div class="pcard ${p.id===(S.pack||"mix")?"on":""} ${MIMG[p.id]?"wimg":""}" data-pk="${p.id}" style="--ph:${p.h};background:${packArt(p)}"><span class="pkj">${p.kj}</span><span class="pn">${p.name}</span></div>`).join("")}</div>
  <div class="pack" id="pack"><div class="art ${MIMG[PK(S.pack).id]?"wimg":""}" style="background:${packArt(PK(S.pack),"15%")}"><span class="kj">${PK(S.pack).kj}</span></div><div class="inf"><div class="bn">${PK(S.pack).name}</div><div class="muted">${PK(S.pack).d}</div>
  <div class="tags"><span class="tag">5 cartes</span><span class="tag a">Rare garantie</span><span class="tag">Mythique sûre en ${PITY}</span></div><div class="muted" id="tmr" style="margin-top:auto;font-size:12px"></div></div></div>
- <div class="row2" style="margin-top:10px"><button class="btn" id="btnOpen" style="flex:1.4"></button><button class="btn ghost" id="btnBuy">${PACKCOST} 💠</button></div><div class="multi"><span class="muted">Ouvrir d'un coup :</span><button class="btn ghost sm" data-multi="5">×5</button><button class="btn ghost sm" data-multi="10">×10</button><button class="btn ghost sm" data-multi="all">Tout</button></div><div class="sumtog"><span class="muted">Invocation :</span><button class="${(S.summon||"manga")==="manga"?"on":""}" data-sum="manga">📚 Manga</button><button class="${S.summon==="booster"?"on":""}" data-sum="booster">🎴 Booster</button></div><div class="err" id="err"></div>
+ <div class="row2" style="margin-top:10px"><button class="btn" id="btnOpen" style="flex:1.4"></button><button class="btn ghost" id="btnBuy">${PACKCOST} 💠</button></div><div class="multi"><span class="muted">Ouvrir d'un coup :</span><button class="btn ghost sm" data-multi="5">×5</button><button class="btn ghost sm" data-multi="10">×10</button><button class="btn ghost sm" data-multi="all">Tout</button></div><div class="sumtog"><span class="muted">Invocation :</span>${typeof BETA!=="undefined"?`<button class="${sumMode()==="ink"?"on":""}" data-sum="ink">🖌️ Encre</button>`:""}<button class="${sumMode()==="manga"?"on":""}" data-sum="manga">📚 Manga</button><button class="${sumMode()==="booster"?"on":""}" data-sum="booster">🎴 Booster</button></div><div class="err" id="err"></div>
  ${sec("02","Ta collection","コレクション")}
  <div class="stats">${RAR.slice().reverse().map(r=>`<div class="stat"><b style="color:var(--${r.id})">${k[r.id]}</b>${r.name}</div>`).join("")}</div>
  <div class="muted" style="margin-top:8px;font-size:12px">${tot} personnages uniques · ${S.opened} boosters ouverts</div>
@@ -2280,6 +2299,71 @@ async function openBook(){if(SH.state!=="book")return;SH.state="open";sfx.whoosh
  const b=$("book").getBoundingClientRect();sparksAt(b.left+b.width/2,b.top+b.height/2,SH.best,ri>=5?40:ri>=3?22:10);
  await sleep(ri>=4?900:650);$("shelf").style.display="none";SH.state="done";fl.classList.remove("hold");
  if(SH.multi){SH.cards.forEach(p=>commitPack(p,false));busy=false;updateTop();showMultiReveal(SH.cards)}else{commitPack(SH.cards,SH.paid);busy=false;updateTop();showReveal(SH.cards)}}
+
+// ================= INVOCATION À L'ENCRE =================
+const INKC={C:{c:"#151515",n:"noire"},R:{c:"#1f6fe0",n:"bleue"},E:{c:"#8a3ff0",n:"violette"},L:{c:"#e09a00",n:"dorée"},M:{c:"#e01e3c",n:"rouge sang"},D:{c:"#f2c200",n:"or éclatant",g:1},X:{c:"#7b5cff",n:"cosmique",g:1,rb:1}};
+const IS={};
+function showInk(P,paid,multi){const sp=PK(S.pack||"mix"),o=$("inkS");Object.assign(IS,{P,paid,multi:multi||0,state:"paint",cards:null,best:null,shown:null,fake:null,cov:0,col:"#151515",stage:0,hue:0});
+ o.innerHTML=`<div class="ishint" id="isHint">🖌️ Peins sur la feuille pour remplir le kanji</div>
+ <div class="ispaper" id="isPaper"><canvas id="isCv"></canvas><div class="isflood" id="isFlood"></div>
+  <div class="ispack" id="isPack"><div class="ispk" style="background:${packBg(sp)}"><span class="kj">${sp.kj}</span><span class="nm">${esc(sp.name)}</span><span class="ct">${multi?multi+" BOOSTERS":"5 CARTES"}</span></div></div></div>
+ <div class="isbar"><i id="isPr"></i></div>
+ <div class="isleg">${RAR.map(r=>`<span><i style="background:${INKC[r.id].rb?"linear-gradient(90deg,#ff3d6e,#ffd23a,#34d399,#4da3ff,#a970ff)":INKC[r.id].c}"></i>${r.name}</span>`).join("")}</div>
+ <button class="btn ghost sm" id="isCancel" style="width:auto;padding:8px 22px;margin-top:12px">Annuler</button>`;
+ o.style.display="flex";sfx.packIn&&sfx.packIn();
+ const pap=$("isPaper"),cv=$("isCv");const W=pap.clientWidth,H=pap.clientHeight,dpr=Math.min(2,window.devicePixelRatio||1);cv.width=W*dpr;cv.height=H*dpr;cv.style.width=W+"px";cv.style.height=H+"px";
+ const g=cv.getContext("2d");g.scale(dpr,dpr);IS.g=g;IS.W=W;IS.H=H;IS.kj=sp.kj;
+ const fs=Math.min(W,H)*.8;IS.font=`900 ${fs}px "Noto Sans JP","Hiragino Sans","Yu Gothic",sans-serif`;
+ g.font=IS.font;g.textAlign="center";g.textBaseline="middle";g.fillStyle="#00000010";g.fillText(sp.kj,W/2,H/2+fs*.03);g.lineWidth=2;g.strokeStyle="#0000002e";g.setLineDash([6,5]);g.strokeText(sp.kj,W/2,H/2+fs*.03);g.setLineDash([]);
+ // points d'échantillonnage du kanji
+ const m=document.createElement("canvas");m.width=W;m.height=H;const mg=m.getContext("2d");mg.font=IS.font;mg.textAlign="center";mg.textBaseline="middle";mg.fillStyle="#000";mg.fillText(sp.kj,W/2,H/2+fs*.03);
+ const d=mg.getImageData(0,0,W,H).data,st=Math.max(5,Math.round(W/46));IS.pts=[];for(let y=st/2|0;y<H;y+=st)for(let x=st/2|0;x<W;x+=st)if(d[(y*W+x)*4+3]>120)IS.pts.push({x,y,c:0});
+ if(IS.pts.length<20){for(let y=H*.2;y<H*.8;y+=st)for(let x=W*.2;x<W*.8;x+=st)IS.pts.push({x,y,c:0})}
+ IS.R=Math.max(10,W/22);
+ P.then(res=>{IS.cards=res;const flat=IS.multi?res.flat():res;const best=flat.reduce((a,c)=>RI[c.rarity]>RI[a]?c.rarity:a,"C");IS.best=best;
+  IS.fake=RI[best]>=3&&Math.random()<.22?RAR[Math.max(1,RI[best]-1-(Math.random()<.4?1:0))].id:null;IS.shown=IS.fake||best}).catch(e=>{IS.err=e});
+ $("isCancel").onclick=()=>{if(IS.state!=="paint"||IS.cov>.02)return;o.style.display="none";busy=false;updateTop()};
+ let dn=false,lx=0,ly=0,lt=0,lastSnd=0;
+ const pos=e=>{const r=cv.getBoundingClientRect();return[e.clientX-r.left,e.clientY-r.top]};
+ cv.onpointerdown=e=>{if(IS.state!=="paint")return;e.preventDefault();dn=true;[lx,ly]=pos(e);lt=performance.now();try{cv.setPointerCapture(e.pointerId)}catch(_){}inkDab(lx,ly,IS.R*1.15);$("isCancel").style.visibility="hidden"};
+ cv.onpointermove=e=>{if(!dn||IS.state!=="paint")return;e.preventDefault();const[x,y]=pos(e),now=performance.now(),dist=Math.hypot(x-lx,y-ly),sp2=dist/Math.max(1,now-lt);
+  const r=IS.R*Math.max(.55,Math.min(1.25,1.25-sp2*.35));const n=Math.max(1,Math.ceil(dist/(r*.35)));for(let i=1;i<=n;i++)inkDab(lx+(x-lx)*i/n,ly+(y-ly)*i/n,r);
+  if(Math.random()<.035*n)inkSpatter(x,y,r);
+  if(now-lastSnd>90&&typeof noise==="function"){lastSnd=now;noise(.06,.05,1800+Math.random()*900)}
+  lx=x;ly=y;lt=now;inkProgress()};
+ cv.onpointerup=cv.onpointercancel=()=>{dn=false}}
+function inkColor(){if(IS.stage===0)return"#151515";const k=INKC[IS.stage===1?IS.shown:IS.best];if(k.rb){IS.hue=(IS.hue+2)%360;return`hsl(${IS.hue},90%,55%)`}return k.c}
+function inkDab(x,y,r){const g=IS.g,c=inkColor();g.save();if(IS.stage>0&&INKC[IS.stage===1?IS.shown:IS.best].g){g.shadowColor=c;g.shadowBlur=10}
+ g.globalAlpha=.16;g.fillStyle=c;g.beginPath();g.arc(x+(Math.random()-.5)*2,y+(Math.random()-.5)*2,r*1.35,0,7);g.fill();
+ g.globalAlpha=.92;g.beginPath();g.arc(x,y,r*(.9+Math.random()*.12),0,7);g.fill();g.restore();
+ const rr=(r+IS.R*.25)**2;for(const p of IS.pts)if(!p.c&&(p.x-x)**2+(p.y-y)**2<rr)p.c=1}
+function inkSpatter(x,y,r){const g=IS.g;g.save();g.fillStyle=inkColor();g.globalAlpha=.9;for(let i=0;i<4+Math.random()*5;i++){const a=Math.random()*6.28,dd=r*(1.4+Math.random()*2.2);g.beginPath();g.arc(x+Math.cos(a)*dd,y+Math.sin(a)*dd,Math.random()*r*.28+1,0,7);g.fill()}g.restore()}
+function inkProgress(){const c=IS.pts.filter(p=>p.c).length/IS.pts.length;IS.cov=c;const goal=.62;$("isPr").style.width=Math.min(100,c/goal*100)+"%";
+ if(IS.shown){if(IS.stage===0&&c>.18){IS.stage=1;inkReveal(IS.shown,false)}
+  else if(IS.stage===1&&IS.fake&&c>.45){IS.stage=2;inkReveal(IS.best,true)}
+  else if(IS.stage===1&&!IS.fake&&c>.45)IS.stage=2}
+ $("isPr").style.background=IS.stage?(INKC[IS.stage===1?IS.shown:IS.best].rb?"linear-gradient(90deg,#ff3d6e,#ffd23a,#34d399,#4da3ff,#a970ff)":INKC[IS.stage===1?IS.shown:IS.best].c):"#151515";
+ if(c>=goal&&IS.state==="paint")inkDone()}
+function inkReveal(r,up){const k=INKC[r],ri=RI[r];const col=k.rb?"#a970ff":k.c;
+ $("isHint").innerHTML=up?`Attends… l'encre devient <b style="color:${col}">${k.n}</b> !!`:r==="C"?`L'encre reste <b>noire</b>… continue !`:`L'encre devient <b style="color:${col}">${k.n}</b>…`;
+ if(up){sfx.fakeout&&sfx.fakeout();const b=$("isPaper").getBoundingClientRect();sparksAt(b.left+b.width/2,b.top+b.height/2,r,24);$("isPaper").classList.remove("shake");void $("isPaper").offsetWidth;$("isPaper").classList.add("shake")}
+ else if(ri>=2)sfx.flip&&sfx.flip(Math.min(2,ri))}
+async function inkDone(){IS.state="fill";$("isHint").innerHTML="…";
+ if(!IS.cards){try{await IS.P}catch(e){$("inkS").style.display="none";packError(e);return}await sleep(30)}
+ if(IS.stage<2){IS.stage=2}
+ const g=IS.g,r=IS.best,k=INKC[r],ri=RI[r],fs=Math.min(IS.W,IS.H)*.8;
+ for(let i=1;i<=12;i++){g.save();g.font=IS.font;g.textAlign="center";g.textBaseline="middle";g.globalAlpha=i/12*.5;
+  if(k.rb){const gr=g.createLinearGradient(0,0,IS.W,IS.H);["#ff3d6e","#ffd23a","#34d399","#4da3ff","#a970ff"].forEach((c,j)=>gr.addColorStop(j/4,c));g.fillStyle=gr}else g.fillStyle=k.c;
+  if(k.g||ri>=4){g.shadowColor=k.rb?"#a970ff":k.c;g.shadowBlur=18}g.fillText(IS.kj,IS.W/2,IS.H/2+fs*.03);g.restore();await sleep(28)}
+ sfx.flip&&sfx.flip(Math.min(4,ri));if(ri>=3&&sfx.hype)sfx.hype(Math.min(4,ri-1));
+ const pb=$("isPaper").getBoundingClientRect();sparksAt(pb.left+pb.width/2,pb.top+pb.height/2,r,ri>=5?40:ri>=3?22:10);
+ const fl=$("isFlood");fl.style.background=k.rb?"radial-gradient(circle,#fff 0,#a970ff 35%,#4de1ff 60%,#0b0b10 100%)":`radial-gradient(circle,${ri>=5?"#fff":k.c} 0,${k.c} 40%,#0b0b10 100%)`;fl.classList.add("on");
+ $("isHint").innerHTML=`Kanji complet ! Encre <b style="color:${k.rb?"#a970ff":k.c}">${k.n}</b>`;await sleep(650);
+ const pk=$("isPack");pk.style.setProperty("--gc",k.rb?"#a970ff":k.c);pk.classList.add("on");if(ri>=4)pk.classList.add("big");IS.state="pack";
+ $("isHint").innerHTML="Le booster est apparu ! <b>Touche-le pour l'ouvrir</b>";
+ pk.onclick=async()=>{if(IS.state!=="pack")return;IS.state="done";sfx.whoosh&&sfx.whoosh();pk.classList.add("pop");const b=pk.getBoundingClientRect();sparksAt(b.left+b.width/2,b.top+b.height/2,r,ri>=5?40:16);
+  await sleep(ri>=4?700:450);$("inkS").style.display="none";
+  if(IS.multi){IS.cards.forEach(p=>commitPack(p,false));busy=false;updateTop();showMultiReveal(IS.cards)}else{commitPack(IS.cards,IS.paid);busy=false;updateTop();showReveal(IS.cards)}}}
 
 // ================= CINÉMATIQUES DE FIN DE CHAPITRE (lore) =================
 const LORE_A=["Un premier Éclat d'Origine s'arrache aux ténèbres. Autrefois, ces fragments reliaient tous les univers entre eux.","Le deuxième Éclat murmure un souvenir : un Gardien a déjà existé, il y a très longtemps.","Le troisième Éclat révèle une vérité : le Brise-Paires n'est pas né mauvais. Il était le gardien des liens.","Le quatrième Éclat montre son ancien serment : protéger chaque Écho… jusqu'au jour où il a perdu le sien.","Le cinquième Éclat tremble. La marée d'ombre recule, et Hoshi se souvient enfin de son propre nom.","Le sixième Éclat fissure le ciel du Néant. Des univers oubliés redeviennent visibles.","Le septième Éclat illumine le dernier rempart. Il ne manque plus qu'une pièce au Cristal.","Le huitième Éclat se pose. Le Cristal des Univers brille… et ouvre la route du Cœur du Néant."];
