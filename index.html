@@ -859,6 +859,24 @@ nav button{font-size:9.5px}
 .albhead{border-radius:16px;padding:16px;background:center/cover;border:1px solid var(--line)}
 @media (min-width:900px){.albgrid{grid-template-columns:repeat(auto-fill,minmax(230px,1fr))}.albt{height:140px}}
 .albparts{display:block;font-size:10px;font-weight:700;color:#ffd34d;margin-top:1px}
+#lfin{position:absolute;inset:0;z-index:45;display:none;background:#000;cursor:pointer;overflow:hidden;--lc:#ff3d6e}
+#lfin[data-r="D"]{--lc:#ffd96a}#lfin[data-r="X"]{--lc:#9b86ff}
+#lfin.on{display:block;animation:lfin .35s ease-out}#lfin.out{animation:lfout .35s forwards}
+@keyframes lfin{from{opacity:0;transform:scale(1.08)}}@keyframes lfout{to{opacity:0}}
+.lfbar{position:absolute;left:0;right:0;height:16%;background:#000;z-index:3;display:flex;flex-direction:column;align-items:center;justify-content:center}.lfbar.t{top:0}.lfbar.b{bottom:0}
+.lfstage{position:absolute;inset:0;display:flex;align-items:center;justify-content:center}
+.lfvid{position:absolute;left:50%;top:50%;width:178vh;height:100vh;transform:translate(-50%,-50%);max-width:none;opacity:0;transition:opacity .4s;pointer-events:none}
+#lfin.vid .lfvid{opacity:1}.lfvid iframe{width:100%;height:100%;border:0;pointer-events:none}
+.lffall{position:relative;display:flex;align-items:center;justify-content:center;transition:opacity .4s}
+#lfin.vid .lffall{opacity:0}
+.lffall img{width:min(52vw,260px);aspect-ratio:2.5/3.6;object-fit:cover;border-radius:14px;border:3px solid var(--lc);box-shadow:0 0 50px var(--lc);animation:lfzoom 3s ease-out forwards;filter:contrast(1.15)}
+.lffall span{position:absolute;font-family:"Noto Sans JP";font-weight:900;font-size:min(46vw,300px);color:transparent;-webkit-text-stroke:3px var(--lc);opacity:.45;animation:lfkj 3s ease-out forwards}
+@keyframes lfzoom{0%{transform:scale(1.6) rotate(-4deg);filter:brightness(3)}20%{transform:scale(1) rotate(0);filter:brightness(1.1)}100%{transform:scale(1.08)}}
+@keyframes lfkj{from{transform:scale(1.8);opacity:0}to{transform:scale(1);opacity:.45}}
+.lftitle{font-weight:900;font-size:clamp(22px,6vw,44px);letter-spacing:.14em;color:#fff;text-shadow:0 0 18px var(--lc),0 0 40px var(--lc);animation:lft .6s .2s both}
+.lfname{font-size:12px;font-weight:800;letter-spacing:.25em;text-transform:uppercase;color:var(--lc);margin-top:4px;animation:lft .6s .4s both}
+@keyframes lft{from{opacity:0;transform:translateY(10px) scale(1.2)}}
+.lfskip{position:absolute;right:12px;top:calc(16% + 10px);z-index:4;font-size:11px;font-weight:800;color:#fffa;background:#0008;border-radius:99px;padding:5px 10px}
 </style>
 <link rel="manifest" href="manifest.webmanifest"><meta name="theme-color" content="#09090c"><link rel="icon" href="icon-192.png"><link rel="apple-touch-icon" href="icon-192.png"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="description" content="Shōkan · jeu gratuit de cartes anime : ouvre des mangas, collectionne, combats, guildes et arène."></head>
 <body>
@@ -892,7 +910,7 @@ nav button{font-size:9.5px}
   <div class="bside" id="bAlly"></div>
   <div id="bctrl"><button class="btn ghost sm" id="bSpeed">Vitesse ×1</button><button class="btn ghost sm" id="bSkip">Passer ⏩</button></div>
   <div id="cine"><div class="cbg"></div><div class="cimg"></div><div class="cstars"></div><div class="crays"></div><div class="cl"></div><div class="mg"><div class="mp p1"><img draggable="false" referrerpolicy="no-referrer" alt=""><div class="spd"></div></div><div class="mp p2"><img draggable="false" referrerpolicy="no-referrer" alt=""><div class="tone"></div><span class="ono">ゴゴゴ</span></div><div class="mp p3"><img draggable="false" referrerpolicy="no-referrer" alt=""><div class="spd"></div><div class="bub"><small></small><span></span><em></em></div><span class="ono2">ドン!</span></div></div></div>
-  <div id="bpart" class="bpart"></div><div id="bveil"></div><canvas id="bfx"></canvas><div id="bflash"></div>
+  <div id="bpart" class="bpart"></div><div id="bveil"></div><div id="lfin"></div><canvas id="bfx"></canvas><div id="bflash"></div>
  </div>
  <div id="modal" class="ovl"><div class="mbox" id="mbox"></div></div>
  <div id="toast"></div>
@@ -1813,6 +1831,22 @@ async function elemFx(el,targets,big){if(B.skip||!EFX[el])return;if(!FXS.ctx||FX
 
 
 
+
+// ================= LEGENDARY FINISH (Mythique, Divin, Cosmos qui achève le dernier ennemi) =================
+// extraits personnalisés : id AniList du perso -> vidéo YouTube OFFICIELLE + moment (secondes)
+const LFIN={/* exemple : 87275:{yt:"ID_YOUTUBE",s:72,e:79} */};
+let LFP=null;
+async function legendaryFinish(u){if(B.skip||!u||!u.card)return;const c=u.card,o=$("lfin"),r=c.rarity,ov=LFIN[c.id];
+ let vid=ov?ov.yt:c.trailer,s=ov?ov.s:40,e=ov?ov.e:47;if(!vid&&!ov){try{await loadBg(c);vid=c.trailer}catch(_){}}
+ o.dataset.r=r;o.innerHTML=`<div class="lfbar t"></div><div class="lfstage"><div class="lfvid" id="lfVid"></div><div class="lffall"><img src="${esc(c.img)}" referrerpolicy="no-referrer"><span>${{M:"神話",D:"神",X:"宇宙"}[r]||"伝説"}</span></div></div>
+ <div class="lfbar b"><div class="lftitle">LEGENDARY FINISH</div><div class="lfname">${esc(c.name)}</div></div><div class="lfskip">Toucher pour passer ▸</div>`;
+ o.classList.add("on");sfx.ult();shakeScreen(10);let done;const end=new Promise(res=>done=res);const finish=()=>{if(!o.classList.contains("on"))return;o.classList.add("out");setTimeout(()=>{o.classList.remove("on","out","vid");o.innerHTML="";if(LFP){try{LFP.destroy()}catch(_){}LFP=null}done()},350)};
+ o.onclick=finish;let to=setTimeout(finish,(vid?Math.max(4,e-s)*1000+2600:3200)/Math.max(1,speed>2?2:1));
+ if(vid&&sceneOn()){try{await loadYT();const h=document.createElement("div");$("lfVid").appendChild(h);
+  LFP=new YT.Player(h,{videoId:vid,playerVars:{autoplay:1,mute:1,controls:0,playsinline:1,rel:0,modestbranding:1,iv_load_policy:3,disablekb:1,fs:0,start:s,end:e},
+   events:{onReady:ev=>{try{ev.target.playVideo()}catch(_){}},onStateChange:ev=>{if(ev.data===1){o.classList.add("vid");try{ev.target.unMute();ev.target.setVolume(70)}catch(_){}}if(ev.data===0)finish()},onError:()=>{o.classList.remove("vid")}}})}catch(_){}}
+ await end;clearTimeout(to)}
+
 // ================= IMPACTS D'ULTIME (après la cinématique manga) =================
 const SPR={};
 function glowSpr(col){if(SPR[col])return SPR[col];const c=document.createElement("canvas");c.width=c.height=128;const g=c.getContext("2d");const gr=g.createRadialGradient(64,64,0,64,64,64);
@@ -2454,7 +2488,7 @@ function center(u){const r=u.dom.querySelector(".bcard").getBoundingClientRect()
 const alive=l=>l.filter(u=>u.hp>0);
 function pickTarget(foes,low){const a=alive(foes);if(!a.length)return null;if(low)return a.reduce((m,u)=>u.hp/u.maxhp<m.hp/m.maxhp?u:m);
  const tt=a.filter(u=>u.taunt>0);if(tt.length&&Math.random()<.85)return tt[0];const tanks=a.filter(u=>u.cls.id==="tnk");if(tanks.length&&Math.random()<.45)return tanks[0];return a[Math.floor(Math.random()*a.length)]}
-function hitUnit(src,t,mult){let m=mult*(.9+Math.random()*.2);let el=1;if(ADV[src.el.id]===t.el.id)el=1.3;else if(ADV[t.el.id]===src.el.id)el=.8;
+function hitUnit(src,t,mult){const _hp0=t.hp;try{queueMicrotask(()=>{if(B&&_hp0>0&&t.hp<=0&&t.side==="e"&&!t.raid&&!alive(B.enemies).length&&!B.finisher)B.finisher=src})}catch(_){}let m=mult*(.9+Math.random()*.2);let el=1;if(ADV[src.el.id]===t.el.id)el=1.3;else if(ADV[t.el.id]===src.el.id)el=.8;
  const crit=Math.random()<(src.cls.id==="ass"?.25:.1);let d=Math.round(src.atk*m*el*(crit?1.8:1));
  let ab=0;if(t.raid){if(src.side==="a")B.dmg+=d}else{if(t.shield>0){ab=Math.min(t.shield,d);t.shield-=ab;d-=ab}t.hp-=d;if(src.side==="a")B.dmg+=d}
  popDmg(t,d===0&&ab?"🛡️ "+fmt(ab)+" bloqués":fmt(d)+(ab?" (🛡️-"+fmt(ab)+")":"")+(crit?" !":""),el>1?"#ffd34d":crit?"#ff8a5c":"#fff",crit);
@@ -2504,7 +2538,7 @@ async function runBattle(){const maxR=B.cfg.type==="raid"||B.cfg.type==="graid"?
   const order=alive(B.allies).concat(alive(B.enemies)).sort((a,b)=>b.spd-a.spd+Math.random()*6-3);
   for(const u of order){if(u.hp<=0)continue;if(!alive(B.enemies).length||!alive(B.allies).length)break;await act(u)}
   if(!alive(B.enemies).length||!alive(B.allies).length||B.round>=maxR)B.over=true}
- endBattle()}
+ if(B&&B.finisher&&B.finisher.side==="a"&&RI[B.finisher.rarity]>=4&&!B.skip&&alive(B.allies).length)await legendaryFinish(B.finisher);if(B)endBattle()}
 function endBattle(){const c=B.cfg,won=alive(B.allies).length>0&&(c.type==="raid"||c.type==="graid"||!alive(B.enemies).length);if(won&&B.syn&&B.syn.maxSeries>=3&&c.type!=="raid"&&c.type!=="graid")S.synWin=(S.synWin||0)+1;const dead=B.allies.filter(u=>u.hp<=0).length;
  let html="",xp=0;
  if(c.type==="raid"){S.raid.tries++;S.raid.best=Math.max(S.raid.best,B.dmg);bump("raid");const sh=Math.round(30+Math.log10(B.dmg+10)*25),on=2+Math.floor(Math.log10(B.dmg+10));
