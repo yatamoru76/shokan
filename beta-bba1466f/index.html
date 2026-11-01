@@ -1228,6 +1228,16 @@ header .hsp{flex:1}
 @keyframes flick{0%,100%{opacity:1}47%{opacity:1}48%{opacity:.4}49%{opacity:1}}
 .altar .arr{position:absolute!important;top:82px;width:38px;height:38px;border-radius:50%;border:1px solid hsl(var(--h) 50% 50% / .45);background:#0e0d0caa;color:var(--tg);font:600 22px/1 Inter;z-index:2!important;display:flex;align-items:center;justify-content:center;padding:0 0 3px}
 .altar .arr.l{left:14px}.altar .arr.r{right:14px}
+
+/* icônes à la place des emoji */
+.jk{font:800 1em var(--min);font-style:normal;color:var(--gold);margin:0 .12em;display:inline-block;line-height:1}
+.btn .jk,.on .jk,button.on .jk{color:inherit}
+.jk.md{width:1.35em;height:1.35em;line-height:1.35em;text-align:center;border-radius:50%;font-size:.8em;color:#1a1612}
+.jk.md-金{background:linear-gradient(#f3d27a,#b8862b)}.jk.md-銀{background:linear-gradient(#e8e8ee,#9a9aa6)}.jk.md-銅{background:linear-gradient(#e2a26a,#94562a)}
+.ji{display:inline-flex;vertical-align:-.15em;margin:0 .15em;color:var(--gold)}.ji svg{width:1.05em;height:1.05em;fill:none;stroke:currentColor;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
+.btn .ji{color:inherit}
+.emo{filter:grayscale(1) sepia(.6) saturate(1.5) brightness(1.08);font-style:normal}
+.wallet .ji{color:var(--gold);margin:0 3px 0 0}
 </style>
 
 </head>
@@ -3373,6 +3383,22 @@ document.addEventListener("visibilitychange",()=>{if(!AC)return;document.hidden?
 // ================= DÉMARRAGE =================
 load();dailyReset();tickBoost();initOpener();setMusicChip();applyDeco();
 // ================= INTERFACE « PAGE DE MANGA » (bêta) =================
+
+// ===== emoji -> kanji / icônes dorées =====
+const SVGI={card:'<svg viewBox="0 0 24 24"><rect x="5" y="3.5" width="14" height="17" rx="2"/><path d="M9 9.5h6M9 12.5h6M12 9.5v6"/></svg>',gem:'<svg viewBox="0 0 24 24"><path d="M12 3l7 7-7 11-7-11z"/><path d="M5 10h14M12 3v18"/></svg>',oni:'<svg viewBox="0 0 24 24"><path d="M12 4c4 0 8 7.5 8 11.5 0 3-2.5 4.5-8 4.5s-8-1.5-8-4.5C4 11.5 8 4 12 4z"/><rect x="8.5" y="13" width="7" height="7" rx="1"/></svg>',bolt:'<svg viewBox="0 0 24 24"><path d="M13 3L5 13.5h6L10 21l8-10.5h-6z"/></svg>',search:'<svg viewBox="0 0 24 24"><circle cx="10.5" cy="10.5" r="6"/><path d="M15 15l5 5"/></svg>'};
+const EMAP={"🎴":"s:card","💠":"s:gem","🍙":"s:oni","⚡":"s:bolt","🔍":"s:search","🔎":"s:search",
+ "🏆":"賞","🎁":"贈","⚙️":"設","⚙":"設","⚔️":"戦","⚔":"戦","🗡️":"刃","🗼":"塔","📖":"物","🖌️":"筆","📚":"巻","👥":"友","🔥":"炎","♻️":"還","👀":"見","👁️":"見","👁":"見","🛡️":"盾","💥":"撃","🎟️":"券","🔒":"封","🔓":"開","📺":"映","🗂️":"類","🎵":"音","🔇":"静","🏯":"城","👑":"王","💎":"宝","🌟":"★","⭐":"★","✨":"✦","💰":"金","🛒":"商","📜":"巻","🎯":"的","🏅":"章","🥇":"金","🥈":"銀","🥉":"銅","💀":"死","🔮":"魔","🍀":"運","🎲":"運","📅":"暦","✏️":"筆","⏩":"»","🎉":"祝","💬":"話","📢":"告","⏳":"時","⌛":"時","🔄":"換","🔁":"換","🤝":"交","📦":"箱","👤":"人","🏠":"家","🔔":"鈴","🎶":"音","🌸":"桜","📊":"表","🧭":"道","🎊":"祝","🪙":"銭","🧧":"封","📮":"便","✉️":"便","📩":"便","🗓️":"暦","🏳️":"降","🚪":"出","🔑":"鍵","❌":"✕","✅":"✓","✔️":"✓","⚠️":"!"};
+const EMRX=/\p{Extended_Pictographic}(?:️|‍\p{Extended_Pictographic}️?)*/gu;
+const EM_SKIP=".card,#battle,#live,svg,.jk,.ji,.emo,input,textarea,script,style,canvas,#inkS .isleg,.cine,#cine";
+function emoNode(t){const s=t.nodeValue;EMRX.lastIndex=0;if(!EMRX.test(s))return;const p=t.parentElement;if(!p||p.closest(EM_SKIP))return;
+ const f=document.createDocumentFragment();let last=0;s.replace(EMRX,(m,i)=>{if(i>last)f.appendChild(document.createTextNode(s.slice(last,i)));const k=EMAP[m]||EMAP[m.replace(/️/g,"")];let el;
+  if(k&&k.startsWith("s:")){el=document.createElement("i");el.className="ji";el.innerHTML=SVGI[k.slice(2)]}else if(k){el=document.createElement("i");el.className="jk";el.textContent=k;if(["金","銀","銅"].includes(k)&&/🥇|🥈|🥉/.test(m))el.classList.add("md","md-"+k)}else{el=document.createElement("span");el.className="emo";el.textContent=m}
+  f.appendChild(el);last=i+m.length;return m});if(last<s.length)f.appendChild(document.createTextNode(s.slice(last)));t.replaceWith(f)}
+function emoScan(root){const w=document.createTreeWalker(root,NodeFilter.SHOW_TEXT);const L=[];let n;while(n=w.nextNode())L.push(n);L.forEach(emoNode)}
+let emoQ=new Set(),emoT=0;const emoObs=new MutationObserver(ms=>{ms.forEach(m=>{if(m.type==="characterData")emoQ.add(m.target.parentNode);m.addedNodes.forEach(x=>emoQ.add(x.nodeType===3?x.parentNode:x))});
+ if(!emoT)emoT=requestAnimationFrame(()=>{emoT=0;emoObs.disconnect();emoQ.forEach(x=>{if(x&&x.isConnected)emoScan(x)});emoQ.clear();emoObs.observe($("app"),{childList:true,subtree:true,characterData:true})})});
+setTimeout(()=>{emoScan($("app"));emoObs.observe($("app"),{childList:true,subtree:true,characterData:true})},0);
+
 const BELL='<svg viewBox="0 0 24 24"><path d="M6 16V11a6 6 0 0 1 12 0v5l1.5 2h-15z"/><path d="M10 20.5a2 2 0 0 0 4 0"/></svg>';
 S.boosters=99;const _cp=commitPack;commitPack=function(){const r=_cp.apply(this,arguments);S.boosters=99;save();return r};
 const _ut=updateTop;updateTop=function(){if(S.boosters<99)S.boosters=99;_ut();try{v2Top()}catch(e){console.warn(e)}};
