@@ -892,11 +892,15 @@ nav button{font-size:9.5px}
 @keyframes lfsl{0%,29%{transform:rotate(-28deg) scaleX(0);opacity:0}31%{transform:rotate(-28deg) scaleX(1);opacity:1}45%{opacity:0}100%{opacity:0;transform:rotate(-28deg) scaleX(1)}}
 #lfin.hit .lfstage,#lfin.hit .lfspd{animation:lfhit .42s steps(1) forwards}#lfin.hit::after{content:"";position:absolute;inset:0;background:#fff;z-index:6;pointer-events:none;animation:lffl .42s steps(1) forwards}@keyframes lffl{0%{opacity:.9}25%{opacity:0}50%{opacity:.6}75%,100%{opacity:0}}
 @keyframes lfhit{0%{filter:invert(1) contrast(2)}25%{filter:none}50%{filter:invert(1) contrast(2) grayscale(1)}75%{filter:none}}
+.frsearch input{width:100%;box-sizing:border-box;background:var(--bg2);border:1px solid var(--line);border-radius:12px;color:var(--ink);font-size:15px;padding:11px 12px;margin:10px 0 6px;user-select:text}
+.frrow{display:flex;align-items:center;gap:8px;background:var(--bg2);border:1px solid var(--line);border-radius:14px;padding:8px 10px;margin-bottom:7px}.frrow.res{border-style:dashed}
+.frn{flex:1;min-width:0;display:flex;flex-direction:column}.frn b{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.frn span{font-size:11.5px}
+.frcode{font-family:ui-monospace,monospace;letter-spacing:.1em;color:#ffd34d}.frx{padding:6px 10px!important}
 </style>
 <link rel="manifest" href="manifest.webmanifest"><meta name="theme-color" content="#09090c"><link rel="icon" href="icon-192.png"><link rel="apple-touch-icon" href="icon-192.png"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="description" content="Shōkan · jeu gratuit de cartes anime : ouvre des mangas, collectionne, combats, guildes et arène."></head>
 <body>
 <div id="app">
- <header><div class="logo" id="logoBtn"><div class="mk">召</div><div><span>Shōkan</span><small> 召喚</small></div></div><div class="res"><div class="chip" id="cGift">🎁</div><div class="chip" id="cBell">🔔</div><div class="chip" id="cMusic">🎵</div><div class="chip" id="cBoost"></div><div class="chip" id="cShard"></div><div class="chip" id="cOni"></div></div></header>
+ <header><div class="logo" id="logoBtn"><div class="mk">召</div><div><span>Shōkan</span><small> 召喚</small></div></div><div class="res"><div class="chip" id="cFriends" style="display:none">👥</div><div class="chip" id="cGift">🎁</div><div class="chip" id="cBell">🔔</div><div class="chip" id="cMusic">🎵</div><div class="chip" id="cBoost"></div><div class="chip" id="cShard"></div><div class="chip" id="cOni"></div></div></header>
  <div id="demoBanner">👀 <b>Mode aperçu</b> : ici les vrais personnages ne peuvent pas se charger, les cartes affichent des silhouettes. Dans l'appli, ce sont les vrais persos d'AniList.</div>
  <main id="main"></main>
  <nav id="nav">
@@ -1406,14 +1410,14 @@ function showProfile(){initProfile();const P=S.prof,p=$("picker"),all=Object.val
  <div class="pcard2 bn-${(S.guild&&S.guild.equip&&S.guild.equip.banner)||"none"}"><div class="pav" id="pAv">${av?`<img src="${esc(av.img)}" referrerpolicy="no-referrer">`:"召"}</div>
   <div style="flex:1;min-width:0"><div class="pname"><span id="pName">${esc(P.name)}</span> <button class="pedit" id="pEdit">✏️</button></div><div class="ptitle">${esc(myTitle())}</div>${S.guild?`<div class="pguild" style="--gc:${S.guild.color}">${S.guild.emblem} ${esc(S.guild.name)} · niv. ${S.guild.lvl}${S.guild.leader?" · Chef":""}</div>`:""}
   <div class="plvl"><b>Niv. ${P.lvl}</b><div class="xpbar" style="flex:1"><i style="width:${pct}%"></i></div></div><div class="muted" style="font-size:11px">${fmt(P.xp)} / ${fmt(pNeed(P.lvl))} XP · prochain cadeau au niveau ${P.lvl+1}</div></div></div>
- <div class="cloudslot" style="margin-top:12px">${cloudBox()}</div><div class="row2" style="margin-top:12px"><button class="btn ghost sm" id="pAch">🏆 Succès · ${ACH.filter(a=>(S.ach||{})[a.id]).length}/${ACH.length}</button><button class="btn ghost sm" id="pPass">🎟️ Passe · palier ${passLvl()}</button></div>
+ <div class="cloudslot" style="margin-top:12px">${cloudBox()}</div><div class="row2" style="margin-top:12px"><button class="btn ghost sm" id="pAch">🏆 Succès · ${ACH.filter(a=>(S.ach||{})[a.id]).length}/${ACH.length}</button><button class="btn ghost sm" id="pPass">🎟️ Passe · palier ${passLvl()}</button></div><button class="btn ghost sm" id="pFr" style="margin-top:8px">👥 Amis & combats amicaux</button>
  <div class="sec" style="margin-top:16px"><span class="no">01</span><span class="t">Mes cartes préférées</span><span class="jp">お気に入り</span></div>
  <div class="pfav">${[0,1,2].map(i=>fav[i]?`<div data-pf="${fav[i].id}">${cardHTML(fav[i],{lv:1})}</div>`:`<div class="pslot">＋<small>Ajoute une carte avec ⭐ dans sa fiche</small></div>`).join("")}</div>
  <div class="sec"><span class="no">02</span><span class="t">Statistiques</span><span class="jp">記録</span></div>
  <div class="pstats">${[["🎴",S.opened,"boosters ouverts"],["📚",all.length,"persos uniques"],["⚔️",S.wins||0,"victoires"],["🗼",S.tower||0,"record de la tour"],["😱",S.fakeouts||0,"fake outs"],["👑",all.filter(c=>c.master).length,"cartes maîtrisées"]].map(([i,v,l])=>`<div><b>${i} ${fmt(v)}</b><span>${l}</span></div>`).join("")}</div>
  <div class="box" style="font-size:13px">${RAR.slice().reverse().map(r=>`<span style="color:var(--${r.id});font-weight:800">${r.name} ${cnt[r.id]||0}</span>`).join(" · ")}${best?`<div class="muted" style="margin-top:6px">Meilleure carte : <b style="color:var(--${best.rarity})">${esc(best.name)}</b></div>`:""}</div>
  <div class="muted" style="text-align:center;margin:14px 0 30px;font-size:11.5px">Joueur depuis le ${new Date(P.since).toLocaleDateString("fr-FR")} · Touche ton avatar pour le changer</div></div>`;
- $("pClose").onclick=()=>{p.style.display="none";updateTop()};$("pAch").onclick=showAch;$("pSet").onclick=showSettings;cloudBind(p);$("pPass").onclick=showPass;
+ $("pClose").onclick=()=>{p.style.display="none";updateTop()};$("pAch").onclick=showAch;$("pSet").onclick=showSettings;cloudBind(p);$("pPass").onclick=showPass;$("pFr").onclick=showFriends;
  $("pEdit").onclick=()=>modal(`<h3>Ton pseudo</h3><input id="pnIn" maxlength="18" value="${esc(P.name)}" style="width:100%;background:var(--bg);border:1px solid var(--line);border-radius:10px;color:var(--ink);font-size:16px;padding:10px;user-select:text">`,[["Annuler"],["Valider",()=>{const v=($("pnIn").value||"").trim().slice(0,18);if(v)P.name=v;save();showProfile()}]]);
  $("pAv").onclick=()=>{p.style.display="none";pickCard("Choisis ton avatar",c=>{P.avatar=c.id;save();updateTop();showProfile()})};
  p.querySelectorAll("[data-pf]").forEach(d=>d.onclick=()=>{p.style.display="none";NAV=[];showDetail(d.dataset.pf)})}
@@ -2125,7 +2129,7 @@ function cloudApply(remote,t){CL.applying=true;CL.hold=true;CL.dirty=false;clear
 async function cloudPush(force){if(!CL.ready||!CL.user||CL.applying||CL.hold)return;if(!force&&!CL.dirty)return;CL.dirty=false;clearTimeout(CL.t);
  const now=Date.now();S.cloudId=CL.user.id;S.cloudT=now;try{localStorage.setItem("otaku_v1",JSON.stringify(S))}catch(_){}
  const {error}=await CL.sb.from("saves").upsert({user_id:CL.user.id,data:S,name:(S.prof&&S.prof.name)||cloudName(),updated_at:new Date(now).toISOString()});
- if(error){CL.err=error.message;CL.dirty=true;console.warn("cloud push",error)}else{CL.last=now;CL.err=""}cloudUI()}
+ if(error){CL.err=error.message;CL.dirty=true;console.warn("cloud push",error)}else{CL.last=now;CL.err="";pushPlayer()}cloudUI()}
 function cloudDirty(){if(!CL.user||CL.applying||CL.hold)return;CL.dirty=true;clearTimeout(CL.t);CL.t=setTimeout(()=>cloudPush(false),15000)}
 save=(f=>function(){if(CL.applying)return;f();cloudDirty()})(save);
 document.addEventListener("visibilitychange",()=>{if(document.visibilityState==="hidden"&&CL.dirty)cloudPush(false)});
@@ -2134,7 +2138,7 @@ function cloudBox(){if(!CL.ready&&!CL.user)return`<div class="cloudbox"><b>☁�
  const av=cloudAvatar();return`<div class="cloudbox on"><div style="display:flex;align-items:center;gap:10px">${av?`<img src="${esc(av)}" class="clav" referrerpolicy="no-referrer">`:'<div class="clav">🎮</div>'}<div style="flex:1;min-width:0"><b>${esc(cloudName())}</b><div class="muted" style="font-size:12px">${CL.err?"⚠️ "+esc(CL.err):CL.last?"☁️ Sauvegardé "+ago(CL.last):"☁️ Compte Discord connecté"}</div></div></div>
  <div class="row2" style="margin-top:8px"><button class="btn sm" data-cl="push">☁️ Sauvegarder maintenant</button><button class="btn ghost sm" data-cl="out">Se déconnecter</button></div></div>`}
 function cloudBind(root){(root||document).querySelectorAll("[data-cl]").forEach(b=>b.onclick=async()=>{const k=b.dataset.cl;if(k==="in")cloudLogin();else if(k==="out")cloudLogout();else{b.disabled=true;await cloudPush(true);toast(CL.err?"⚠️ Échec : "+CL.err:"☁️ Partie sauvegardée en ligne")}})}
-function cloudUI(){document.querySelectorAll(".cloudslot").forEach(el=>{el.innerHTML=cloudBox();cloudBind(el)});const c=$("cCloud");if(c){c.style.display=CL.ready?"":"none";c.textContent=CL.user?"☁️":"☁️"; c.classList.toggle("off",!CL.user)}}
+function cloudUI(){const cf=$("cFriends");if(cf){cf.style.display=CL.ready?"":"none";if(CL.user&&!cloudUI.fb){cloudUI.fb=1;friendBadge();pushPlayer();setInterval(friendBadge,60000)}}document.querySelectorAll(".cloudslot").forEach(el=>{el.innerHTML=cloudBox();cloudBind(el)});const c=$("cCloud");if(c){c.style.display=CL.ready?"":"none";c.textContent=CL.user?"☁️":"☁️"; c.classList.toggle("off",!CL.user)}}
 
 
 // ================= PARAMÈTRES + CODES CADEAUX =================
@@ -2339,6 +2343,48 @@ async function arenaOnlineEnd(c,won){const A=arenaState();bump("arena");if(won)A
   if(ARANK.indexOf(R1)>ARANK.indexOf(R0)){up=`<p style="font-size:18px">${R1.ic} <b style="color:${R1.c}">Promotion : ${R1.n} !</b></p>`;if(!A.reached[R1.n]){A.reached[R1.n]=1;addGift(R1.ic,"Arène : rang "+R1.n,"Première promotion à ce rang !",AWEEK[ARANK.indexOf(R1)])}}
   if(won){S.shards+=60;updateTop()}save();setArRes(`<p>🏟️ <b>${data.delta>0?"+":""}${data.delta} points</b> · ${R1.ic} ${R1.n} (${fmt(A.pts)})</p>${won?"<p>+60 💠</p>":""}${up}`)}
  catch(e){setArRes(`<p class="muted">⚠️ Classement non mis à jour : ${esc(e.message||String(e))}</p>`)}}
+
+
+// ================= AMIS + COMBATS AMICAUX =================
+const FR={tab:"list",q:"",res:[],t:null,pend:0};
+async function pushPlayer(){if(!pvpOn())return;initProfile();try{await CL.sb.from("players").upsert({user_id:CL.user.id,name:S.prof.name,avatar:cloudAvatar()||null,title:myTitle(),lvl:S.prof.lvl,power:teamPower(),team:S.team.length?defenseTeam():null,updated_at:new Date().toISOString()})}catch(_){}}
+async function friendRows(){const {data,error}=await CL.sb.from("friends").select("id,requester,addressee,status").or(`requester.eq.${CL.user.id},addressee.eq.${CL.user.id}`);if(error)throw error;return data||[]}
+async function playersByIds(ids){if(!ids.length)return{};const {data}=await CL.sb.from("players").select("user_id,name,avatar,title,lvl,power,team").in("user_id",ids);const m={};(data||[]).forEach(p=>m[p.user_id]=p);return m}
+async function friendBadge(){if(!pvpOn())return;try{const r=await friendRows();FR.pend=r.filter(x=>x.status==="pending"&&x.addressee===CL.user.id).length;const c=$("cFriends");if(c)c.innerHTML="👥"+(FR.pend?`<span class="bdg">${FR.pend}</span>`:"")}catch(_){}}
+function frAv(p){return p&&p.avatar?`<img src="${esc(p.avatar)}" class="clav" referrerpolicy="no-referrer">`:`<div class="clav">召</div>`}
+async function showFriends(){const p=$("picker");p.style.display="flex";
+ if(!pvpOn()){p.innerHTML=`<div style="width:100%;max-width:420px"><div style="display:flex;justify-content:space-between;align-items:center;margin:4px 0 10px"><div style="font-weight:900;font-size:19px">👥 Amis</div><button class="btn ghost sm" style="width:auto" id="frClose">Fermer</button></div><div class="cloudslot">${cloudBox()}</div><div class="muted" style="text-align:center;font-size:12.5px">Connecte-toi avec Discord pour ajouter des amis et faire des combats amicaux.</div></div>`;$("frClose").onclick=()=>{p.style.display="none"};cloudBind(p);return}
+ p.innerHTML=`<div class="muted" style="padding:40px">Chargement de tes amis…</div>`;let rows=[],pl={};
+ try{pushPlayer();rows=await friendRows();const ids=[...new Set(rows.map(r=>r.requester===CL.user.id?r.addressee:r.requester))];pl=await playersByIds(ids)}catch(e){p.innerHTML=`<div style="max-width:420px;text-align:center;padding:30px"><h3>👥 Amis indisponibles</h3><p class="muted">${esc(e.message||String(e))}</p><button class="btn ghost" id="frClose">Fermer</button></div>`;$("frClose").onclick=()=>{p.style.display="none"};return}
+ const other=r=>r.requester===CL.user.id?r.addressee:r.requester;const acc=rows.filter(r=>r.status==="accepted"),inc=rows.filter(r=>r.status==="pending"&&r.addressee===CL.user.id),out=rows.filter(r=>r.status==="pending"&&r.requester===CL.user.id);
+ FR.rows=rows;FR.pend=inc.length;friendBadge();const fd=fDaily();
+ p.innerHTML=`<div style="width:100%;max-width:420px"><div style="display:flex;justify-content:space-between;align-items:center;margin:4px 0 10px"><div style="font-weight:900;font-size:19px">👥 Amis · ${acc.length}</div><button class="btn ghost sm" style="width:auto" id="frClose">Fermer</button></div>
+ <div class="box" style="font-size:12.5px">Ton pseudo : <b>${esc(S.prof.name)}</b> · ton code ami : <b class="frcode">${CL.user.id.slice(0,8).toUpperCase()}</b><div class="muted" style="font-size:11.5px;margin-top:3px">Tes amis peuvent te trouver avec ton pseudo ou ton code. Change ton pseudo avec ✏️ dans ton profil.</div></div>
+ <div class="frsearch"><input id="frQ" type="search" placeholder="🔍 Chercher un joueur (pseudo ou code ami)" value="${esc(FR.q)}" autocomplete="off"></div><div id="frRes"></div>
+ ${inc.length?`<div class="sec"><span class="no">📩</span><span class="t">Demandes reçues</span><span class="jp">申請</span></div>${inc.map(r=>{const o=pl[other(r)];return`<div class="frrow">${frAv(o)}<div class="frn"><b>${esc(o?o.name:"Joueur")}</b><span class="muted">${esc(o&&o.title||"")}</span></div><button class="btn sm" style="width:auto" data-fa="${r.id}">✓</button><button class="btn ghost sm" style="width:auto" data-fd="${r.id}">✕</button></div>`}).join("")}`:""}
+ <div class="sec"><span class="no">⚔️</span><span class="t">Mes amis</span><span class="jp">友達</span></div>
+ <div class="muted" style="font-size:12px;margin:-4px 2px 8px">Combat amical : sans points de classement · récompense ${fd.left>0?`+25 💠 (encore ${fd.left}/5 aujourd'hui)`:"du jour déjà prise"}</div>
+ ${acc.length?acc.map(r=>{const o=pl[other(r)];return`<div class="frrow">${frAv(o)}<div class="frn"><b>${esc(o?o.name:"Joueur")}</b><span class="muted">${o?`Niv. ${o.lvl||1} · ⚡ ${fmt(o.power||0)}`:""}</span></div><button class="btn sm" style="width:auto" data-ff="${other(r)}" ${o&&o.team&&o.team.length&&S.team.length?"":"disabled"}>⚔️ Combat</button><button class="btn ghost sm frx" style="width:auto" data-fd="${r.id}" title="Retirer">✕</button></div>`}).join(""):'<div class="box muted" style="text-align:center;font-size:12.5px">Pas encore d\'amis. Cherche le pseudo d\'un pote juste au-dessus !</div>'}
+ ${out.length?`<div class="sec"><span class="no">⏳</span><span class="t">Demandes envoyées</span><span class="jp">送信</span></div>${out.map(r=>{const o=pl[other(r)];return`<div class="frrow">${frAv(o)}<div class="frn"><b>${esc(o?o.name:"Joueur")}</b><span class="muted">En attente…</span></div><button class="btn ghost sm" style="width:auto" data-fd="${r.id}">Annuler</button></div>`}).join("")}`:""}
+ <div style="height:30px"></div></div>`;
+ $("frClose").onclick=()=>{p.style.display="none";updateTop()};
+ const q=$("frQ");q.oninput=()=>{FR.q=q.value;clearTimeout(FR.t);FR.t=setTimeout(frSearch,350)};if(FR.q)frSearch();
+ p.querySelectorAll("[data-fa]").forEach(b=>b.onclick=async()=>{b.disabled=true;const {error}=await CL.sb.from("friends").update({status:"accepted"}).eq("id",+b.dataset.fa);if(error)toast("⚠️ "+error.message);else{toast("👥 Ami ajouté !");sfx.coin()}showFriends()});
+ p.querySelectorAll("[data-fd]").forEach(b=>b.onclick=async()=>{b.disabled=true;await CL.sb.from("friends").delete().eq("id",+b.dataset.fd);showFriends()});
+ p.querySelectorAll("[data-ff]").forEach(b=>b.onclick=()=>{const o=pl[b.dataset.ff];if(!o||!o.team)return;const en=o.team.map(c=>{const f=mkFoe(c,1,false);f.maxhp=c.hp;f.atk=c.atk;f.spd=c.spd;return f});p.style.display="none";
+  startBattle({type:"friendly",friend:o,enemies:en,title:"🤝 Combat amical · "+o.name,loc:"arena"})})}
+async function frSearch(){const el=$("frRes");if(!el)return;const q=FR.q.trim();if(q.length<2){el.innerHTML="";return}el.innerHTML='<div class="muted" style="padding:8px">Recherche…</div>';
+ try{let data=[];const isCode=/^[0-9a-f]{6,8}$/i.test(q);
+  if(isCode){const r=await CL.sb.rpc("find_player_by_code",{code:q.toLowerCase()});if(!r.error)data=r.data||[]}
+  const r2=await CL.sb.from("players").select("user_id,name,avatar,title,lvl,power").ilike("name","%"+q.replace(/[%_]/g,"")+"%").neq("user_id",CL.user.id).limit(15);if(r2.error)throw r2.error;
+  (r2.data||[]).forEach(x=>{if(!data.find(y=>y.user_id===x.user_id))data.push(x)});
+  if(!$("frRes"))return;const st=id=>{const r=(FR.rows||[]).find(x=>x.requester===id||x.addressee===id);return r?(r.status==="accepted"?"ami":"attente"):""};
+  el.innerHTML=data.length?data.filter(x=>x.user_id!==CL.user.id).map(x=>`<div class="frrow res">${frAv(x)}<div class="frn"><b>${esc(x.name||"Joueur")}</b><span class="muted">Niv. ${x.lvl||1} · ⚡ ${fmt(x.power||0)}</span></div>${st(x.user_id)==="ami"?'<span class="muted">✓ Ami</span>':st(x.user_id)==="attente"?'<span class="muted">⏳</span>':`<button class="btn sm" style="width:auto" data-fadd="${x.user_id}">+ Ajouter</button>`}</div>`).join(""):'<div class="muted" style="padding:8px">Aucun joueur trouvé. Il doit s\'être connecté avec Discord au moins une fois.</div>';
+  el.querySelectorAll("[data-fadd]").forEach(b=>b.onclick=async()=>{b.disabled=true;const {error}=await CL.sb.from("friends").insert({requester:CL.user.id,addressee:b.dataset.fadd});if(error){toast("⚠️ "+(error.code==="23505"?"Demande déjà envoyée":error.message));b.disabled=false;return}toast("📨 Demande d'ami envoyée !");sfx.select();showFriends()})}
+ catch(e){el.innerHTML=`<div class="muted" style="padding:8px">⚠️ ${esc(e.message||String(e))}</div>`}}
+function fDaily(){S.fr=S.fr||{day:"",n:0};if(S.fr.day!==today()){S.fr={day:today(),n:0}}return{left:5-S.fr.n}}
+function friendlyEnd(c,won){const f=fDaily();let rw="";if(won&&f.left>0){S.fr.n++;S.shards+=25;rw="<p>+25 💠</p>"}save();
+ return`<p>🤝 Combat amical contre <b>${esc(c.friend.name||"ton ami")}</b></p><p class="muted">Aucun point de classement en jeu.</p>${rw}`}
 
 // ================= RAID DE GUILDE =================
 const GBOSS=[{n:"Dragon de l'Éclipse",kj:"龍",el:"dark",c1:"#7b2cff",c2:"#ff4dd2",t:0},{n:"Hydre des Abysses",kj:"蛇",el:"water",c1:"#0b6bd6",c2:"#3bffd9",t:1},{n:"Phénix Écarlate",kj:"鳳",el:"fire",c1:"#ff4a1c",c2:"#ffd34d",t:2},{n:"Colosse du Tonnerre",kj:"雷",el:"thunder",c1:"#e8b400",c2:"#7fe3ff",t:3}];
@@ -2578,6 +2624,7 @@ function endBattle(){const c=B.cfg,won=alive(B.allies).length>0&&(c.type==="raid
   S.shards+=sh;S.oni+=on;xp=200;html=`<div style="width:90px;margin:0 auto">${cardHTML(B.enemies[0].card)}</div><h2>Raid terminé</h2><div class="power">${fmt(B.dmg)}</div><div class="muted">dégâts infligés${B.dmg>=S.raid.best?" · 🏆 nouveau record du jour !":""}</div><p>+${sh} 💠 · +${on} 🍙</p>`}
  else if(c.type==="graid"){const R=graidState();R.used++;bump("graid");const d=B.dmg;graidHit(d,true);gxp(60,true);gfeed("⚔️ "+((S.prof&&S.prof.name)||"Toi")+" inflige "+fmt(d)+" dégâts à "+GBOSS[R.b].n);const sh=Math.round(40+Math.log10(d+10)*30);S.shards+=sh;xp=220;
   html=`<div style="width:90px;margin:0 auto">${cardHTML(B.enemies[0].card)}</div><h2>Raid de guilde</h2><div class="power">${fmt(d)}</div><div class="muted">dégâts infligés · ${R.dead?"🏆 BOSS VAINCU !":"PV restants : "+fmt(R.hp)}</div><p>+${sh} 💠</p>`;sfx.win()}
+ else if(c.type==="friendly"){if(won)S.wins++;pxp(won?20:8);html=`<div style="font-size:34px">${won?"🏆":"💀"}</div><h2>${won?"Victoire !":"Défaite…"}</h2>`+friendlyEnd(c,won);xp=won?200:80;won?sfx.win():sfx.lose()}
  else if(c.type==="arena"){S.wins+=won?1:0;if(won)bump("win");pxp(won?30:10);html=`<div style="font-size:34px">${won?"🏆":"💀"}</div><h2>${won?"Victoire !":"Défaite…"}</h2>`+(c.online?(arenaOnlineEnd(c,won),'<div id="arRes"><p class="muted">Mise à jour du classement…</p></div>'):arenaEnd(c,won));xp=won?400:120;won?sfx.win():sfx.lose()}
  else if(won&&c.type==="story"){S.wins++;bump("win");pxp(40);const r=storyWin(c);html=`<div style="font-size:30px">✨</div><h2>Victoire !</h2>`+r.html;c._after=r.after;xp=Math.round(60+(c.ch||8)*25+(c.stg||0)*10);sfx.win()}
  else if(won){const g=c.type==="stage"?c.w*10+c.s:6+c.f;const stars=dead===0?3:dead<=2?2:1;S.wins++;bump("win");pxp(30);
@@ -2591,7 +2638,7 @@ function endBattle(){const c=B.cfg,won=alive(B.allies).length>0&&(c.type==="raid
  html+=`<div class="muted">+${fmt(xp)} XP pour l'équipe${ups.length?"<br>⬆️ "+ups.map(esc).join("<br>⬆️ "):""}</div>`;
  save();const cfg=c;(async()=>{if(won&&c.type==="story")await purifyFoes()})().then(()=>setTimeout(()=>{if(!B)return;$("battle").style.display="none";$("cine").classList.remove("on");B=null;
   const btns=[["OK",()=>render()]];if(cfg.type==="stage"&&won&&cfg.s<10)btns.push(["Étape suivante ▶",()=>{render();stagePrompt(cfg.w,cfg.s+1)}]);
-  if(cfg.type==="tower"&&won)btns.push(["Étage suivant ▶",()=>{render();towerPrompt()}]);if(cfg.type==="arena")btns.push(["Arène ▶",()=>{render();showArena(!!cfg.practice)}]);if(cfg.type==="graid")btns.push(["Guilde ▶",()=>{view="guild";setNav();render()}]);if(!won&&cfg.type!=="raid"&&cfg.type!=="graid"&&cfg.type!=="arena")btns.push(["Réessayer",()=>{render();cfg.type==="tower"?towerPrompt():stagePrompt(cfg.w,cfg.s)}]);
+  if(cfg.type==="tower"&&won)btns.push(["Étage suivant ▶",()=>{render();towerPrompt()}]);if(cfg.type==="friendly")btns.push(["Amis ▶",()=>{render();showFriends()}]);if(cfg.type==="arena")btns.push(["Arène ▶",()=>{render();showArena(!!cfg.practice)}]);if(cfg.type==="graid")btns.push(["Guilde ▶",()=>{view="guild";setNav();render()}]);if(!won&&cfg.type!=="raid"&&cfg.type!=="graid"&&cfg.type!=="arena"&&cfg.type!=="friendly")btns.push(["Réessayer",()=>{render();cfg.type==="tower"?towerPrompt():stagePrompt(cfg.w,cfg.s)}]);
   if(cfg.type==="story"){btns.length=0;btns.push(["Continuer",()=>{if(cfg._after)cfg._after();else showStory()}]);if(!won)btns.push(["Réessayer",()=>cfg.final?startBattle(Object.assign({},cfg,{enemies:villainFoes()})):storyStage(cfg.ch,cfg.stg,cfg.d)])}
   modal(html,btns);updateTop()},B&&B.skip?100:700))}
 $("bSpeed").onclick=()=>{speed=speed===1?2:speed===2?4:1;$("bSpeed").textContent="Vitesse ×"+speed};
@@ -2735,7 +2782,7 @@ document.addEventListener("pointerdown",()=>{if(!M_.started){M_.started=true;mus
 document.addEventListener("visibilitychange",()=>{if(!AC)return;document.hidden?AC.suspend():AC.resume()});
 
 // ================= DÉMARRAGE =================
-load();dailyReset();tickBoost();initOpener();setMusicChip();applyDeco();$("cBell").onclick=showNotifs;$("cGift").onclick=showGifts;$("logoBtn").onclick=showProfile;initProfile();render();setTimeout(cloudInit,300);setTimeout(albumWarm,4000);
+load();dailyReset();tickBoost();initOpener();setMusicChip();applyDeco();$("cBell").onclick=showNotifs;$("cGift").onclick=showGifts;$("cFriends").onclick=showFriends;$("logoBtn").onclick=showProfile;initProfile();render();setTimeout(cloudInit,300);setTimeout(albumWarm,4000);
 setInterval(()=>{const b=S.boosters;tickBoost();if(S.boosters!==b){save();if(view==="home")render()}try{mkTick()}catch(e){console.error(e)}try{notifWatch()}catch(e){}try{guildTick()}catch(e){console.error(e)}if(view==="mk")mkTimers();updateTop()},1000);
 document.addEventListener("visibilitychange",()=>{if(document.hidden)save()});
 </script>
