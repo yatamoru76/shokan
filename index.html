@@ -919,6 +919,10 @@ nav button{font-size:9.5px}
 .lvwait{margin:auto;display:flex;flex-direction:column;align-items:center;gap:8px}
 .lvsp{width:46px;height:46px;border-radius:50%;border:4px solid #ffffff22;border-top-color:var(--acc);animation:spin .9s linear infinite}
 @media (min-width:900px){#live{padding:20px 12%}.lvu{max-width:130px}.lvnm{font-size:11px}}
+.adin{width:100%;box-sizing:border-box;background:var(--bg);border:1px solid var(--line);border-radius:10px;color:var(--ink);font-size:15px;padding:9px 10px;margin-top:8px;user-select:text}
+.adcr{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-top:8px}.adcc{cursor:pointer;border-radius:12px;transition:transform .1s}.adcc.on{transform:scale(1.05);box-shadow:0 0 0 3px #ffd34d;border-radius:12px}
+.adcc .card .ov .sr,.adcc .card .ce,.adcc .card .lv{display:none}
+.adg{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px}.adg label{font-size:12px;font-weight:700;display:flex;flex-direction:column;gap:3px}.adg input{width:100%;box-sizing:border-box;min-width:0;background:var(--bg);border:1px solid var(--line);border-radius:8px;color:var(--ink);font-size:15px;padding:7px}
 </style>
 <link rel="manifest" href="manifest.webmanifest"><meta name="theme-color" content="#09090c"><link rel="icon" href="icon-192.png"><link rel="apple-touch-icon" href="icon-192.png"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="description" content="Shōkan · jeu gratuit de cartes anime : ouvre des mangas, collectionne, combats, guildes et arène."></head>
 <body>
@@ -1408,8 +1412,8 @@ function masterScene(c){const o=$("mscene");o.style.display="flex";o.innerHTML=`
 
 // ================= BOÎTE CADEAU =================
 function addGift(ic,title,desc,rw){S.gifts=S.gifts||[];S.gifts.unshift({id:Math.random().toString(36).slice(2),ic,title,desc,rw,t:Date.now()});save();notify("🎁","Nouveau cadeau : "+title,true);try{updateTop()}catch(_){}}
-function rwText(rw){return[rw.boosters?rw.boosters+" 🎴":"",rw.shards?fmt(rw.shards)+" 💠":"",rw.oni?rw.oni+" 🍙":"",rw.frag?rw.frag+" 🌟":""].filter(Boolean).join(" · ")}
-function claimGift(g){S.boosters+=g.rw.boosters||0;S.shards+=g.rw.shards||0;S.oni+=g.rw.oni||0;S.frag+=g.rw.frag||0;S.gifts=S.gifts.filter(x=>x.id!==g.id)}
+function rwText(rw){return[rw.cardObj?"🎴 "+rw.cardObj.name+" ("+(RAR[RI[rw.cardObj.rarity]]||RAR[0]).name+")":"",rw.boosters?rw.boosters+" 🎴":"",rw.shards?fmt(rw.shards)+" 💠":"",rw.oni?rw.oni+" 🍙":"",rw.frag?rw.frag+" 🌟":""].filter(Boolean).join(" · ")}
+function claimGift(g){if(g.rw.cardObj){const c=Object.assign({},g.rw.cardObj);c.isNew=!S.coll[c.id];addCard(c);setTimeout(()=>{sfx.flip(RI[c.rarity]||0);modal(`<h3 style="margin:0 0 8px">🎁 ${esc(g.title)}</h3><div style="width:150px;margin:0 auto">${cardHTML(S.coll[c.id])}</div><p><b style="color:var(--${c.rarity})">${esc(c.name)}</b>${c.isNew?" · NOUVEAU":""}</p>`)},150)}S.boosters+=g.rw.boosters||0;S.shards+=g.rw.shards||0;S.oni+=g.rw.oni||0;S.frag+=g.rw.frag||0;S.gifts=S.gifts.filter(x=>x.id!==g.id)}
 function showGifts(){const p=$("picker"),G=S.gifts||[];p.style.display="flex";
  p.innerHTML=`<div style="width:100%;max-width:420px"><div style="display:flex;justify-content:space-between;align-items:center;margin:4px 0 10px"><div style="font-weight:900;font-size:19px">🎁 Boîte cadeau</div><button class="btn ghost sm" style="width:auto" id="gClose">Fermer</button></div>
  ${G.length?G.map(g=>`<div class="gift"><div class="gic">${g.ic}</div><div style="flex:1"><b>${esc(g.title)}</b><div class="muted" style="font-size:12px">${esc(g.desc)}</div><div class="grw">${rwText(g.rw)}</div></div><button class="btn sm" data-g="${g.id}" style="width:auto">Récupérer</button></div>`).join("")+`<button class="btn" id="gAll" style="margin:10px 0 30px">Tout récupérer</button>`
@@ -2162,7 +2166,7 @@ function cloudBox(){if(!CL.ready&&!CL.user)return`<div class="cloudbox"><b>☁�
  const av=cloudAvatar();return`<div class="cloudbox on"><div style="display:flex;align-items:center;gap:10px">${av?`<img src="${esc(av)}" class="clav" referrerpolicy="no-referrer">`:'<div class="clav">🎮</div>'}<div style="flex:1;min-width:0"><b>${esc(cloudName())}</b><div class="muted" style="font-size:12px">${CL.err?"⚠️ "+esc(CL.err):CL.last?"☁️ Sauvegardé "+ago(CL.last):"☁️ Compte Discord connecté"}</div></div></div>
  <div class="row2" style="margin-top:8px"><button class="btn sm" data-cl="push">☁️ Sauvegarder maintenant</button><button class="btn ghost sm" data-cl="out">Se déconnecter</button></div></div>`}
 function cloudBind(root){(root||document).querySelectorAll("[data-cl]").forEach(b=>b.onclick=async()=>{const k=b.dataset.cl;if(k==="in")cloudLogin();else if(k==="out")cloudLogout();else{b.disabled=true;await cloudPush(true);toast(CL.err?"⚠️ Échec : "+CL.err:"☁️ Partie sauvegardée en ligne")}})}
-function cloudUI(){const cf=$("cFriends");if(cf){cf.style.display=CL.ready?"":"none";if(CL.user&&!cloudUI.fb){cloudUI.fb=1;friendBadge();pushPlayer();lvInbox();setInterval(friendBadge,60000)}}document.querySelectorAll(".cloudslot").forEach(el=>{el.innerHTML=cloudBox();cloudBind(el)});const c=$("cCloud");if(c){c.style.display=CL.ready?"":"none";c.textContent=CL.user?"☁️":"☁️"; c.classList.toggle("off",!CL.user)}}
+function cloudUI(){const cf=$("cFriends");if(cf){cf.style.display=CL.ready?"":"none";if(CL.user&&!cloudUI.fb){cloudUI.fb=1;friendBadge();pushPlayer();lvInbox();setTimeout(mailCheck,2500);setInterval(mailCheck,120000);setInterval(friendBadge,60000)}}document.querySelectorAll(".cloudslot").forEach(el=>{el.innerHTML=cloudBox();cloudBind(el)});const c=$("cCloud");if(c){c.style.display=CL.ready?"":"none";c.textContent=CL.user?"☁️":"☁️"; c.classList.toggle("off",!CL.user)}}
 
 
 // ================= PARAMÈTRES + CODES CADEAUX =================
@@ -2180,12 +2184,12 @@ function showSettings(){const p=$("picker");p.style.display="flex";
  <div class="box"><b>🎁 Code cadeau</b><div class="muted" style="font-size:12px;margin:3px 0 8px">Des codes sont partagés sur le <a href="${DISCORD}" target="_blank" style="color:#8ea1ff">Discord Shōkan</a> (salon #cadeaux).</div>
  <div style="display:flex;gap:8px"><input id="codeIn" maxlength="24" placeholder="EX : SHOKAN" autocapitalize="characters" style="flex:1;min-width:0;background:var(--bg);border:1px solid var(--line);border-radius:10px;color:var(--ink);font-size:16px;font-weight:800;letter-spacing:.06em;padding:10px;text-transform:uppercase;user-select:text"><button class="btn gold sm" id="codeGo" style="width:auto">Valider</button></div>
  ${(S.codes||[]).length?`<div class="muted" style="font-size:11px;margin-top:6px">Codes déjà utilisés : ${S.codes.map(esc).join(", ")}</div>`:""}</div>
- <div class="cloudslot">${cloudBox()}</div>
+ ${IS_ADMIN?`<button class="btn gold" id="stAdm" style="margin-bottom:10px">🛠️ Admin · Envoyer un cadeau à un joueur</button>`:""}<div class="cloudslot">${cloudBox()}</div>
  <div class="box"><b>🔊 Son et vidéos</b><div class="row2" style="margin-top:8px"><button class="btn ghost sm" id="stMus">${M_.on?"🎵 Musique : activée":"🔇 Musique : coupée"}</button><button class="btn ghost sm" id="stVid">${sceneOn()?"🎬 Vidéos d'anime : oui":"🎴 Vidéos d'anime : non"}</button></div><div class="muted" style="font-size:11.5px;margin-top:6px">Vidéos d'anime = fonds animés des cartes et Legendary Finish. Si elles s'affichent mal sur ton appareil, coupe-les : une cinématique dessinée les remplace.</div></div>
  ${discordBox()}
  <div class="box"><b>⚠️ Zone dangereuse</b><div class="muted" style="font-size:12px;margin:3px 0 8px">Efface la partie de ce téléphone.${CL.user?" Ta sauvegarde en ligne Discord n'est pas supprimée.":""}</div><button class="btn ghost sm" id="stReset">Effacer ma progression</button></div>
  <div class="muted" style="text-align:center;font-size:11px;margin:10px 0 30px">Shōkan · 召喚 · jeu de fan gratuit et non commercial<br>Données et images : AniList · les personnages appartiennent à leurs auteurs</div></div>`;
- $("stClose").onclick=()=>{p.style.display="none";render()};cloudBind(p);
+ $("stClose").onclick=()=>{p.style.display="none";render()};cloudBind(p);const sa=$("stAdm");if(sa)sa.onclick=showAdmin;
  $("codeGo").onclick=async()=>{const b=$("codeGo");b.disabled=true;await redeemCode($("codeIn").value);if($("codeGo"))$("codeGo").disabled=false};
  $("codeIn").onkeydown=e=>{if(e.key==="Enter")$("codeGo").click()};
  $("stMus").onclick=()=>{$("cMusic").click();setTimeout(showSettings,50)};$("stVid").onclick=()=>{try{localStorage.setItem("otaku_scene",sceneOn()?"0":"1")}catch(_){}sfx.select();showSettings()};
@@ -2486,6 +2490,41 @@ function lvRender(onlyTimer){const o=$("live");if(!o.classList.contains("on"))re
   $("lvAtk").onclick=()=>{LV.act="atk";lvRender()};const ub=$("lvUlt");if(ub)ub.onclick=()=>{if(!canU)return;if(su.cls==="mag"||su.cls==="hea"||su.cls==="tnk"){LV.act="ult";go(op.findIndex(x=>x.hp>0))}else{LV.act="ult";lvRender();toast("💥 Choisis la cible de l'ultime")}}}}
 function lvQuit(){if(LV.ch)LV.ch.send({type:"broadcast",event:"quit",payload:{}});if(LV.st&&!LV.st.over){LV.st.over=LV.side==="h"?"g":"h"}lvClose()}
 function lvEnd(){clearInterval(LV.tick);const won=LV.st.over===LV.side;if(won){S.wins++;const f=fDaily();if(f.left>0){S.fr.n++;S.shards+=25;toast("🏆 Victoire en direct ! +25 💠")}else toast("🏆 Victoire en direct !");sfx.win()}else sfx.lose();pxp(won?25:10);save();updateTop()}
+
+
+// ================= COURRIER DE L'ÉQUIPE (cadeaux envoyés par l'admin à un joueur ou à tous) =================
+let IS_ADMIN=false;
+async function mailCheck(){if(!pvpOn())return;try{const {data,error}=await CL.sb.rpc("claim_mail");if(error||!data)return;
+ data.forEach(m=>{const rw={boosters:m.boosters||0,shards:m.shards||0,oni:m.oni||0,frag:m.frag||0};if(m.card)rw.cardObj=m.card;addGift(m.card?"🎴":"📨",m.title||"Cadeau de l'équipe Shōkan",m.msg||"Un cadeau rien que pour toi !",rw)});
+ if(data.length){notify("📨",data.length>1?data.length+" cadeaux de l'équipe Shōkan !":"Cadeau de l'équipe Shōkan : "+(data[0].title||""));updateTop();cloudPush(true)}}catch(_){}
+ try{const {data}=await CL.sb.from("admins").select("user_id").eq("user_id",CL.user.id).maybeSingle();IS_ADMIN=!!data}catch(_){}}
+const QCH=`query($s:String){Page(perPage:8){characters(search:$s,sort:FAVOURITES_DESC){id name{full} image{large} favourites media(perPage:1,sort:POPULARITY_DESC){nodes{title{romaji english}}}}}}`;
+async function charSearch(q){const r=await fetch(API,{method:"POST",headers:{"Content-Type":"application/json",Accept:"application/json"},body:JSON.stringify({query:QCH,variables:{s:q}})});const j=await r.json();const T=await favThresholds();
+ return((j.data&&j.data.Page&&j.data.Page.characters)||[]).filter(c=>c.image&&c.image.large).map(c=>{const rid=rarFromFav(c.favourites||0,T),m=c.media&&c.media.nodes&&c.media.nodes[0];return{id:c.id,name:c.name.full,img:c.image.large,fav:c.favourites||0,series:m?(m.title.english||m.title.romaji):"",rarity:rid,rank:rankFromFav(c.favourites||0,rid,T)}})}
+const ADM={to:null,card:null};
+function showAdmin(){const p=$("picker");p.style.display="flex";
+ p.innerHTML=`<div style="width:100%;max-width:420px"><div style="display:flex;justify-content:space-between;align-items:center;margin:4px 0 10px"><div style="font-weight:900;font-size:19px">🛠️ Envoyer un cadeau</div><button class="btn ghost sm" style="width:auto" id="adClose">Fermer</button></div>
+ <div class="box"><b>1. Destinataire</b><div class="row2" style="margin:8px 0"><button class="btn ${ADM.to==="all"?"":"ghost"} sm" id="adAll">🌍 Tous les joueurs</button></div><input id="adQ" class="adin" placeholder="…ou cherche un pseudo"><div id="adP"></div>
+ <div class="muted" style="font-size:12px;margin-top:6px">Choisi : <b id="adTo">${ADM.to==="all"?"Tous les joueurs":ADM.to?esc(ADM.to.name):"personne"}</b></div></div>
+ <div class="box"><b>2. Carte à offrir (facultatif)</b><input id="adC" class="adin" placeholder="Nom du perso (ex : Gojo, Luffy…)"><div id="adCR" class="adcr"></div>
+ <div class="muted" style="font-size:12px;margin-top:6px">Carte : <b id="adCard">${ADM.card?esc(ADM.card.name)+" ("+RAR[RI[ADM.card.rarity]].name+")":"aucune"}</b></div></div>
+ <div class="box"><b>3. Bonus (facultatif)</b><div class="adg"><label>🎴 Boosters<input id="adB" type="number" min="0" value="0"></label><label>💠 Éclats<input id="adS" type="number" min="0" value="0"></label><label>🍙 Onigiri<input id="adO" type="number" min="0" value="0"></label><label>🌟 Fragments<input id="adF" type="number" min="0" value="0"></label></div></div>
+ <div class="box"><b>4. Message</b><input id="adT" class="adin" placeholder="Titre (ex : Merci de jouer !)" maxlength="60"><input id="adM" class="adin" placeholder="Message" maxlength="200"></div>
+ <button class="btn gold" id="adSend" style="margin:6px 0 30px">📨 Envoyer le cadeau</button></div>`;
+ $("adClose").onclick=()=>{p.style.display="none"};
+ $("adAll").onclick=()=>{ADM.to="all";$("adTo").textContent="Tous les joueurs";$("adAll").classList.remove("ghost")};
+ let t1,t2;$("adQ").oninput=e=>{clearTimeout(t1);t1=setTimeout(async()=>{const q=e.target.value.trim();if(q.length<2){$("adP").innerHTML="";return}
+  const {data}=await CL.sb.from("players").select("user_id,name,avatar,lvl").ilike("name","%"+q.replace(/[%_]/g,"")+"%").limit(8);
+  $("adP").innerHTML=(data||[]).map(x=>`<div class="frrow res" data-pu="${x.user_id}">${frAv(x)}<div class="frn"><b>${esc(x.name)}</b><span class="muted">Niv. ${x.lvl||1}</span></div></div>`).join("")||'<div class="muted" style="padding:6px">Personne.</div>';
+  $("adP").querySelectorAll("[data-pu]").forEach(el=>el.onclick=()=>{ADM.to=(data||[]).find(x=>x.user_id===el.dataset.pu);$("adTo").textContent=ADM.to.name;$("adAll").classList.add("ghost");$("adP").innerHTML=""})},350)};
+ $("adC").oninput=e=>{clearTimeout(t2);t2=setTimeout(async()=>{const q=e.target.value.trim();if(q.length<2){$("adCR").innerHTML="";return}$("adCR").innerHTML='<div class="muted">Recherche…</div>';
+  let L=[];try{L=await charSearch(q)}catch(_){}$("adCR").innerHTML=L.map((c,i)=>`<div class="adcc" data-ci="${i}">${cardHTML(Object.assign({},c,{star:1,lvl:1}))}</div>`).join("")||'<div class="muted">Aucun perso trouvé.</div>';
+  $("adCR").querySelectorAll("[data-ci]").forEach(el=>el.onclick=()=>{ADM.card=L[+el.dataset.ci];$("adCard").textContent=ADM.card.name+" ("+RAR[RI[ADM.card.rarity]].name+")";$("adCR").querySelectorAll(".adcc").forEach(x=>x.classList.toggle("on",x===el))})},400)};
+ $("adSend").onclick=async()=>{if(!ADM.to){toast("Choisis un destinataire");return}const n=id=>Math.max(0,parseInt($(id).value)||0);
+  const row={user_id:ADM.to==="all"?null:ADM.to.user_id,title:$("adT").value.trim()||"Cadeau de l'équipe Shōkan",msg:$("adM").value.trim()||"",boosters:n("adB"),shards:n("adS"),oni:n("adO"),frag:n("adF"),card:ADM.card?slim(ADM.card):null,expires_at:ADM.to==="all"?new Date(Date.now()+14*86400000).toISOString():null};
+  if(!row.card&&!row.boosters&&!row.shards&&!row.oni&&!row.frag){toast("Ajoute une carte ou un bonus");return}
+  const b=$("adSend");b.disabled=true;const {error}=await CL.sb.from("mail").insert(row);if(error){toast("⚠️ "+error.message);b.disabled=false;return}
+  sfx.win();toast("📨 Cadeau envoyé à "+(ADM.to==="all"?"tous les joueurs":ADM.to.name)+" !");ADM.to=null;ADM.card=null;showAdmin()}}
 
 // ================= RAID DE GUILDE =================
 const GBOSS=[{n:"Dragon de l'Éclipse",kj:"龍",el:"dark",c1:"#7b2cff",c2:"#ff4dd2",t:0},{n:"Hydre des Abysses",kj:"蛇",el:"water",c1:"#0b6bd6",c2:"#3bffd9",t:1},{n:"Phénix Écarlate",kj:"鳳",el:"fire",c1:"#ff4a1c",c2:"#ffd34d",t:2},{n:"Colosse du Tonnerre",kj:"雷",el:"thunder",c1:"#e8b400",c2:"#7fe3ff",t:3}];
