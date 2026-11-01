@@ -1009,6 +1009,13 @@ nav button{font-size:9.5px}
 .mvbest small{display:block;font-size:11px;color:#9a9082}.mvbest b{display:block;font:800 15px "Shippori Mincho B1",serif;color:#efe7da}.mvbest span{font:700 12px Inter}
 .mvperk{margin:10px 2px 12px;font-size:12.5px;color:#9a9082;line-height:1.45}.mvperk b{color:#c9a45c}
 .mvinfo .btn{width:100%}
+.mvbtns{display:flex;gap:8px}.mvbtns .btn.ghost{flex:0 0 34%}.mvbtns .btn:not(.ghost){flex:1}
+.shleg{pointer-events:none}
+@media (max-width:640px){.bookstage.on .bookwrap.spread,.bookstage.on .bookwrap.riffle{transform:translateX(-46%) rotateX(-4deg) rotateY(6deg) scale(.86)!important}}
+#shelf.series{justify-content:flex-start;overflow-y:auto;padding-top:max(14px,env(safe-area-inset-top))}
+#shelf.series #shCancel{display:none!important}
+#shelf.series .bookstage.on~#shCancel{display:none}
+@media (max-height:760px){.mvflow{padding-top:10px;padding-bottom:14px}.mv,.bk3{transform-origin:center}.mvshop .mv{zoom:.86}.mvinfo{padding-top:6px}.mvbest{padding:7px}.mvperk{margin:7px 2px 9px}}
 .sumodes{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;margin-top:12px}
 .smd{display:flex;flex-direction:column;align-items:flex-start;gap:3px;padding:10px 9px;border-radius:10px;background:var(--bg2);border:1.5px solid var(--line);color:var(--ink);text-align:left;cursor:pointer}
 .smd .si{font-size:20px}.smd b{font-weight:900;font-size:14px}.smd small{font-size:10.5px;color:var(--muted);line-height:1.3}
@@ -2450,7 +2457,7 @@ function mangaPage(chars,seed,opt){opt=opt||{};const R=rnd(seed*7919+71),pick=()
   y+=hh+2.5}
  return`<div class="mpg">${h}</div>`}
 
-function showShelf(P,paid,multi,series){const sp=PK(S.pack||"mix"),o=$("shelf");Object.assign(SH,{P,paid,multi:multi||0,state:"shelf",cards:null,series:series||null,album:null});const KJS=["漫","巻","話","冊","画","物","語"];
+function showShelf(P,paid,multi,series){const sp=PK(S.pack||"mix"),o=$("shelf");o.classList.toggle("series",!!series);Object.assign(SH,{P,paid,multi:multi||0,state:"shelf",cards:null,series:series||null,album:null});const KJS=["漫","巻","話","冊","画","物","語"];
  const spine=(r,k)=>{const R=rnd(r*31+k*7+sp.h);const h=150+R()*36|0,w=30+R()*14|0,hue=(sp.h+(R()*80-40))|0,lean=R()<.12?(R()<.5?-5:5):0;
   const A=series&&series[(r*7+k)%series.length];return`<div class="spine ${A?"ser":""}" data-k="${r}-${k}" data-a="${A?(r*7+k)%series.length:""}" style="height:${h}px;width:${A?w+8:w}px;--sh:${hue};transform:rotate(${lean}deg)"><span class="skj">${A?KJS[(r*7+k)%7]:sp.kj}</span><span class="stt">${esc(A?A.title:sp.name)}</span><span class="svol">${multi?"×"+multi:(1+(R()*40|0))}</span></div>`};
  o.innerHTML=`<div class="shint" id="shHint">${series?"巻 Choisis ton manga<span class=\"muted\">Les 5 cartes viendront de la série choisie</span>":"📚 Tire un manga de l'étagère"}</div>
@@ -2544,7 +2551,7 @@ function mvInfo(i){const a=SH.series[i];if(!a)return;const f=albInfo(a);const to
  <div class="mvrow">${top.map(r=>{const own=a.chars.filter(c=>c.rarity===r.id&&S.coll[c.id]).length;return`<span class="mvr" style="--rc:var(--${r.id})"><i></i>${r.name} <b>${own}/${f.cnt[r.id]}</b></span>`}).join("")}</div>
  <div class="mvbest"><div class="mvbi ${bo?"":"sil"}" style="background-image:url('${cssU(f.best.img)}');--rc:var(--${f.best.rarity})"></div><div><small>Le plus rare de la série</small><b>${bo?esc(f.best.name):"? ? ?"}</b><span style="color:var(--${f.best.rarity})">${RAR[RI[f.best.rarity]].name}${bo?" · obtenu":""}</span></div></div>
  <div class="mvperk">${f.special?`<b>★ Tome spécial</b> : une carte Épique ou mieux garantie !`:`Tome ${f.vol} · prochain tome spécial au tome ${Math.ceil(f.vol/5)*5}`}${f.tot-f.own>0?` · <b>1 perso inédit garanti</b>`:""}</div>
- <button class="btn" id="mvGo">Lire ce manga</button>`;$("mvGo").onclick=()=>mvPick(i)}
+ <div class="mvbtns"><button class="btn ghost" id="mvX">Annuler</button><button class="btn" id="mvGo">Lire ce manga</button></div>`;$("mvGo").onclick=()=>mvPick(i);$("mvX").onclick=()=>{const c=$("shCancel");if(c)c.click()}}
 function mvPick(i){if(SH.state!=="shelf")return;const fl=$("mvFlow"),el=fl.querySelectorAll(".mv")[i];if(!el)return;const cur=SH.cur;
  if(cur!==i){fl.scrollTo({left:el.offsetLeft-(fl.clientWidth-el.offsetWidth)/2,behavior:"smooth"});return}
  sfx.select&&sfx.select();$("shBox").querySelector(".mvsearch").style.visibility="hidden";$("mvInfo").style.opacity="0";pullBook(el)}
