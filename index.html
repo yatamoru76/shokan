@@ -1103,8 +1103,8 @@ function rHome(){setTimeout(()=>document.querySelectorAll("#main .cloudslot").fo
  ${sec("03","Chances par carte","確率")}
  <div class="box">${RAR.slice().reverse().map(r=>`<div class="oddrow"><span style="color:var(--${r.id});font-weight:700">${r.name}</span><div class="bar"><i style="width:${Math.max(3,Math.sqrt(r.odds/55)*100)}%;background:var(--${r.id})"></i></div><span style="text-align:right;font-weight:700">${r.odds} %</span></div>`).join("")}
  <div class="muted" style="margin-top:8px;font-size:12px">Compteur Mythique : ${S.pity} / ${PITY}</div></div>
- <div class="cloudslot">${CL.user?"":cloudBox()}</div>${discordBox()}<div class="foot">Démo non officielle, gratuite et sans but commercial.<br>Données et images : <a href="https://anilist.co" target="_blank">AniList</a>. Les personnages appartiennent à leurs auteurs et studios.<br><span id="reset" style="text-decoration:underline">Effacer ma progression</span></div>`;
- $("pack").onclick=()=>openPack(false);$("btnOpen").onclick=()=>openPack(false);$("btnBuy").onclick=()=>openPack(true);
+ <div class="cloudslot">${CL.user?"":cloudBox()}</div><button class="btn ghost" id="hSet" style="margin-bottom:10px">⚙️ Paramètres · 🎁 Code cadeau</button>${discordBox()}<div class="foot">Démo non officielle, gratuite et sans but commercial.<br>Données et images : <a href="https://anilist.co" target="_blank">AniList</a>. Les personnages appartiennent à leurs auteurs et studios.<br><span id="reset" style="text-decoration:underline">Effacer ma progression</span></div>`;
+ $("hSet").onclick=showSettings;$("pack").onclick=()=>openPack(false);$("btnOpen").onclick=()=>openPack(false);$("btnBuy").onclick=()=>openPack(true);
  $("main").querySelectorAll("[data-multi]").forEach(b=>b.onclick=()=>openMulti(b.dataset.multi==="all"?S.boosters:+b.dataset.multi));setTimeout(prefetchPack,400);$("main").querySelectorAll("[data-sum]").forEach(b=>b.onclick=()=>{S.summon=b.dataset.sum;save();sfx.select();rHome()});
  const pks=$("packs");pks.querySelectorAll("[data-pk]").forEach(c=>c.onclick=()=>{if(busy)return;S.pack=c.dataset.pk;save();const sl=pks.scrollLeft;rHome();updateTop();$("packs").scrollLeft=sl;sfx.select()});
  const on=pks.querySelector(".on");if(on&&!rHome.scrolled){pks.scrollLeft=on.offsetLeft-20;rHome.scrolled=1}
@@ -1297,7 +1297,7 @@ function ptitle(l){let t=TITLES[0][1];TITLES.forEach(([n,x])=>{if(l>=n)t=x});ret
 function showProfile(){initProfile();const P=S.prof,p=$("picker"),all=Object.values(S.coll),cnt={};all.forEach(c=>cnt[c.rarity]=(cnt[c.rarity]||0)+1);
  const best=all.slice().sort((a,b)=>RI[b.rarity]-RI[a.rarity]||a.rank-b.rank)[0],av=P.avatar&&S.coll[P.avatar],fav=P.fav.map(id=>S.coll[id]).filter(Boolean),pct=Math.min(100,P.xp/pNeed(P.lvl)*100);
  p.style.display="flex";p.innerHTML=`<div style="width:100%;max-width:420px">
- <div style="display:flex;justify-content:flex-end;margin:4px 0"><button class="btn ghost sm" style="width:auto" id="pClose">Fermer</button></div>
+ <div style="display:flex;justify-content:space-between;margin:4px 0"><button class="btn ghost sm" style="width:auto" id="pSet">⚙️ Paramètres · 🎁 Code</button><button class="btn ghost sm" style="width:auto" id="pClose">Fermer</button></div>
  <div class="pcard2 bn-${(S.guild&&S.guild.equip&&S.guild.equip.banner)||"none"}"><div class="pav" id="pAv">${av?`<img src="${esc(av.img)}" referrerpolicy="no-referrer">`:"召"}</div>
   <div style="flex:1;min-width:0"><div class="pname"><span id="pName">${esc(P.name)}</span> <button class="pedit" id="pEdit">✏️</button></div><div class="ptitle">${esc(myTitle())}</div>${S.guild?`<div class="pguild" style="--gc:${S.guild.color}">${S.guild.emblem} ${esc(S.guild.name)} · niv. ${S.guild.lvl}${S.guild.leader?" · Chef":""}</div>`:""}
   <div class="plvl"><b>Niv. ${P.lvl}</b><div class="xpbar" style="flex:1"><i style="width:${pct}%"></i></div></div><div class="muted" style="font-size:11px">${fmt(P.xp)} / ${fmt(pNeed(P.lvl))} XP · prochain cadeau au niveau ${P.lvl+1}</div></div></div>
@@ -1308,7 +1308,7 @@ function showProfile(){initProfile();const P=S.prof,p=$("picker"),all=Object.val
  <div class="pstats">${[["🎴",S.opened,"boosters ouverts"],["📚",all.length,"persos uniques"],["⚔️",S.wins||0,"victoires"],["🗼",S.tower||0,"record de la tour"],["😱",S.fakeouts||0,"fake outs"],["👑",all.filter(c=>c.master).length,"cartes maîtrisées"]].map(([i,v,l])=>`<div><b>${i} ${fmt(v)}</b><span>${l}</span></div>`).join("")}</div>
  <div class="box" style="font-size:13px">${RAR.slice().reverse().map(r=>`<span style="color:var(--${r.id});font-weight:800">${r.name} ${cnt[r.id]||0}</span>`).join(" · ")}${best?`<div class="muted" style="margin-top:6px">Meilleure carte : <b style="color:var(--${best.rarity})">${esc(best.name)}</b></div>`:""}</div>
  <div class="muted" style="text-align:center;margin:14px 0 30px;font-size:11.5px">Joueur depuis le ${new Date(P.since).toLocaleDateString("fr-FR")} · Touche ton avatar pour le changer</div></div>`;
- $("pClose").onclick=()=>{p.style.display="none";updateTop()};$("pAch").onclick=showAch;cloudBind(p);$("pPass").onclick=showPass;
+ $("pClose").onclick=()=>{p.style.display="none";updateTop()};$("pAch").onclick=showAch;$("pSet").onclick=showSettings;cloudBind(p);$("pPass").onclick=showPass;
  $("pEdit").onclick=()=>modal(`<h3>Ton pseudo</h3><input id="pnIn" maxlength="18" value="${esc(P.name)}" style="width:100%;background:var(--bg);border:1px solid var(--line);border-radius:10px;color:var(--ink);font-size:16px;padding:10px;user-select:text">`,[["Annuler"],["Valider",()=>{const v=($("pnIn").value||"").trim().slice(0,18);if(v)P.name=v;save();showProfile()}]]);
  $("pAv").onclick=()=>{p.style.display="none";pickCard("Choisis ton avatar",c=>{P.avatar=c.id;save();updateTop();showProfile()})};
  p.querySelectorAll("[data-pf]").forEach(d=>d.onclick=()=>{p.style.display="none";NAV=[];showDetail(d.dataset.pf)})}
@@ -1927,6 +1927,33 @@ function cloudBox(){if(!CL.ready&&!CL.user)return`<div class="cloudbox"><b>☁�
  <div class="row2" style="margin-top:8px"><button class="btn sm" data-cl="push">☁️ Sauvegarder maintenant</button><button class="btn ghost sm" data-cl="out">Se déconnecter</button></div></div>`}
 function cloudBind(root){(root||document).querySelectorAll("[data-cl]").forEach(b=>b.onclick=async()=>{const k=b.dataset.cl;if(k==="in")cloudLogin();else if(k==="out")cloudLogout();else{b.disabled=true;await cloudPush(true);toast(CL.err?"⚠️ Échec : "+CL.err:"☁️ Partie sauvegardée en ligne")}})}
 function cloudUI(){document.querySelectorAll(".cloudslot").forEach(el=>{el.innerHTML=cloudBox();cloudBind(el)});const c=$("cCloud");if(c){c.style.display=CL.ready?"":"none";c.textContent=CL.user?"☁️":"☁️"; c.classList.toggle("off",!CL.user)}}
+
+
+// ================= PARAMÈTRES + CODES CADEAUX =================
+const CODE_ERR={login:"Connecte ton compte Discord pour utiliser un code.",invalid:"Ce code n'existe pas.",expired:"Ce code a expiré.",full:"Ce code a déjà été utilisé par trop de joueurs.",used:"Tu as déjà utilisé ce code."};
+async function redeemCode(raw){const c=(raw||"").trim().toUpperCase();if(!c){toast("Écris un code");return}
+ if(!CL.ready){toast("Les codes marchent depuis le lien du jeu : yatamoru76.github.io/shokan");return}
+ if(!CL.user){modal(`<h3>🎁 Code cadeau</h3><p class="muted">${CODE_ERR.login}</p>`,[["Annuler"],["🎮 Se connecter",cloudLogin]]);return}
+ const {data,error}=await CL.sb.rpc("redeem_code",{c});
+ if(error){toast("⚠️ Impossible de vérifier le code ("+error.message+")");return}
+ if(!data||!data.ok){sfx.lose();toast("❌ "+(CODE_ERR[data&&data.err]||"Code refusé"));return}
+ const rw={boosters:data.boosters||0,shards:data.shards||0,oni:data.oni||0,frag:data.frag||0};if(data.card)rw.card=data.card;
+ S.codes=S.codes||[];S.codes.push(c);await giveRw(rw,"🎁 Code « "+c+" »");if(!rw.card)toast("🎁 Code « "+c+" » : "+rwLabel(rw));cloudPush(true);showSettings()}
+function showSettings(){const p=$("picker");p.style.display="flex";
+ p.innerHTML=`<div style="width:100%;max-width:420px"><div style="display:flex;justify-content:space-between;align-items:center;margin:4px 0 10px"><div style="font-weight:900;font-size:19px">⚙️ Paramètres</div><button class="btn ghost sm" style="width:auto" id="stClose">Fermer</button></div>
+ <div class="box"><b>🎁 Code cadeau</b><div class="muted" style="font-size:12px;margin:3px 0 8px">Des codes sont partagés sur le <a href="${DISCORD}" target="_blank" style="color:#8ea1ff">Discord Shōkan</a> (salon #cadeaux).</div>
+ <div style="display:flex;gap:8px"><input id="codeIn" maxlength="24" placeholder="EX : SHOKAN" autocapitalize="characters" style="flex:1;min-width:0;background:var(--bg);border:1px solid var(--line);border-radius:10px;color:var(--ink);font-size:16px;font-weight:800;letter-spacing:.06em;padding:10px;text-transform:uppercase;user-select:text"><button class="btn gold sm" id="codeGo" style="width:auto">Valider</button></div>
+ ${(S.codes||[]).length?`<div class="muted" style="font-size:11px;margin-top:6px">Codes déjà utilisés : ${S.codes.map(esc).join(", ")}</div>`:""}</div>
+ <div class="cloudslot">${cloudBox()}</div>
+ <div class="box"><b>🔊 Son</b><div class="row2" style="margin-top:8px"><button class="btn ghost sm" id="stMus">${M_.on?"🎵 Musique : activée":"🔇 Musique : coupée"}</button></div></div>
+ ${discordBox()}
+ <div class="box"><b>⚠️ Zone dangereuse</b><div class="muted" style="font-size:12px;margin:3px 0 8px">Efface la partie de ce téléphone.${CL.user?" Ta sauvegarde en ligne Discord n'est pas supprimée.":""}</div><button class="btn ghost sm" id="stReset">Effacer ma progression</button></div>
+ <div class="muted" style="text-align:center;font-size:11px;margin:10px 0 30px">Shōkan · 召喚 · jeu de fan gratuit et non commercial<br>Données et images : AniList · les personnages appartiennent à leurs auteurs</div></div>`;
+ $("stClose").onclick=()=>{p.style.display="none";render()};cloudBind(p);
+ $("codeGo").onclick=async()=>{const b=$("codeGo");b.disabled=true;await redeemCode($("codeIn").value);if($("codeGo"))$("codeGo").disabled=false};
+ $("codeIn").onkeydown=e=>{if(e.key==="Enter")$("codeGo").click()};
+ $("stMus").onclick=()=>{$("cMusic").click();setTimeout(showSettings,50)};
+ $("stReset").onclick=()=>modal("<h3>Tout effacer ?</h3><p class='muted'>La partie de ce téléphone sera perdue.</p>",[["Annuler"],["Effacer",()=>{localStorage.removeItem("otaku_v1");location.reload()}]])}
 
 // ================= RÉCOMPENSES GÉNÉRIQUES =================
 async function drawRarity(rid){const r=RAR[RI[rid]];return charAt(r.min+Math.floor(Math.random()*(r.max-r.min+1)),r)}
