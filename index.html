@@ -858,6 +858,7 @@ nav button{font-size:9.5px}
 .albok{position:absolute;top:6px;right:6px;width:24px;height:24px;border-radius:50%;background:#ffd34d;color:#000;font-weight:900;display:flex;align-items:center;justify-content:center;font-size:13px}
 .albhead{border-radius:16px;padding:16px;background:center/cover;border:1px solid var(--line)}
 @media (min-width:900px){.albgrid{grid-template-columns:repeat(auto-fill,minmax(230px,1fr))}.albt{height:140px}}
+.albparts{display:block;font-size:10px;font-weight:700;color:#ffd34d;margin-top:1px}
 </style>
 <link rel="manifest" href="manifest.webmanifest"><meta name="theme-color" content="#09090c"><link rel="icon" href="icon-192.png"><link rel="apple-touch-icon" href="icon-192.png"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="description" content="Shōkan · jeu gratuit de cartes anime : ouvre des mangas, collectionne, combats, guildes et arène."></head>
 <body>
@@ -2301,29 +2302,48 @@ function graidHTML(){const g=S.guild,R=graidState(),b=GBOSS[R.b],pct=R.hp/R.max*
 
 
 // ================= ALBUMS PAR ANIME (au moins 10 cartes par anime) =================
-const ALB_PAGES=4,ALB_MIN=10;let collMode="rar";try{collMode=localStorage.getItem("shk_cmode")||"rar"}catch(_){}
-async function albumList(){const out=[];for(let p=1;p<=ALB_PAGES;p++){try{(await animePage(p)).forEach(a=>{if(a.chars.length>=ALB_MIN&&!out.find(x=>x.id===a.id))out.push(a)})}catch(e){if(!out.length)throw e;break}}return out}
+const ALB_PAGES=12,ALB_MIN=10;let collMode="rar";try{collMode=localStorage.getItem("shk_cmode")||"rar"}catch(_){}
+// une œuvre = un album : toutes les saisons, suites, films et OAV sont regroupés grâce aux relations AniList
+const QA=n=>`query($p:Int){Page(page:$p,perPage:10){media(type:ANIME,sort:POPULARITY_DESC,isAdult:false,genre_not_in:["Ecchi","Hentai"]){id title{romaji english} bannerImage coverImage{extraLarge} relations{edges{relationType node{id type}}} characters(sort:FAVOURITES_DESC,perPage:${n}){nodes{id name{full} image{large} favourites}}}}}`;
+const APAGE={};
+async function albPage(p){if(APAGE[p])return APAGE[p];const key="shk_alb_"+p;try{const c=JSON.parse(localStorage.getItem(key)||"null");if(c&&Date.now()-c.t<7*86400000)return APAGE[p]=c.m}catch(_){}
+ let j=null;for(const n of [25,16]){for(let a=0;a<3;a++){const r=await fetch(API,{method:"POST",headers:{"Content-Type":"application/json",Accept:"application/json"},body:JSON.stringify({query:QA(n),variables:{p}})});if(r.status===429){await sleep(2500*(a+1));continue}j=await r.json().catch(()=>null);break}if(j&&j.data&&j.data.Page)break}
+ if(!j||!j.data||!j.data.Page)throw new Error("AniList");const T=await favThresholds();
+ const m=j.data.Page.media.map(x=>({id:x.id,title:x.title.english||x.title.romaji,bg:x.bannerImage||(x.coverImage&&x.coverImage.extraLarge),rel:((x.relations&&x.relations.edges)||[]).filter(e=>e.node&&e.node.type==="ANIME"&&["SEQUEL","PREQUEL","PARENT","SIDE_STORY","ALTERNATIVE","SUMMARY"].includes(e.relationType)).map(e=>[e.relationType,e.node.id]),
+  chars:(x.characters.nodes||[]).filter(c=>c.image&&c.image.large).map(c=>{const rid=rarFromFav(c.favourites||0,T);return{id:c.id,name:c.name.full,img:c.image.large,fav:c.favourites||0,series:x.title.english||x.title.romaji,rarity:rid,rank:rankFromFav(c.favourites||0,rid,T)}})}));
+ try{localStorage.setItem(key,JSON.stringify({t:Date.now(),m}))}catch(_){}return APAGE[p]=m}
+function cleanTitle(t){return t.replace(/\s*[:\-–]?\s*(the\s+)?(final\s+season|season\s*\d+|saison\s*\d+|\d+(st|nd|rd|th)\s+season|part\s*\d+|cour\s*\d+|2nd|3rd).*$/i,"").replace(/\s+(II|III|IV|2|3|4)$/,"").trim()||t}
+function groupWorks(media){const par={};const f=x=>{while(par[x]!==undefined&&par[x]!==x)x=par[x]=par[par[x]]??par[x];return x};const u=(a,b)=>{par[a]=par[a]??a;par[b]=par[b]??b;const ra=f(a),rb=f(b);if(ra!==rb)par[rb]=ra};
+ media.forEach(m=>{par[m.id]=par[m.id]??m.id;m.rel.forEach(([,id])=>u(m.id,id))});const G={};
+ media.forEach(m=>{const r=f(m.id);(G[r]=G[r]||[]).push(m)});
+ return Object.values(G).map(ms=>{const ids=new Set(ms.map(m=>m.id));const root=ms.find(m=>!m.rel.some(([t,id])=>(t==="PREQUEL"||t==="PARENT")&&ids.has(id)))||ms[0];
+  const seen=new Set(),chars=[];ms.forEach(m=>m.chars.forEach(c=>{if(!seen.has(c.id)){seen.add(c.id);chars.push(c)}}));chars.sort((a,b)=>b.fav-a.fav);
+  return{id:Math.min(...ms.map(m=>m.id)),title:cleanTitle(root.title),bg:root.bg||ms.find(m=>m.bg)&&ms.find(m=>m.bg).bg,parts:ms.length,chars,pop:media.indexOf(ms[0])}}).sort((a,b)=>a.pop-b.pop)}
+let ALBS=null;
+async function albumList(onProgress){const all=[];let err=null;for(let p=1;p<=ALB_PAGES;p++){try{all.push(...await albPage(p));if(onProgress&&p%3===0)onProgress(groupWorks(all).filter(a=>a.chars.length>=ALB_MIN))}catch(e){err=e;break}if(!APAGE[p+1])await sleep(350)}
+ if(!all.length)throw err||new Error("vide");return ALBS=groupWorks(all).filter(a=>a.chars.length>=ALB_MIN)}
 function albRw(a){return{boosters:2,shards:150+a.chars.length*15}}
-async function rAlbums(){const el=$("albums");if(!el)return;let L;try{L=await albumList()}catch(e){el.innerHTML=`<div class="muted" style="text-align:center;padding:30px">Impossible de charger les albums (connexion ?).</div>`;return}
- if(!$("albums"))return;const q=query.toLowerCase();if(q)L=L.filter(a=>a.title.toLowerCase().includes(q));S.albums=S.albums||{};
+async function rAlbums(){const el=$("albums");if(!el)return;let L;if(ALBS)return drawAlbums(ALBS);try{L=await albumList(x=>{if($("albums"))drawAlbums(x)})}catch(e){el.innerHTML=`<div class="muted" style="text-align:center;padding:30px">Impossible de charger les albums (connexion ?).</div>`;return}
+ if($("albums"))drawAlbums(L)}
+function drawAlbums(L){const el=$("albums");if(!el)return;const q=query.toLowerCase();if(q)L=L.filter(a=>a.title.toLowerCase().includes(q)||a.chars.some(c=>c.name.toLowerCase().includes(q)));S.albums=S.albums||{};
  const prog=a=>a.chars.filter(c=>S.coll[c.id]).length;L.sort((a,b)=>(prog(b)/b.chars.length)-(prog(a)/a.chars.length)||b.chars.length-a.chars.length);
  const done=L.filter(a=>prog(a)>=a.chars.length).length;
  el.innerHTML=`<div class="muted" style="margin-bottom:8px">📺 ${L.length} animes · ${done} album${done>1?"s":""} complété${done>1?"s":""} · chaque album compte au moins ${ALB_MIN} cartes</div><div class="albgrid">${L.map(a=>{const n=prog(a),t=a.chars.length,full=n>=t,cl=S.albums[a.id];
-  return`<div class="albt ${full?"full":""}" data-alb="${a.id}"><div class="albbg" style="background-image:url('${esc((a.bg||"").replace(/'/g,"%27"))}')"></div><div class="albin"><b>${esc(a.title)}</b><div class="albp"><i style="width:${n/t*100}%"></i></div><span>${n} / ${t}${full?(cl?" · ✓ récompense prise":" · 🎁 à récupérer !"):""}</span></div>${full?'<div class="albok">✓</div>':""}</div>`}).join("")}</div>`;
+  return`<div class="albt ${full?"full":""}" data-alb="${a.id}"><div class="albbg" style="background-image:url('${esc((a.bg||"").replace(/'/g,"%27"))}')"></div><div class="albin"><b>${esc(a.title)}</b>${a.parts>1?`<small class="albparts">${a.parts} saisons / films</small>`:""}<div class="albp"><i style="width:${n/t*100}%"></i></div><span>${n} / ${t}${full?(cl?" · ✓ récompense prise":" · 🎁 à récupérer !"):""}</span></div>${full?'<div class="albok">✓</div>':""}</div>`}).join("")}</div>`;
  el.querySelectorAll("[data-alb]").forEach(t=>t.onclick=()=>{const a=L.find(x=>String(x.id)===t.dataset.alb);if(a)showAlbum(a)})}
 function showAlbum(a){const p=$("picker"),n=a.chars.filter(c=>S.coll[c.id]).length,full=n>=a.chars.length;S.albums=S.albums||{};p.style.display="flex";
  p.innerHTML=`<div style="width:100%;max-width:420px"><div style="display:flex;justify-content:space-between;align-items:center;margin:4px 0 10px"><div style="font-weight:900;font-size:18px;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">📺 ${esc(a.title)}</div><button class="btn ghost sm" style="width:auto" id="abClose">Fermer</button></div>
  <div class="albhead" style="background-image:linear-gradient(180deg,#0003,#09090cee),url('${esc((a.bg||"").replace(/'/g,"%27"))}')"><div style="font-weight:900;font-size:26px">${n} / ${a.chars.length}</div><div class="albp big"><i style="width:${n/a.chars.length*100}%"></i></div>
  <div style="font-size:12.5px;margin-top:6px">🎁 Album complet : <b>${rwText(albRw(a))}</b></div>${full&&!S.albums[a.id]?`<button class="btn gold" id="abClaim" style="margin-top:8px">Récupérer la récompense</button>`:S.albums[a.id]?'<div style="margin-top:6px;color:var(--ok);font-weight:800">✓ Album complété</div>':""}</div>
  <div class="grid" style="margin-top:10px">${a.chars.map(c=>{const o=S.coll[c.id];return o?`<div data-aid="${c.id}">${cardHTML(o,{lv:1,cnt:1})}</div>`:`<div class="lk" data-alk="${c.id}">${cardHTML(Object.assign({},c,{star:0,lvl:0}))}<span class="lki">🔒</span></div>`}).join("")}</div>
- <p class="muted" style="font-size:12px;margin:10px 0 30px">Les persos de cet album peuvent sortir dans les boosters Shōnen Mix et dans les boosters à thème de son genre.</p></div>`;
+ <p class="muted" style="font-size:12px;margin:10px 0 30px">${a.parts>1?`Cet album regroupe toute l'œuvre (${a.parts} saisons, films ou OAV). `:""}Ses persos peuvent sortir dans les boosters Shōnen Mix et dans les boosters à thème de son genre.</p></div>`;
  $("abClose").onclick=()=>{p.style.display="none";render()};
  const cb=$("abClaim");if(cb)cb.onclick=async()=>{if(S.albums[a.id])return;S.albums[a.id]=1;save();await giveRw(albRw(a),"📺 Album "+a.title+" complété !");showAlbum(a)};
  p.querySelectorAll("[data-aid]").forEach(d=>d.onclick=()=>{p.style.display="none";NAV=a.chars.filter(c=>S.coll[c.id]).map(c=>String(c.id));showDetail(d.dataset.aid)});
  p.querySelectorAll("[data-alk]").forEach(d=>d.onclick=()=>{const c=a.chars.find(x=>String(x.id)===d.dataset.alk);toast("🔒 "+c.name+" · "+RAR[RI[c.rarity]].name+" · pas encore obtenu")})}
 // les persos des albums peuvent sortir des boosters (même rareté), pour que chaque album soit complétable
-function albumPoolPick(rid){const pool=[];for(let p=1;p<=ALB_PAGES;p++)(MPAGE[p]||[]).forEach(a=>{if(a.chars.length>=ALB_MIN)a.chars.forEach(c=>{if(c.rarity===rid)pool.push(c)})});return pool.length?Object.assign({},pool[Math.floor(Math.random()*pool.length)]):null}
-function albumWarm(){if(DEMO)return;for(let p=1;p<=ALB_PAGES;p++)if(!MPAGE[p])animePage(p).catch(()=>{})}
+function albumPoolPick(rid){const pool=[];(ALBS||[]).forEach(a=>a.chars.forEach(c=>{if(c.rarity===rid)pool.push(c)}));return pool.length?Object.assign({},pool[Math.floor(Math.random()*pool.length)]):null}
+function albumWarm(){if(DEMO||ALBS)return;albumList().catch(()=>{})}
 
 // ================= MODE HISTOIRE =================
 // personnages originaux du jeu (dessinés ici) : le Gardien, Hoshi, le Brise-Paires
