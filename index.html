@@ -803,6 +803,43 @@ nav button{font-size:9.5px}
 .dcbtn{background:#5865f2!important;color:#fff!important;box-shadow:0 8px 20px -10px #5865f2!important}.clav{width:38px;height:38px;border-radius:50%;object-fit:cover;background:#5865f2;display:flex;align-items:center;justify-content:center;flex:none}
 .pcard.wimg{box-shadow:inset 0 0 0 2px hsla(var(--ph),90%,60%,.6)}.pcard.wimg .pkj{opacity:.38;font-size:46px;top:auto;bottom:16px;text-shadow:0 2px 12px #000}
 .pack .art.wimg .kj{opacity:.35}
+
+/* ===== version PC / tablette : l'interface s'adapte à la taille de l'écran ===== */
+@media (min-width:900px){
+ #app{max-width:none;display:grid;grid-template-columns:240px minmax(0,1fr);grid-template-rows:auto auto minmax(0,1fr)}
+ header{grid-column:1/3;grid-row:1;padding:14px 28px}
+ header .logo .mk{width:44px;height:44px;font-size:24px}header .logo span{font-size:20px}
+ header .chip{font-size:13px;padding:5px 11px}
+ #demoBanner{grid-column:1/3;grid-row:2}
+ main{grid-column:2;grid-row:3;padding:10px 40px 40px;width:100%;max-width:1180px;justify-self:center;box-sizing:border-box}
+ nav{grid-column:1;grid-row:3;flex-direction:column;align-self:start;margin:16px 0 16px 16px;padding:8px;border-radius:20px}
+ nav button{flex:none;flex-direction:row;justify-content:flex-start;gap:14px;padding:13px 16px;font-size:14.5px;border-radius:12px}
+ nav button:hover{background:#ffffff0d;color:var(--ink)}
+ nav button.on{background:color-mix(in srgb,var(--acc) 14%,transparent)}
+ nav button.on::before{left:0;right:auto;top:22%;bottom:22%;width:3px;height:auto}
+ nav button svg{width:22px;height:22px;flex:none}
+ nav .dot{top:50%;right:14px;margin-top:-4px}
+ .grid{grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px}
+ .stats{grid-template-columns:repeat(7,1fr)!important}
+ .pcard{width:118px;height:160px}.pcard .pkj{font-size:56px}.pcard .pn{font-size:13px}.pcard.wimg .pkj{font-size:62px}
+ .pack .art{width:230px}.pack{min-height:230px}.pack .kj{font-size:120px}
+ .sec .t{font-size:24px}
+ .ovl>div[style*="max-width:420px"],#picker>div{max-width:760px!important}
+ #picker{padding:30px}
+ .slots{max-width:760px;margin-left:auto;margin-right:auto}
+ .bu{width:104px}.bnm{font-size:12px}
+ #battle{padding:16px 10%}
+ #stack{width:300px}
+ .shelfbox{max-width:620px}.shrow{height:220px}
+ .bookstage.on .bookwrap{transform:rotateX(-10deg) rotateY(36deg) scale(1.35)}
+ .bookstage.on .bookwrap.spread,.bookstage.on .bookwrap.riffle{transform:rotateX(-6deg) rotateY(14deg) scale(1.35)}
+ .world{padding:18px}
+ .dcban,.cloudbox,.box,.passban,.arban,.storyban,.achban{max-width:100%}
+ ::-webkit-scrollbar{width:10px}::-webkit-scrollbar-thumb{background:#ffffff1c;border-radius:10px}
+}
+@media (min-width:1400px){main{max-width:1320px}.grid{grid-template-columns:repeat(auto-fill,minmax(165px,1fr))}}
+/* tablette en portrait : un peu plus large que le téléphone */
+@media (min-width:600px) and (max-width:899px){#app{max-width:760px}.grid{grid-template-columns:repeat(4,1fr)}}
 </style>
 <link rel="manifest" href="manifest.webmanifest"><meta name="theme-color" content="#09090c"><link rel="icon" href="icon-192.png"><link rel="apple-touch-icon" href="icon-192.png"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="description" content="Shōkan · jeu gratuit de cartes anime : ouvre des mangas, collectionne, combats, guildes et arène."></head>
 <body>
