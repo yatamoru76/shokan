@@ -936,7 +936,12 @@ nav button{font-size:9.5px}
 .adcr{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-top:8px}.adcc{cursor:pointer;border-radius:12px;transition:transform .1s}.adcc.on{transform:scale(1.05);box-shadow:0 0 0 3px #ffd34d;border-radius:12px}
 .adcc .card .ov .sr,.adcc .card .ce,.adcc .card .lv{display:none}
 .adg{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px}.adg label{font-size:12px;font-weight:700;display:flex;flex-direction:column;gap:3px}.adg input{width:100%;box-sizing:border-box;min-width:0;background:var(--bg);border:1px solid var(--line);border-radius:8px;color:var(--ink);font-size:15px;padding:7px}
-.frhit{display:flex;align-items:center;gap:8px;flex:1;min-width:0;cursor:pointer}.ppteam{display:grid;grid-template-columns:repeat(5,1fr);gap:5px}.ppteam .card .ov .sr,.ppteam .card .ce{display:none}.ppteam .card .nm{font-size:9px}
+.frhit{display:flex;align-items:center;gap:8px;flex:1;min-width:0;cursor:pointer}
+.frrow:has(.frmsg){flex-wrap:wrap;row-gap:10px;padding:10px 12px}
+.frrow:has(.frmsg) .frhit{flex:1 1 100%}
+.frrow:has(.frmsg) .frn span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.frrow:has(.frmsg)>.btn{flex:1 1 0;min-width:0;padding:9px 6px!important;font-size:13px}
+.frrow:has(.frmsg)>.frx{flex:0 0 42px}.ppteam{display:grid;grid-template-columns:repeat(5,1fr);gap:5px}.ppteam .card .ov .sr,.ppteam .card .ce{display:none}.ppteam .card .nm{font-size:9px}
 
 /* livres 3D */
 .mv{perspective:none}
@@ -1404,7 +1409,7 @@ header .hsp{flex:1}
  <div id="modal" class="ovl"><div class="mbox" id="mbox"></div></div>
  <div id="toast"></div>
 </div>
-<script>window.SHK_VER="01/11 23h42";
+<script>window.SHK_VER="01/11 23h48";
 const BETA=true;const PUBLIC=true;
 
 "use strict";
@@ -3047,7 +3052,7 @@ async function showFriends(){const p=$("picker");p.style.display="flex";
  ${inc.length?`<div class="sec"><span class="no">📩</span><span class="t">Demandes reçues</span><span class="jp">申請</span></div>${inc.map(r=>{const o=pl[other(r)];return`<div class="frrow">${frAv(o)}<div class="frn"><b>${esc(o?o.name:"Joueur")}</b><span class="muted">${esc(o&&o.title||"")}</span></div><button class="btn sm" style="width:auto" data-fa="${r.id}">✓</button><button class="btn ghost sm" style="width:auto" data-fd="${r.id}">✕</button></div>`}).join("")}`:""}
  <div class="sec"><span class="no">⚔️</span><span class="t">Mes amis</span><span class="jp">友達</span></div>
  <div class="muted" style="font-size:12px;margin:-4px 2px 8px">⚔️ Auto : contre son équipe, combat automatique · 🔴 Direct : en même temps que lui, tour par tour, tu choisis qui attaque qui. Sans points de classement · récompense ${fd.left>0?`+25 💠 (encore ${fd.left}/5 aujourd'hui)`:"du jour déjà prise"}</div>
- ${acc.length?acc.map(r=>{const o=pl[other(r)];return`<div class="frrow"><div class="frhit" data-pp="${other(r)}">${frAv(o)}<div class="frn"><b>${esc(o?o.name:"Joueur")}</b><span class="muted">${o?`Niv. ${o.lvl||1} · ⚡ ${fmt(o.power||0)} · voir le profil ›`:""}</span></div></div><button class="btn ghost sm frmsg" style="width:auto" data-fc="${other(r)}" title="Messages">💬${CHT.unread[other(r)]?`<i class="frub">${CHT.unread[other(r)]}</i>`:""}</button><button class="btn sm" style="width:auto" data-ff="${other(r)}" ${o&&o.team&&o.team.length&&S.team.length?"":"disabled"} title="Contre son équipe (automatique)">⚔️ Auto</button><button class="btn gold sm" style="width:auto" data-fl="${other(r)}" ${S.team.length?"":"disabled"} title="En direct, tour par tour">🔴 Direct</button><button class="btn ghost sm frx" style="width:auto" data-fd="${r.id}" title="Retirer">✕</button></div>`}).join(""):'<div class="box muted" style="text-align:center;font-size:12.5px">Pas encore d\'amis. Cherche le pseudo d\'un pote juste au-dessus !</div>'}
+ ${acc.length?acc.map(r=>{const o=pl[other(r)];return`<div class="frrow"><div class="frhit" data-pp="${other(r)}">${frAv(o)}<div class="frn"><b>${esc(o?o.name:"Joueur")}</b><span class="muted">${o?`Niv. ${o.lvl||1} · ⚡ ${fmt(o.power||0)} · voir le profil ›`:""}</span></div></div><button class="btn ghost sm frmsg" style="width:auto" data-fc="${other(r)}" title="Messages">💬 Message${CHT.unread[other(r)]?`<i class="frub">${CHT.unread[other(r)]}</i>`:""}</button><button class="btn sm" style="width:auto" data-ff="${other(r)}" ${o&&o.team&&o.team.length&&S.team.length?"":"disabled"} title="Contre son équipe (automatique)">⚔️ Auto</button><button class="btn gold sm" style="width:auto" data-fl="${other(r)}" ${S.team.length?"":"disabled"} title="En direct, tour par tour">🔴 Direct</button><button class="btn ghost sm frx" style="width:auto" data-fd="${r.id}" title="Retirer">✕</button></div>`}).join(""):'<div class="box muted" style="text-align:center;font-size:12.5px">Pas encore d\'amis. Cherche le pseudo d\'un pote juste au-dessus !</div>'}
  ${out.length?`<div class="sec"><span class="no">⏳</span><span class="t">Demandes envoyées</span><span class="jp">送信</span></div>${out.map(r=>{const o=pl[other(r)];return`<div class="frrow">${frAv(o)}<div class="frn"><b>${esc(o?o.name:"Joueur")}</b><span class="muted">En attente…</span></div><button class="btn ghost sm" style="width:auto" data-fd="${r.id}">Annuler</button></div>`}).join("")}`:""}
  <div style="height:30px"></div></div>`;
  $("frClose").onclick=()=>{p.style.display="none";updateTop()};
@@ -3621,7 +3626,7 @@ load();dailyReset();tickBoost();initOpener();setMusicChip();applyDeco();
 // ===== emoji -> kanji / icônes dorées =====
 const SVGI={card:'<svg viewBox="0 0 24 24"><rect x="5" y="3.5" width="14" height="17" rx="2"/><path d="M9 9.5h6M9 12.5h6M12 9.5v6"/></svg>',gem:'<svg viewBox="0 0 24 24"><path d="M12 3l7 7-7 11-7-11z"/><path d="M5 10h14M12 3v18"/></svg>',oni:'<svg viewBox="0 0 24 24"><path d="M12 4c4 0 8 7.5 8 11.5 0 3-2.5 4.5-8 4.5s-8-1.5-8-4.5C4 11.5 8 4 12 4z"/><rect x="8.5" y="13" width="7" height="7" rx="1"/></svg>',bolt:'<svg viewBox="0 0 24 24"><path d="M13 3L5 13.5h6L10 21l8-10.5h-6z"/></svg>',search:'<svg viewBox="0 0 24 24"><circle cx="10.5" cy="10.5" r="6"/><path d="M15 15l5 5"/></svg>'};
 const EMAP={"🎴":"s:card","💠":"s:gem","🍙":"s:oni","⚡":"s:bolt","🔍":"s:search","🔎":"s:search",
- "🏆":"賞","🎁":"贈","⚙️":"設","⚙":"設","⚔️":"戦","⚔":"戦","🗡️":"刃","🗼":"塔","📖":"物","🖌️":"筆","📚":"巻","👥":"友","🔥":"炎","♻️":"還","👀":"見","👁️":"見","👁":"見","🛡️":"盾","💥":"撃","🎟️":"券","🔒":"封","🔓":"開","📺":"映","🗂️":"類","🎵":"音","🔇":"静","🏯":"城","👑":"王","💎":"宝","🌟":"★","⭐":"★","✨":"✦","💰":"金","🛒":"商","📜":"巻","🎯":"的","🏅":"章","🥇":"金","🥈":"銀","🥉":"銅","💀":"死","🔮":"魔","🍀":"運","🎲":"運","📅":"暦","✏️":"筆","⏩":"»","🎉":"祝","💬":"話","📢":"告","⏳":"時","⌛":"時","🔄":"換","🔁":"換","🤝":"交","📦":"箱","👤":"人","🏠":"家","🔔":"鈴","🎶":"音","🌸":"桜","📊":"表","🧭":"道","🎊":"祝","🪙":"銭","🧧":"封","📮":"便","✉️":"便","📩":"便","🗓️":"暦","🏳️":"降","🚪":"出","🔑":"鍵","❌":"✕","✅":"✓","✔️":"✓","⚠️":"!"};
+ "🏆":"賞","🎁":"贈","⚙️":"設","⚙":"設","⚔️":"戦","⚔":"戦","🗡️":"刃","🗼":"塔","📖":"物","🖌️":"筆","📚":"巻","👥":"友","🔥":"炎","♻️":"還","👀":"見","👁️":"見","👁":"見","🛡️":"盾","💥":"撃","🎟️":"券","🔒":"封","🔓":"開","📺":"映","🗂️":"類","🎵":"音","🔇":"静","🏯":"城","👑":"王","💎":"宝","🌟":"★","⭐":"★","✨":"✦","💰":"金","🛒":"商","📜":"巻","🎯":"的","🏅":"章","🥇":"金","🥈":"銀","🥉":"銅","💀":"死","🔮":"魔","🍀":"運","🎲":"運","📅":"暦","✏️":"筆","⏩":"»","🎉":"祝","💬":"話","📢":"告","⏳":"時","⌛":"時","🔄":"換","🔁":"換","🤝":"交","📦":"箱","👤":"人","🏠":"家","🔔":"鈴","🎶":"音","🌸":"桜","📊":"表","🧭":"道","🎊":"祝","🪙":"銭","🧧":"封","📮":"便","✉️":"便","📩":"便","🗓️":"暦","🏳️":"降","🚪":"出","🔑":"鍵","❌":"✕","✅":"✓","✔️":"✓","⚠️":"!","🔴":"生","💬":"話","🤝":"友","📨":"便"};
 const EMRX=/\p{Extended_Pictographic}(?:️|‍\p{Extended_Pictographic}️?)*/gu;
 const EM_SKIP="#chat .chl,#chat .chi,.stkchips,#skTxt,.card,#battle,#live,svg,.jk,.ji,.emo,input,textarea,script,style,canvas,#inkS .isleg,.cine,#cine";
 function emoNode(t){const s=t.nodeValue;EMRX.lastIndex=0;if(!EMRX.test(s))return;const p=t.parentElement;if(!p||p.closest(EM_SKIP))return;
