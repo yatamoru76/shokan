@@ -878,6 +878,20 @@ nav button{font-size:9.5px}
 .lfname{font-size:12px;font-weight:800;letter-spacing:.25em;text-transform:uppercase;color:var(--lc);margin-top:4px;animation:lft .6s .4s both}
 @keyframes lft{from{opacity:0;transform:translateY(10px) scale(1.2)}}
 .lfskip{position:absolute;right:14px;top:calc(16% + 12px);z-index:5;font-size:14px;font-weight:900;color:#fff;background:#000b;border:1.5px solid #ffffff55;border-radius:99px;padding:9px 18px;cursor:pointer;backdrop-filter:blur(4px)}.lfskip:active{transform:scale(.95)}
+
+/* Legendary Finish dessiné (sans vidéo) */
+#lfin .lfspd{position:absolute;inset:-30%;background:repeating-conic-gradient(from 0deg at 50% 50%,transparent 0 3deg,#ffffff22 3deg 4deg,transparent 4deg 9deg);-webkit-mask:radial-gradient(circle,transparent 18%,#000 60%);mask:radial-gradient(circle,transparent 18%,#000 60%);animation:spin 6s linear infinite;opacity:.0;transition:opacity .2s}
+#lfin.on .lfspd{opacity:1}
+#lfin .lffall{position:relative}
+#lfin .lffall img{width:min(56vw,280px);animation:lfzoom2 3.4s cubic-bezier(.2,.9,.2,1) forwards;box-shadow:0 0 0 3px #000,0 0 60px var(--lc),0 0 120px var(--ec)}
+@keyframes lfzoom2{0%{transform:scale(2.4) rotate(-8deg);filter:brightness(0) contrast(2)}22%{transform:scale(.96) rotate(1deg);filter:brightness(1.05)}30%{transform:scale(1.04)}100%{transform:scale(1.1)}}
+#lfin .lfkj{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);font-family:"Noto Sans JP";font-weight:900;font-size:min(42vw,260px);line-height:1;color:var(--lc);opacity:0;white-space:nowrap;-webkit-text-stroke:4px #000;paint-order:stroke;text-shadow:0 0 30px var(--lc);z-index:2;pointer-events:none}
+#lfin.hit .lfkj,#lfin .lfkj{animation:lfkj2 3.4s ease-out forwards}
+@keyframes lfkj2{0%,28%{opacity:0;transform:translate(-50%,-50%) scale(2.6) rotate(-10deg)}34%{opacity:1;transform:translate(-50%,-50%) scale(1) rotate(-6deg)}80%{opacity:.95}100%{opacity:0;transform:translate(-50%,-50%) scale(1.08) rotate(-6deg)}}
+#lfin .lfslash{position:absolute;left:-40%;right:-40%;top:50%;height:10px;background:linear-gradient(90deg,transparent,#fff,var(--lc),#fff,transparent);transform:rotate(-28deg) scaleX(0);opacity:0;animation:lfsl 3.4s ease-out forwards;z-index:3;box-shadow:0 0 24px var(--lc)}
+@keyframes lfsl{0%,29%{transform:rotate(-28deg) scaleX(0);opacity:0}31%{transform:rotate(-28deg) scaleX(1);opacity:1}45%{opacity:0}100%{opacity:0;transform:rotate(-28deg) scaleX(1)}}
+#lfin.hit .lfstage,#lfin.hit .lfspd{animation:lfhit .42s steps(1) forwards}#lfin.hit::after{content:"";position:absolute;inset:0;background:#fff;z-index:6;pointer-events:none;animation:lffl .42s steps(1) forwards}@keyframes lffl{0%{opacity:.9}25%{opacity:0}50%{opacity:.6}75%,100%{opacity:0}}
+@keyframes lfhit{0%{filter:invert(1) contrast(2)}25%{filter:none}50%{filter:invert(1) contrast(2) grayscale(1)}75%{filter:none}}
 </style>
 <link rel="manifest" href="manifest.webmanifest"><meta name="theme-color" content="#09090c"><link rel="icon" href="icon-192.png"><link rel="apple-touch-icon" href="icon-192.png"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="description" content="Shōkan · jeu gratuit de cartes anime : ouvre des mangas, collectionne, combats, guildes et arène."></head>
 <body>
@@ -1840,19 +1854,31 @@ const LFIN={
  "ken kaneki":{yt:"ZsQnAuh3tZU",s:105,e:122}};
 const lfinFor=c=>LFIN[c.id]||LFIN[String(c.name||"").toLowerCase().trim()]||null;
 let LFP=null;
-async function legendaryFinish(u){if(B.skip||!u||!u.card)return;const c=u.card,o=$("lfin"),r=c.rarity,ov=lfinFor(c);
- let vid=ov?ov.yt:c.trailer,s=ov?ov.s:38,e=ov?ov.e:50;if(!vid&&!ov){try{await loadBg(c);vid=c.trailer}catch(_){}}
- o.dataset.r=r;o._um=0;o._rt=0;o.innerHTML=`<div class="lfbar t"></div><div class="lfstage"><div class="lfvid" id="lfVid"></div><div class="lffall"><img src="${esc(c.img)}" referrerpolicy="no-referrer"><span>${{M:"神話",D:"神",X:"宇宙"}[r]||"伝説"}</span></div></div>
- <div class="lfbar b"><div class="lftitle">LEGENDARY FINISH</div><div class="lfname">${esc(c.name)}</div></div><button class="lfskip" id="lfSkip">Passer ⏭</button>`;
- o.classList.add("on");sfx.ult();shakeScreen(10);let done;const end=new Promise(res=>done=res);const finish=()=>{if(!o.classList.contains("on"))return;o.classList.add("out");setTimeout(()=>{o.classList.remove("on","out","vid");o.innerHTML="";if(LFP){try{LFP.destroy()}catch(_){}LFP=null}done()},350)};
- o.onclick=finish;$("lfSkip").onclick=ev=>{ev.stopPropagation();finish()};let to=setTimeout(finish,(vid?Math.max(4,e-s)*1000+2600:3200)/Math.max(1,speed>2?2:1));
- if(vid&&sceneOn()){try{await loadYT();const h=document.createElement("div");$("lfVid").appendChild(h);
-  LFP=new YT.Player(h,{videoId:vid,playerVars:{autoplay:1,mute:1,controls:0,playsinline:1,rel:0,modestbranding:1,iv_load_policy:3,disablekb:1,fs:0,start:s,end:e},
-   events:{onStateChange:ev=>{const P=ev.target;clearTimeout(o._sh);
-     if(ev.data===1){o._sh=setTimeout(()=>{o.classList.add("vid");if(!o._um){o._um=1;setTimeout(()=>{try{P.unMute();P.setVolume(70)}catch(_){}},400)}},1500)}
-     else{o.classList.remove("vid");if(ev.data===2&&o._um&&!o._rt){o._rt=1;try{P.mute();P.playVideo()}catch(_){}}}
-     if(ev.data===0)finish()},onError:()=>{o.classList.remove("vid")}}})}catch(_){}}
- await end;clearTimeout(to)}
+// son original du Legendary Finish : inspiration → cri de guerre synthétisé → impact → réverbération
+function lfSound(rid){const c=ac();if(!c)return;const t=c.currentTime+.02,out=c.createGain();out.gain.value=.9;out.connect(c.destination);
+ const rv=c.createConvolver(),L=c.sampleRate*2.2,ir=c.createBuffer(2,L,c.sampleRate);for(let ch=0;ch<2;ch++){const d=ir.getChannelData(ch);for(let i=0;i<L;i++)d[i]=(Math.random()*2-1)*Math.pow(1-i/L,3)}rv.buffer=ir;const rg=c.createGain();rg.gain.value=.35;rv.connect(rg);rg.connect(out);
+ const nb=(dur)=>{const n=Math.floor(c.sampleRate*dur),b=c.createBuffer(1,n,c.sampleRate),x=b.getChannelData(0);for(let i=0;i<n;i++)x[i]=Math.random()*2-1;const s=c.createBufferSource();s.buffer=b;return s};
+ const dist=c.createWaveShaper(),cu=new Float32Array(1024);for(let i=0;i<1024;i++){const x=i/512-1;cu[i]=Math.tanh(x*3.5)}dist.curve=cu;
+ // 1) inspiration : souffle qui monte
+ {const s=nb(1.1),f=c.createBiquadFilter(),g=c.createGain();f.type="bandpass";f.Q.value=1.4;f.frequency.setValueAtTime(300,t);f.frequency.exponentialRampToValueAtTime(5000,t+1.05);g.gain.setValueAtTime(.0001,t);g.gain.exponentialRampToValueAtTime(.35,t+1);g.gain.exponentialRampToValueAtTime(.0001,t+1.1);s.connect(f);f.connect(g);g.connect(out);s.start(t);s.stop(t+1.1)}
+ const h=t+1.05;
+ // 2) cri de guerre synthétique (voix grave « HAAA » : dent de scie + formants)
+ {const o1=c.createOscillator(),o2=c.createOscillator(),g=c.createGain();o1.type=o2.type="sawtooth";o1.frequency.setValueAtTime(165,h-.25);o1.frequency.linearRampToValueAtTime(205,h);o1.frequency.exponentialRampToValueAtTime(120,h+.9);o2.frequency.setValueAtTime(167,h-.25);o2.frequency.linearRampToValueAtTime(208,h);o2.frequency.exponentialRampToValueAtTime(118,h+.9);
+  const vib=c.createOscillator(),vg=c.createGain();vib.frequency.value=7;vg.gain.value=5;vib.connect(vg);vg.connect(o1.frequency);vg.connect(o2.frequency);
+  const mix=c.createGain();o1.connect(mix);o2.connect(mix);[[750,8,.9],[1180,10,.6],[2500,12,.25]].forEach(([fq,q,v])=>{const f=c.createBiquadFilter();f.type="bandpass";f.frequency.value=fq;f.Q.value=q;const fg=c.createGain();fg.gain.value=v;mix.connect(f);f.connect(fg);fg.connect(g)});
+  g.gain.setValueAtTime(.0001,h-.25);g.gain.exponentialRampToValueAtTime(.55,h-.05);g.gain.setValueAtTime(.55,h+.45);g.gain.exponentialRampToValueAtTime(.0001,h+.95);const gd=c.createGain();gd.gain.value=.8;g.connect(dist);dist.connect(gd);gd.connect(out);gd.connect(rv);
+  [o1,o2,vib].forEach(o=>{o.start(h-.25);o.stop(h+1)})}
+ // 3) impact : sub-basse + explosion + lame métallique
+ {const o=c.createOscillator(),g=c.createGain();o.frequency.setValueAtTime(90,h);o.frequency.exponentialRampToValueAtTime(26,h+1.6);g.gain.setValueAtTime(.0001,h);g.gain.exponentialRampToValueAtTime(1,h+.01);g.gain.exponentialRampToValueAtTime(.0001,h+1.8);o.connect(g);g.connect(out);o.start(h);o.stop(h+1.9)}
+ {const s=nb(1.4),f=c.createBiquadFilter(),g=c.createGain();f.type="lowpass";f.frequency.setValueAtTime(3500,h);f.frequency.exponentialRampToValueAtTime(140,h+1.3);g.gain.setValueAtTime(.8,h);g.gain.exponentialRampToValueAtTime(.0001,h+1.4);s.connect(f);f.connect(g);g.connect(out);g.connect(rv);s.start(h);s.stop(h+1.4)}
+ [[2637,.25],[3951,.12],[rid==="X"?5274:1760,.1]].forEach(([fq,v],k)=>{const o=c.createOscillator(),g=c.createGain();o.type="triangle";o.frequency.value=fq;g.gain.setValueAtTime(.0001,h+.02);g.gain.exponentialRampToValueAtTime(v,h+.03);g.gain.exponentialRampToValueAtTime(.0001,h+1.6);o.connect(g);g.connect(rv);g.connect(out);o.start(h);o.stop(h+1.7)})}
+async function legendaryFinish(u){if(B.skip||!u||!u.card)return;const c=u.card,o=$("lfin"),r=c.rarity,el=u.el||ELS[0];
+ o.dataset.r=r;o.style.setProperty("--ec",el.c);
+ o.innerHTML=`<div class="lfspd"></div><div class="lfbar t"></div><div class="lfstage"><div class="lffall"><span class="lfkj">必殺</span><img src="${esc(c.img)}" referrerpolicy="no-referrer"><i class="lfslash"></i></div></div>
+ <div class="lfbar b"><div class="lftitle">LEGENDARY FINISH</div><div class="lfname">${esc(c.name)} · ${{M:"神話",D:"神",X:"宇宙"}[r]||"伝説"}</div></div><button class="lfskip" id="lfSkip">Passer ⏭</button>`;
+ o.classList.add("on");lfSound(r);setTimeout(()=>{if(o.classList.contains("on")){o.classList.add("hit");shakeScreen(14);setTimeout(()=>o.classList.remove("hit"),420)}},1050);
+ let done;const end=new Promise(res=>done=res);const finish=()=>{if(!o.classList.contains("on"))return;o.classList.add("out");setTimeout(()=>{o.classList.remove("on","out","hit");o.innerHTML="";done()},350)};
+ o.onclick=finish;$("lfSkip").onclick=ev=>{ev.stopPropagation();finish()};const to=setTimeout(finish,3600);await end;clearTimeout(to)}
 
 // ================= IMPACTS D'ULTIME (après la cinématique manga) =================
 const SPR={};
