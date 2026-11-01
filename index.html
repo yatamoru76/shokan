@@ -1061,6 +1061,16 @@ nav button{font-size:9.5px}
 .stkpick{display:flex;gap:8px;overflow-x:auto;padding:4px 2px 8px;scrollbar-width:none}.stkpick div{flex:0 0 56px;height:72px;border-radius:10px;background:#333 center 15%/cover;box-shadow:0 0 0 1.5px var(--rc);cursor:pointer;opacity:.75}.stkpick div.on{opacity:1;box-shadow:0 0 0 3px #c9a45c}
 .stkbox .btn{width:100%;margin-top:12px}
 .frmsg{position:relative}.frub{position:absolute;top:-6px;right:-6px;min-width:17px;height:17px;border-radius:9px;background:#d6452f;color:#fff;font:700 10px/17px Inter;font-style:normal;padding:0 4px}
+.gbwrap{position:relative;flex:none;width:92px;height:122px;border-radius:12px;isolation:isolate}
+.gbwrap::before{content:"";position:absolute;inset:-14px;border-radius:50%;background:radial-gradient(circle,#c43cff99,#7b2cff44 45%,transparent 70%);animation:aura2 1.3s ease-in-out infinite alternate;z-index:-1}
+.gbwrap .gbimg{width:100%;height:100%;object-fit:cover;object-position:top;border-radius:12px;display:block}
+.gbwrap .gbimg.real{filter:hue-rotate(230deg) saturate(1.6) brightness(.6) contrast(1.25);box-shadow:0 0 0 2px #7b2cff,0 0 18px #c43cff,inset 0 0 30px #000}
+.gbwrap::after{content:"";position:absolute;inset:0;border-radius:12px;background:radial-gradient(circle at 50% 30%,transparent 30%,#2a003f99 75%),repeating-linear-gradient(115deg,transparent 0 9px,#c43cff22 9px 10px);mix-blend-mode:multiply;pointer-events:none}
+.gbsm{position:absolute;bottom:-4px;left:20%;width:26px;height:26px;border-radius:50%;background:radial-gradient(circle,#9b3cffaa,transparent 70%);filter:blur(2px);animation:gbsmoke 2.6s ease-in infinite;pointer-events:none}
+.gbsm.s2{left:55%;animation-delay:-.9s;width:20px;height:20px}.gbsm.s3{left:38%;animation-delay:-1.7s}
+@keyframes gbsmoke{0%{transform:translateY(0) scale(.6);opacity:0}25%{opacity:.9}100%{transform:translateY(-120px) scale(1.8);opacity:0}}
+.gbk{position:absolute;right:-6px;top:-6px;width:28px;height:28px;border-radius:50%;background:#1a0526;color:#e2a8ff;font:900 15px/28px "Noto Sans JP";text-align:center;box-shadow:0 0 0 1.5px #c43cff,0 0 12px #c43cff}
+.gbwrap.pure::before{background:radial-gradient(circle,#ffe9a888,transparent 70%)}.gbwrap.pure .gbimg.real{filter:none;box-shadow:0 0 0 2px #ffd34d,0 0 18px #ffd34d}.gbwrap.pure::after,.gbwrap.pure .gbsm{display:none}.gbwrap.pure .gbk{color:#ffd34d;box-shadow:0 0 0 1.5px #ffd34d}
 .sumodes{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;margin-top:12px}
 .smd{display:flex;flex-direction:column;align-items:flex-start;gap:3px;padding:10px 9px;border-radius:10px;background:var(--bg2);border:1.5px solid var(--line);color:var(--ink);text-align:left;cursor:pointer}
 .smd .si{font-size:20px}.smd b{font-weight:900;font-size:14px}.smd small{font-size:10.5px;color:var(--muted);line-height:1.3}
@@ -1411,7 +1421,7 @@ header .hsp{flex:1}
  <div id="modal" class="ovl"><div class="mbox" id="mbox"></div></div>
  <div id="toast"></div>
 </div>
-<script>window.SHK_VER="02/11 00h02";
+<script>window.SHK_VER="02/11 00h06";
 const BETA=true;const PUBLIC=true;
 
 "use strict";
@@ -1969,7 +1979,7 @@ function gRefresh(){const g=S.guild,el=$("gBody");if(!g||!el)return;guildTick.si
  <div class="sec"><span class="no">03</span><span class="t">Activité</span><span class="jp">活動</span></div>
  <div class="hist box">${g.feed.slice(0,12).map(f=>`<div>${esc(f.x)} <span style="opacity:.6">· ${ago(f.t)}</span></div>`).join("")||'<div>Rien pour l\'instant.</div>'}</div>
  ${guildRank()}<button class="btn ghost sm" id="gLeave" style="margin:14px 0 6px">${g.leader?"Dissoudre la guilde":"Quitter la guilde"}</button>`;
- $("gRaid").onclick=()=>{const R=graidState();if(R.dead||R.used>=3)return;if(!S.team.length){toast("Ajoute des persos à ton équipe");return}startBattle({type:"graid",enemies:[graidFoe()],loc:"storm",title:"🐉 Raid de guilde · "+GBOSS[R.b].n})};$("gChest").onclick=()=>{if(Date.now()<g.chestAt)return;const r=chestRw(g);S.boosters+=r.boosters||0;S.oni+=r.oni||0;S.shards+=r.shards||0;S.frag+=r.frag||0;g.chestAt=Date.now()+8*3600000;gxp(30,true);save();sfx.win();toast("🎁 Coffre de guilde : +"+rwText(r));updateTop();gRefresh()};
+ $("gRaid").onclick=()=>{const R=graidState();if(R.dead||R.used>=3)return;if(!S.team.length){toast("Ajoute des persos à ton équipe");return}startBattle({type:"graid",enemies:[graidFoe()],loc:"storm",corrupt:true,title:"🐉 Raid de guilde · "+gbName(R)})};$("gChest").onclick=()=>{if(Date.now()<g.chestAt)return;const r=chestRw(g);S.boosters+=r.boosters||0;S.oni+=r.oni||0;S.shards+=r.shards||0;S.frag+=r.frag||0;g.chestAt=Date.now()+8*3600000;gxp(30,true);save();sfx.win();toast("🎁 Coffre de guilde : +"+rwText(r));updateTop();gRefresh()};
  $("gDeco").onclick=showDecos;
  $("gLeave").onclick=()=>modal(`<h3>${g.leader?"Dissoudre":"Quitter"} la guilde ?</h3><p class="muted">Tu garderas les décorations déjà équipées, mais plus les récompenses de guilde.</p>`,[["Annuler"],["Confirmer",()=>{S.guild=null;save();rGuild()}]])}
 function createGuild(){let em=EMBL[0],col=GCOL[0];
@@ -3236,18 +3246,21 @@ function gbossSVG(b){const bodies=[
  const eyes=[[105,95,135,95],[0,0,0,0],[112,95,128,95],[108,52,132,52]][b.t];
  return`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 345"><defs><radialGradient id="gb" cx=".5" cy=".4"><stop offset="0" stop-color="${b.c2}" stop-opacity=".55"/><stop offset="1" stop-color="#05030c"/></radialGradient></defs><rect width="240" height="345" fill="url(#gb)"/><g transform="translate(0,40)">${bodies}${eyes[0]?`<circle cx="${eyes[0]}" cy="${eyes[1]}" r="6" fill="#fff"/><circle cx="${eyes[2]}" cy="${eyes[3]}" r="6" fill="#fff"/>`:""}</g><text x="120" y="330" text-anchor="middle" font-size="40" font-weight="900" fill="${b.c2}" opacity=".5" font-family="Noto Sans JP,sans-serif">${b.kj}</text></svg>`}
 function graidState(){const g=S.guild;if(!g)return null;const wk=weekId();if(!g.raid||g.raid.wk!==wk){const b=GBOSS[wk%GBOSS.length],est=Math.max(2000,teamPower()*2),m=g.members.length;
-  const max=Math.round(est*(14+m*2.2)*(1+Math.min(1,g.lvl/20)));g.raid={wk,b:wk%GBOSS.length,max,hp:max,est,me:0,npc:{},tiers:{},last:Date.now(),day:"",used:0,dead:false};gfeed("🐉 Un nouveau boss de raid apparaît : "+b.n+" !")}
- const R=g.raid;if(R.day!==today()){R.day=today();R.used=0}
+  const max=Math.round(est*(14+m*2.2)*(1+Math.min(1,g.lvl/20)));g.raid={wk,b:wk%GBOSS.length,max,hp:max,est,me:0,npc:{},tiers:{},last:Date.now(),day:"",used:0,dead:false};gfeed("🐉 Un Écho corrompu surgit : le boss de raid de la semaine !")}
+ const R=g.raid;if(!R.bc)setTimeout(graidChar,0);if(R.day!==today()){R.day=today();R.used=0}
  const dt=Math.min(48,(Date.now()-R.last)/3600000);if(dt>.02&&!R.dead){R.last=Date.now();g.members.forEach((m,i)=>{if(Math.random()<.55){const d=Math.round(R.est*.022*dt*(.4+Math.random()*1.3));R.npc[m.n]=(R.npc[m.n]||0)+d;graidHit(d,false)}})}return R}
+function graidChar(){const g=S.guild;if(!g||!g.raid||g.raid.bc||graidChar.busy)return;graidChar.busy=1;const R=g.raid;const rk=1+(hash(R.wk*7919+13)%60);
+ charAt(rk,rarOfRank(rk)).then(c=>{if(!S.guild||S.guild.raid!==R)return;R.bc={id:c.id,name:c.name,img:c.img,series:c.series,rarity:c.rarity};save();if(view==="guild"&&typeof gRefresh==="function")gRefresh()}).catch(()=>{}).finally(()=>{graidChar.busy=0})}
+function gbName(R){return R&&R.bc?"Écho corrompu · "+R.bc.name:GBOSS[R.b].n}
 function graidHit(d,mine){const g=S.guild,R=g.raid;if(R.dead)return;R.hp=Math.max(0,R.hp-d);if(mine)R.me+=d;const pct=1-R.hp/R.max;
- [[.25,{boosters:1,shards:150,oni:4}],[.5,{boosters:2,shards:250,oni:6}],[.75,{boosters:2,shards:400,oni:8,frag:1}]].forEach(([t,rw])=>{if(pct>=t&&!R.tiers[t]){R.tiers[t]=1;addGift("🐉","Raid de guilde : "+Math.round(t*100)+" %","Ta guilde a infligé "+Math.round(t*100)+" % des PV à "+GBOSS[R.b].n+".",bonusRw(rw));gfeed("🐉 "+GBOSS[R.b].n+" : "+Math.round(t*100)+" % des PV détruits")}});
- if(R.hp<=0){R.dead=true;S.graidKills=(S.graidKills||0)+1;addGift("👑","Raid de guilde : boss vaincu !",GBOSS[R.b].n+" est tombé. Bravo à toute la guilde !",bonusRw({boosters:5,shards:1000,oni:15,frag:2}));gxp(800,false);gfeed("🏆 "+GBOSS[R.b].n+" est vaincu !");notify("🐉","Le boss de raid de ta guilde est vaincu !")}}
-function graidFoe(){const R=graidState(),b=GBOSS[R.b];const img="data:image/svg+xml,"+encodeURIComponent(gbossSVG(b));const card={id:-7000-R.b,name:b.n,img,series:"Raid de guilde",rarity:"X",rank:1};
+ [[.25,{boosters:1,shards:150,oni:4}],[.5,{boosters:2,shards:250,oni:6}],[.75,{boosters:2,shards:400,oni:8,frag:1}]].forEach(([t,rw])=>{if(pct>=t&&!R.tiers[t]){R.tiers[t]=1;addGift("🐉","Raid de guilde : "+Math.round(t*100)+" %","Ta guilde a infligé "+Math.round(t*100)+" % des PV à "+gbName(R)+".",bonusRw(rw));gfeed("🐉 "+gbName(R)+" : "+Math.round(t*100)+" % des PV détruits")}});
+ if(R.hp<=0){R.dead=true;S.graidKills=(S.graidKills||0)+1;addGift("👑","Raid de guilde : boss vaincu !",gbName(R)+" a été purifié. Bravo à toute la guilde !",bonusRw({boosters:5,shards:1000,oni:15,frag:2}));gxp(800,false);gfeed("🏆 "+GBOSS[R.b].n+" est vaincu !");notify("🐉","Le boss de raid de ta guilde est vaincu !")}}
+function graidFoe(){const R=graidState(),b=GBOSS[R.b];const img=R.bc?R.bc.img:"data:image/svg+xml,"+encodeURIComponent(gbossSVG(b));const card={id:R.bc?R.bc.id:-7000-R.b,name:gbName(R),img,series:R.bc?R.bc.series:"Raid de guilde",rarity:"X",rank:1};
  const P=enemyP(8+Math.min(40,Object.values(S.prog).length));const f=mkFoe(card,P,true);f.el=ELS.find(e=>e.id===b.el);f.cls=CLS.find(c=>c.id==="war")||f.cls;const tm=teamCards().map(stats);const avgHp=tm.length?tm.reduce((a,x)=>a+x.hp,0)/tm.length:1000;
  f.maxhp=R.max;f.atk=Math.round(Math.max(P*.6,avgHp*.15));f.raid=true;f.titan=true;return f}
-function graidHTML(){const g=S.guild,R=graidState(),b=GBOSS[R.b],pct=R.hp/R.max*100,img="data:image/svg+xml,"+encodeURIComponent(gbossSVG(b));const weak=ELS.find(e=>ADV[e.id]===b.el);
+function graidHTML(){const g=S.guild,R=graidState(),b=GBOSS[R.b],pct=R.hp/R.max*100,img=R.bc?R.bc.img:"data:image/svg+xml,"+encodeURIComponent(gbossSVG(b));const weak=ELS.find(e=>ADV[e.id]===b.el);
  const board=[["⭐ "+((S.prof&&S.prof.name)||"Toi")+" (toi)",R.me,1],...Object.entries(R.npc).map(([n,d])=>[n,d,0])].sort((a,b)=>b[1]-a[1]).slice(0,6);
- return`<div class="graid" style="--g1:${b.c1};--g2:${b.c2}"><div style="display:flex;gap:10px"><img class="gbimg" src="${img}"><div style="flex:1;min-width:0"><div class="sbk" style="color:${b.c2}">🐉 RAID DE GUILDE · SEMAINE</div><div style="font-weight:900;font-size:17px">${b.n}</div>
+ return`<div class="graid" style="--g1:${b.c1};--g2:${b.c2}"><div style="display:flex;gap:12px"><div class="gbwrap ${R.dead?"pure":""}"><img class="gbimg ${R.bc?"real":""}" src="${img}" referrerpolicy="no-referrer"><i class="gbsm"></i><i class="gbsm s2"></i><i class="gbsm s3"></i><span class="gbk">${R.dead?"浄":"穢"}</span></div><div style="flex:1;min-width:0"><div class="sbk" style="color:#c43cff">🐉 RAID DE GUILDE · ÉCHO CORROMPU</div><div style="font-weight:900;font-size:17px">${R.bc?esc(R.bc.name):b.n}</div>${R.bc?`<div class="muted" style="font-size:11.5px;color:#d9c6ff">${esc(R.bc.series||"")} · corrompu par le Brise-Paires</div>`:""}
  <div class="muted" style="font-size:11.5px;color:#fffb">${R.dead?"✅ Vaincu ! Un nouveau boss arrive dans "+dLeft(Date.UTC(2026,0,5)+(weekId()+1)*7*86400000):"⏳ Disparaît dans "+dLeft(Date.UTC(2026,0,5)+(weekId()+1)*7*86400000)}${weak?" · Faible contre "+weak.ic:""}</div>
  <div class="ghp"><i style="width:${pct}%"></i><span>${fmt(R.hp)} / ${fmt(R.max)} PV</span></div><div class="gtiers">${[25,50,75,100].map(t=>`<span class="${(100-pct)>=t?"on":""}">${t} %</span>`).join("")}</div></div></div>
  <button class="btn ${R.dead||R.used>=3?"ghost":"gold"}" id="gRaid" style="margin-top:8px" ${R.dead||R.used>=3||!S.team.length?"disabled":""}>${R.dead?"Boss vaincu 🏆":R.used>=3?"Reviens demain (3/3 attaques)":"⚔️ Attaquer · "+(3-R.used)+"/3 aujourd'hui"}</button>
