@@ -951,11 +951,14 @@ const PK=id=>PACKS.find(p=>p.id===id)||PACKS[0];
 // personnage emblématique de chaque catégorie (image AniList)
 const MASC={mix:"Goku",shonen:"Naruto Uzumaki",seinen:"Guts",shojo:"Usagi Tsukino",josei:"Nana Oosaki",isekai:"Rimuru Tempest",fantasy:"Frieren",mecha:"Lelouch Lamperouge",scifi:"Spike Spiegel",sport:"Shouyou Hinata",romance:"Kaguya Shinomiya",comedy:"Saitama",sol:"Hitori Gotou",psy:"Light Yagami",horror:"Ken Kaneki"};
 let MIMG={};try{const c=JSON.parse(localStorage.getItem("shk_masc")||"null");if(c&&Date.now()-c.t<20*86400000)MIMG=c.m}catch(_){}
-async function loadMascots(){if(DEMO||Object.keys(MIMG).length>=Object.keys(MASC).length)return;
- const q="query{"+Object.entries(MASC).map(([k,n])=>`${k}:Page(perPage:1){characters(search:${JSON.stringify(n)},sort:FAVOURITES_DESC){image{large}}}`).join(" ")+"}";
- try{const r=await fetch(API,{method:"POST",headers:{"Content-Type":"application/json",Accept:"application/json"},body:JSON.stringify({query:q})});if(!r.ok)return;const j=await r.json();
-  for(const k in MASC){const c=j.data&&j.data[k]&&j.data[k].characters[0];if(c&&c.image&&c.image.large)MIMG[k]=c.image.large}
-  try{localStorage.setItem("shk_masc",JSON.stringify({t:Date.now(),m:MIMG}))}catch(_){}if(view==="home"){const sl=$("packs")&&$("packs").scrollLeft;rHome();if($("packs"))$("packs").scrollLeft=sl}}catch(_){}}
+async function loadMascots(){if(DEMO||loadMascots.busy)return;loadMascots.busy=1;setTimeout(()=>loadMascots.busy=0,30000);const miss=Object.keys(MASC).filter(k=>!MIMG[k]);if(!miss.length)return;let got=0;
+ const done=()=>{try{localStorage.setItem("shk_masc",JSON.stringify({t:Date.now(),m:MIMG}))}catch(_){}if(view==="home"){const sl=$("packs")&&$("packs").scrollLeft;rHome();if($("packs"))$("packs").scrollLeft=sl}};
+ const ask=async q=>{const r=await fetch(API,{method:"POST",headers:{"Content-Type":"application/json",Accept:"application/json"},body:JSON.stringify(q)});if(!r.ok)throw new Error("HTTP "+r.status);return r.json()};
+ try{const q="query{"+miss.map(k=>`${k}:Page(perPage:1){characters(search:${JSON.stringify(MASC[k])},sort:FAVOURITES_DESC){image{large}}}`).join(" ")+"}";const j=await ask({query:q});
+  miss.forEach(k=>{const c=j.data&&j.data[k]&&j.data[k].characters&&j.data[k].characters[0];if(c&&c.image&&c.image.large){MIMG[k]=c.image.large;got++}})}catch(e){console.warn("mascots batch",e)}
+ if(got)done();
+ // secours : une requête par personnage si la requête groupée a échoué
+ for(const k of Object.keys(MASC).filter(k=>!MIMG[k])){try{const j=await ask({query:"query($s:String){Character(search:$s,sort:FAVOURITES_DESC){image{large}}}",variables:{s:MASC[k]}});const im=j.data&&j.data.Character&&j.data.Character.image&&j.data.Character.image.large;if(im){MIMG[k]=im;done()}}catch(_){}await sleep(700)}}
 function packArt(p,pos){const im=MIMG[p.id];return im?`linear-gradient(180deg,hsla(${p.h},90%,55%,.15) 0,#0000 30%,hsla(${p.h},85%,18%,.95) 92%),url('${im.replace(/'/g,"%27")}') center ${pos||"18%"}/cover no-repeat,${packBg(p)}`:packBg(p)}
 function packBg(p){return`radial-gradient(circle at 70% 18%,hsl(${p.h+20},100%,78%) 0,transparent 30%),linear-gradient(160deg,hsl(${p.h},90%,60%),hsl(${p.h},85%,52%) 35%,hsl(${p.h-10},80%,32%) 75%,hsl(${p.h-15},85%,14%))`}
 const QT=`query($p:Int,$g:[String],$t:[String]){Page(page:$p,perPage:40){media(type:ANIME,sort:POPULARITY_DESC,isAdult:false,genre_in:$g,tag_in:$t,genre_not_in:["Ecchi","Hentai"]){title{romaji english} characters(sort:FAVOURITES_DESC,perPage:8){nodes{id name{full} image{large} favourites}}}}}`;
@@ -1101,7 +1104,7 @@ function render(){dailyReset();try{achCheck()}catch(_){}({home:rHome,coll:rColl,
 // ================= ÉCRAN BOOSTERS =================
 function counts(){const k={C:0,R:0,E:0,L:0,M:0,D:0,X:0};Object.values(S.coll).forEach(c=>k[c.rarity]++);return k}
 function sec(no,t,jp){return`<div class="sec"><span class="no">${no}</span><span class="t">${t}</span><span class="jp">${jp}</span></div>`}
-function rHome(){if(!rHome.m){rHome.m=1;setTimeout(loadMascots,600)}setTimeout(()=>document.querySelectorAll("#main .cloudslot").forEach(el=>{if(CL.user)el.innerHTML="";else cloudBind(el)}),0);const k=counts(),ev=EV(),tot=Object.keys(S.coll).length;
+function rHome(){if(!rHome.m){rHome.m=1;setTimeout(loadMascots,1500)}setTimeout(()=>document.querySelectorAll("#main .cloudslot").forEach(el=>{if(CL.user)el.innerHTML="";else cloudBind(el)}),0);const k=counts(),ev=EV(),tot=Object.keys(S.coll).length;
  $("main").innerHTML=`<div class="event" style="margin-top:10px"><b>${ev.n}</b> <span class="muted">· ${ev.d}</span></div>
  ${sec("01","Choisis ton booster","ブースター")}
  <div class="packs" id="packs">${PACKS.map(p=>`<div class="pcard ${p.id===(S.pack||"mix")?"on":""} ${MIMG[p.id]?"wimg":""}" data-pk="${p.id}" style="--ph:${p.h};background:${packArt(p)}"><span class="pkj">${p.kj}</span><span class="pn">${p.name}</span></div>`).join("")}</div>
