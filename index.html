@@ -2415,7 +2415,7 @@ function friendlyEnd(c,won){const f=fDaily();let rw="";if(won&&f.left>0){S.fr.n+
 // ================= COMBAT AMICAL EN DIRECT (tour par tour, temps réel via Supabase Realtime) =================
 const LV={ch:null,inbox:null,mid:null,host:false,side:null,st:null,sel:null,act:"atk",tick:null,opp:null,lastSeen:0};
 const LV_TURN=30000;
-function lvInbox(){if(!pvpOn()||LV.inbox)return;LV.inbox=CL.sb.channel("u-"+CL.user.id,{config:{broadcast:{self:false}}})
+function lvInbox(){if(!pvpOn()||LV.inbox||typeof CL.sb.channel!=="function")return;LV.inbox=CL.sb.channel("u-"+CL.user.id,{config:{broadcast:{self:false}}})
  .on("broadcast",{event:"invite"},({payload:p})=>{if(LV.mid)return;sfx.select();modal(`<h3>⚔️ Défi en direct !</h3><div style="display:flex;align-items:center;gap:10px;justify-content:center;margin:8px 0">${frAv(p.from)}<b>${esc(p.from.name)}</b></div><p class="muted">te défie en combat amical en direct (tour par tour).</p>`,[["Refuser",()=>lvSend("u-"+p.from.id,"decline",{mid:p.mid})],["⚔️ Accepter",()=>lvAccept(p)]])})
  .on("broadcast",{event:"accept"},({payload:p})=>{if(LV.mid===p.mid&&LV.host&&!LV.st)lvStart(p)})
  .on("broadcast",{event:"decline"},({payload:p})=>{if(LV.mid===p.mid){LV.mid=null;$("modal").style.display="none";toast("❌ Défi refusé");lvClose()}})
