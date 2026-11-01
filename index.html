@@ -1834,10 +1834,13 @@ async function elemFx(el,targets,big){if(B.skip||!EFX[el])return;if(!FXS.ctx||FX
 
 // ================= LEGENDARY FINISH (Mythique, Divin, Cosmos qui achève le dernier ennemi) =================
 // extraits personnalisés : id AniList du perso -> vidéo YouTube OFFICIELLE + moment (secondes)
-const LFIN={/* exemple : 87275:{yt:"ID_YOUTUBE",s:72,e:79} */};
+const LFIN={
+ // Ken Kaneki : « Kaneki vs Jason », extrait officiel publié par Crunchyroll sur YouTube
+ "ken kaneki":{yt:"ZsQnAuh3tZU",s:60,e:76}};
+const lfinFor=c=>LFIN[c.id]||LFIN[String(c.name||"").toLowerCase().trim()]||null;
 let LFP=null;
-async function legendaryFinish(u){if(B.skip||!u||!u.card)return;const c=u.card,o=$("lfin"),r=c.rarity,ov=LFIN[c.id];
- let vid=ov?ov.yt:c.trailer,s=ov?ov.s:40,e=ov?ov.e:47;if(!vid&&!ov){try{await loadBg(c);vid=c.trailer}catch(_){}}
+async function legendaryFinish(u){if(B.skip||!u||!u.card)return;const c=u.card,o=$("lfin"),r=c.rarity,ov=lfinFor(c);
+ let vid=ov?ov.yt:c.trailer,s=ov?ov.s:38,e=ov?ov.e:50;if(!vid&&!ov){try{await loadBg(c);vid=c.trailer}catch(_){}}
  o.dataset.r=r;o.innerHTML=`<div class="lfbar t"></div><div class="lfstage"><div class="lfvid" id="lfVid"></div><div class="lffall"><img src="${esc(c.img)}" referrerpolicy="no-referrer"><span>${{M:"神話",D:"神",X:"宇宙"}[r]||"伝説"}</span></div></div>
  <div class="lfbar b"><div class="lftitle">LEGENDARY FINISH</div><div class="lfname">${esc(c.name)}</div></div><div class="lfskip">Toucher pour passer ▸</div>`;
  o.classList.add("on");sfx.ult();shakeScreen(10);let done;const end=new Promise(res=>done=res);const finish=()=>{if(!o.classList.contains("on"))return;o.classList.add("out");setTimeout(()=>{o.classList.remove("on","out","vid");o.innerHTML="";if(LFP){try{LFP.destroy()}catch(_){}LFP=null}done()},350)};
