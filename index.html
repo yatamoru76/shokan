@@ -882,13 +882,13 @@ nav button{font-size:9.5px}
 "use strict";
 // ================= DONNÉES =================
 const RAR=[
- {id:"C",name:"Commun",min:1001,max:3000,odds:62,shard:1,base:100},
- {id:"R",name:"Rare",min:301,max:1000,odds:27,shard:3,base:140},
- {id:"E",name:"Épique",min:101,max:300,odds:8.5,shard:10,base:195},
- {id:"L",name:"Légendaire",min:31,max:100,odds:1.2,shard:40,base:265},
- {id:"M",name:"Mythique",min:11,max:30,odds:.4,shard:150,base:350},
- {id:"D",name:"Divin",min:4,max:10,odds:.08,shard:400,base:450},
- {id:"X",name:"Cosmos",min:1,max:3,odds:.02,shard:1000,base:560}];
+ {id:"C",name:"Commun",min:1101,max:3100,odds:62,shard:1,base:100},
+ {id:"R",name:"Rare",min:401,max:1100,odds:27,shard:3,base:140},
+ {id:"E",name:"Épique",min:201,max:400,odds:8.5,shard:10,base:195},
+ {id:"L",name:"Légendaire",min:61,max:200,odds:1.2,shard:40,base:265},
+ {id:"M",name:"Mythique",min:21,max:60,odds:.4,shard:150,base:350},
+ {id:"D",name:"Divin",min:7,max:20,odds:.08,shard:400,base:450},
+ {id:"X",name:"Cosmos",min:1,max:6,odds:.02,shard:1000,base:560}];
 const RI={};RAR.forEach((r,i)=>RI[r.id]=i);
 const CLS=[
  {id:"war",name:"Guerrier",ic:"⚔️",hp:1,atk:1,spd:100,ult:"Frappe dévastatrice",ud:"Inflige 260 % de dégâts à un ennemi"},
@@ -1000,11 +1000,11 @@ function packArt(p,pos){const im=MIMG[p.id];return im?`linear-gradient(180deg,hs
 function packBg(p){return`radial-gradient(circle at 70% 18%,hsl(${p.h+20},100%,78%) 0,transparent 30%),linear-gradient(160deg,hsl(${p.h},90%,60%),hsl(${p.h},85%,52%) 35%,hsl(${p.h-10},80%,32%) 75%,hsl(${p.h-15},85%,14%))`}
 const QT=`query($p:Int,$g:[String],$t:[String]){Page(page:$p,perPage:40){media(type:ANIME,sort:POPULARITY_DESC,isAdult:false,genre_in:$g,tag_in:$t,genre_not_in:["Ecchi","Hentai"]){title{romaji english} characters(sort:FAVOURITES_DESC,perPage:8){nodes{id name{full} image{large} favourites}}}}}`;
 const TPOOL={};
-async function favThresholds(){if(favThresholds.v)return favThresholds.v;const need=[[1,3],[1,10],[1,30],[2,100],[6,300],[20,1000]];
+async function favThresholds(){if(favThresholds.v)return favThresholds.v;const need=RAR.slice(1).map(r=>[Math.ceil(r.max/50),r.max]);
  const v={};for(const [p,k] of need){const L=await fetchPage(p);v[k]=(L[(k-1)%50]||{}).fav||0}favThresholds.v=v;return v}
-function rarFromFav(f,T){const tiers=[["X",3],["D",10],["M",30],["L",100],["E",300],["R",1000]];for(const [id,k] of tiers)if(f>=T[k])return id;return"C"}
+function rarFromFav(f,T){const tiers=RAR.slice(1).reverse().map(r=>[r.id,r.max]);for(const [id,k] of tiers)if(f>=T[k])return id;return"C"}
 function rankFromFav(f,rid,T){const r=RAR[RI[rid]];const hi=r.min===1?Infinity:T[r.min-1]||Infinity,lo=T[r.max]||0;if(!isFinite(hi))return r.min;const t=Math.max(0,Math.min(1,(hi-f)/Math.max(1,hi-lo)));return Math.round(r.min+t*(r.max-r.min))}
-async function themePool(p){if(TPOOL[p.id])return TPOOL[p.id];const key="otaku_tp_"+p.id;
+async function themePool(p){if(TPOOL[p.id])return TPOOL[p.id];const key="otaku_tp2_"+p.id;
  try{const c=JSON.parse(localStorage.getItem(key)||"null");if(c&&Date.now()-c.t<3*86400000&&c.list.length){TPOOL[p.id]=c.list;return c.list}}catch(_){}
  const T=await favThresholds();const seen=new Set(),list=[];
  for(const pg of [1,2]){let res;for(let a=0;a<3;a++){res=await fetch(API,{method:"POST",headers:{"Content-Type":"application/json",Accept:"application/json"},body:JSON.stringify({query:QT,variables:{p:pg,g:p.genre?[p.genre]:null,t:p.tag?[p.tag]:null}})});if(res.status===429){await sleep(2500*(a+1));continue}break}
@@ -1183,7 +1183,7 @@ function rColl(){let list=Object.values(S.coll);const sp=list.reduce((a,c)=>a+sp
 let NAV=[],detSlide="",missN=60,showMiss=false;try{showMiss=localStorage.getItem("otaku_miss")==="1"}catch(_){}
 // ===== album : cartes possédées + cartes manquantes (grisées) =====
 function rarOfRank(k){return RAR.find(r=>k>=r.min&&k<=r.max)}
-function albumRanks(){if(filt==="all"){const out=[];for(let k=1;k<=100;k++)out.push(k);return out}const r=RAR[RI[filt]];const out=[];for(let k=r.min;k<=Math.min(r.max,r.min+missN-1);k++)out.push(k);return out}
+function albumRanks(){if(filt==="all"){const out=[];for(let k=1;k<=RAR[RI.L].max;k++)out.push(k);return out}const r=RAR[RI[filt]];const out=[];for(let k=r.min;k<=Math.min(r.max,r.min+missN-1);k++)out.push(k);return out}
 async function renderAlbum(){const el=$("album");if(!el)return;const ranks=albumRanks();const tok=Symbol();renderAlbum.tok=tok;
  try{await Promise.all([...new Set(ranks.map(k=>Math.ceil(k/50)))].map(p=>fetchPage(p)))}catch(e){el.innerHTML='<div class="muted" style="text-align:center;padding:20px">Impossible de charger l\'album (connexion ?).</div>';return}
  if(renderAlbum.tok!==tok||!el.isConnected)return;
@@ -1482,7 +1482,7 @@ async function makeEnemies(w,s){const g=w*10+s,boss=s===10,R=WRAR[w];const n=bos
 // ===== adversaires d'un même anime + décor de leur univers =====
 const QM=`query($p:Int){Page(page:$p,perPage:25){media(type:ANIME,sort:POPULARITY_DESC,isAdult:false,genre_not_in:["Ecchi","Hentai"]){id title{romaji english} bannerImage coverImage{extraLarge} characters(sort:FAVOURITES_DESC,perPage:12){nodes{id name{full} image{large} favourites}}}}}`;
 const MPAGE={};
-async function animePage(p){if(MPAGE[p])return MPAGE[p];const key="otaku_mp_"+p;try{const c=JSON.parse(localStorage.getItem(key)||"null");if(c&&Date.now()-c.t<7*86400000){MPAGE[p]=c.list;return c.list}}catch(_){}
+async function animePage(p){if(MPAGE[p])return MPAGE[p];const key="otaku_mp2_"+p;try{const c=JSON.parse(localStorage.getItem(key)||"null");if(c&&Date.now()-c.t<7*86400000){MPAGE[p]=c.list;return c.list}}catch(_){}
  let res;for(let a=0;a<3;a++){res=await fetch(API,{method:"POST",headers:{"Content-Type":"application/json",Accept:"application/json"},body:JSON.stringify({query:QM,variables:{p}})});if(res.status===429){await sleep(2500*(a+1));continue}break}
  if(!res.ok)throw new Error("HTTP "+res.status);const j=await res.json();const T=await favThresholds();
  const list=j.data.Page.media.map(m=>({id:m.id,title:m.title.english||m.title.romaji,bg:m.bannerImage||(m.coverImage&&m.coverImage.extraLarge),
