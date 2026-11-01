@@ -847,6 +847,17 @@ nav button{font-size:9.5px}
 .livebadge{font-size:10px;font-weight:900;letter-spacing:.08em;background:#ff3d6e;color:#fff;border-radius:6px;padding:2px 6px;vertical-align:middle;animation:tw 1.2s infinite alternate}
 #bveil{position:absolute;inset:0;z-index:14;pointer-events:none;opacity:0;transition:opacity .25s;--vt:#ff5a1c;background:radial-gradient(circle at 50% 35%,transparent 15%,rgba(0,0,0,.6) 90%),color-mix(in srgb,var(--vt) 14%,transparent);will-change:opacity}
 #bveil.on{opacity:1}#bveil.deep{background:radial-gradient(circle at 50% 35%,rgba(0,0,0,.25) 10%,rgba(0,0,0,.75) 90%),color-mix(in srgb,var(--vt) 12%,transparent)}
+.cmode{display:flex;gap:6px;margin:8px 0}.cmode button{flex:1;border:1px solid var(--line);background:var(--bg2);color:var(--muted);border-radius:12px;padding:9px 6px;font-weight:800;font-size:13px}.cmode button.on{background:var(--acc);border-color:var(--acc);color:#fff}
+.albgrid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}
+.albt{position:relative;height:118px;border-radius:14px;overflow:hidden;border:1px solid var(--line);cursor:pointer;background:var(--bg2)}
+.albt.full{border-color:#ffd34d;box-shadow:0 0 14px -4px #ffd34d}
+.albbg{position:absolute;inset:0;background:center/cover;opacity:.55}
+.albin{position:absolute;inset:auto 0 0 0;padding:8px;background:linear-gradient(transparent,#000d 45%)}
+.albin b{display:block;font-size:12.5px;line-height:1.15;max-height:2.3em;overflow:hidden}.albin span{font-size:10.5px;color:#ddd;font-weight:700}
+.albp{height:6px;border-radius:9px;background:#ffffff26;overflow:hidden;margin:5px 0 3px}.albp i{display:block;height:100%;background:linear-gradient(90deg,#ff4d2e,#ffd34d)}.albp.big{height:9px}
+.albok{position:absolute;top:6px;right:6px;width:24px;height:24px;border-radius:50%;background:#ffd34d;color:#000;font-weight:900;display:flex;align-items:center;justify-content:center;font-size:13px}
+.albhead{border-radius:16px;padding:16px;background:center/cover;border:1px solid var(--line)}
+@media (min-width:900px){.albgrid{grid-template-columns:repeat(auto-fill,minmax(230px,1fr))}.albt{height:140px}}
 </style>
 <link rel="manifest" href="manifest.webmanifest"><meta name="theme-color" content="#09090c"><link rel="icon" href="icon-192.png"><link rel="apple-touch-icon" href="icon-192.png"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="description" content="Shōkan · jeu gratuit de cartes anime : ouvre des mangas, collectionne, combats, guildes et arène."></head>
 <body>
@@ -1005,13 +1016,13 @@ async function loadMascots(){if(DEMO||loadMascots.busy)return;loadMascots.busy=1
  for(const k of Object.keys(MASC).filter(k=>!MIMG[k])){try{const j=await ask({query:"query($s:String){Character(search:$s,sort:FAVOURITES_DESC){image{large}}}",variables:{s:MASC[k]}});const im=j.data&&j.data.Character&&j.data.Character.image&&j.data.Character.image.large;if(im){MIMG[k]=im;done()}}catch(_){}await sleep(700)}}
 function packArt(p,pos){const im=MIMG[p.id];return im?`linear-gradient(180deg,hsla(${p.h},90%,55%,.15) 0,#0000 30%,hsla(${p.h},85%,18%,.95) 92%),url('${im.replace(/'/g,"%27")}') center ${pos||"18%"}/cover no-repeat,${packBg(p)}`:packBg(p)}
 function packBg(p){return`radial-gradient(circle at 70% 18%,hsl(${p.h+20},100%,78%) 0,transparent 30%),linear-gradient(160deg,hsl(${p.h},90%,60%),hsl(${p.h},85%,52%) 35%,hsl(${p.h-10},80%,32%) 75%,hsl(${p.h-15},85%,14%))`}
-const QT=`query($p:Int,$g:[String],$t:[String]){Page(page:$p,perPage:40){media(type:ANIME,sort:POPULARITY_DESC,isAdult:false,genre_in:$g,tag_in:$t,genre_not_in:["Ecchi","Hentai"]){title{romaji english} characters(sort:FAVOURITES_DESC,perPage:8){nodes{id name{full} image{large} favourites}}}}}`;
+const QT=`query($p:Int,$g:[String],$t:[String]){Page(page:$p,perPage:40){media(type:ANIME,sort:POPULARITY_DESC,isAdult:false,genre_in:$g,tag_in:$t,genre_not_in:["Ecchi","Hentai"]){title{romaji english} characters(sort:FAVOURITES_DESC,perPage:12){nodes{id name{full} image{large} favourites}}}}}`;
 const TPOOL={};
 async function favThresholds(){if(favThresholds.v)return favThresholds.v;const need=RAR.slice(1).map(r=>[Math.ceil(r.max/50),r.max]);
  const v={};for(const [p,k] of need){const L=await fetchPage(p);v[k]=(L[(k-1)%50]||{}).fav||0}favThresholds.v=v;return v}
 function rarFromFav(f,T){const tiers=RAR.slice(1).reverse().map(r=>[r.id,r.max]);for(const [id,k] of tiers)if(f>=T[k])return id;return"C"}
 function rankFromFav(f,rid,T){const r=RAR[RI[rid]];const hi=r.min===1?Infinity:T[r.min-1]||Infinity,lo=T[r.max]||0;if(!isFinite(hi))return r.min;const t=Math.max(0,Math.min(1,(hi-f)/Math.max(1,hi-lo)));return Math.round(r.min+t*(r.max-r.min))}
-async function themePool(p){if(TPOOL[p.id])return TPOOL[p.id];const key="otaku_tp2_"+p.id;
+async function themePool(p){if(TPOOL[p.id])return TPOOL[p.id];const key="otaku_tp3_"+p.id;
  try{const c=JSON.parse(localStorage.getItem(key)||"null");if(c&&Date.now()-c.t<3*86400000&&c.list.length){TPOOL[p.id]=c.list;return c.list}}catch(_){}
  const T=await favThresholds();const seen=new Set(),list=[];
  for(const pg of [1,2]){let res;for(let a=0;a<3;a++){res=await fetch(API,{method:"POST",headers:{"Content-Type":"application/json",Accept:"application/json"},body:JSON.stringify({query:QT,variables:{p:pg,g:p.genre?[p.genre]:null,t:p.tag?[p.tag]:null}})});if(res.status===429){await sleep(2500*(a+1));continue}break}
@@ -1020,7 +1031,7 @@ async function themePool(p){if(TPOOL[p.id])return TPOOL[p.id];const key="otaku_t
    const rid=rarFromFav(c.favourites||0,T);list.push({id:c.id,name:c.name.full,img:c.image.large,fav:c.favourites||0,series,rarity:rid,rank:rankFromFav(c.favourites||0,rid,T)})})})}
  TPOOL[p.id]=list;try{localStorage.setItem(key,JSON.stringify({t:Date.now(),list}))}catch(_){}return list}
 async function drawPack(packId){const rs=rollPack();const p=PK(packId);
- if(p.id==="mix"||DEMO)return Promise.all(rs.map(r=>charAt(r.min+Math.floor(Math.random()*(r.max-r.min+1)),r)));
+ if(p.id==="mix"||DEMO)return Promise.all(rs.map(r=>{if(!DEMO&&RI[r.id]<=1&&Math.random()<.3){const a=albumPoolPick(r.id);if(a)return a}return charAt(r.min+Math.floor(Math.random()*(r.max-r.min+1)),r)}));
  let pool;try{pool=await themePool(p)}catch(e){if(e instanceof TypeError){DEMO=true;$("demoBanner").style.display="block";return drawPack("mix")}throw e}
  return rs.map(r=>{let i=RI[r.id],cand=[];while(i>=0){cand=pool.filter(c=>c.rarity===RAR[i].id);if(cand.length)break;i--}if(!cand.length)cand=pool;return Object.assign({},cand[Math.floor(Math.random()*cand.length)])})}
 
@@ -1174,13 +1185,15 @@ function rColl(){let list=Object.values(S.coll);const sp=list.reduce((a,c)=>a+sp
  if(filt!=="all")list=list.filter(c=>c.rarity===filt);if(query)list=list.filter(c=>(c.name+" "+c.series).toLowerCase().includes(query.toLowerCase()));
  list.sort(sortBy==="pow"?(a,b)=>power(b)-power(a):(a,b)=>RI[b.rarity]-RI[a.rarity]||b.star-a.star||a.rank-b.rank);
  $("main").innerHTML=`${sec("01","Collection","コレクション")}<input type="search" id="q" placeholder="Rechercher un personnage ou un anime" value="${esc(query)}">
- <div class="filters">${[["all","Toutes"]].concat(RAR.slice().reverse().map(r=>[r.id,r.name])).map(([id,n])=>`<button data-f="${id}" class="${filt===id?"on":""}">${n}</button>`).join("")}<button data-s="1">Tri : ${sortBy==="pow"?"puissance":"rareté"}</button></div>
+ <div class="cmode"><button class="${collMode==="rar"?"on":""}" data-cm="rar">🗂️ Par rareté</button><button class="${collMode==="anime"?"on":""}" data-cm="anime">📺 Albums par anime</button></div>${collMode==="anime"?`<div id="albums"><div class="muted" style="text-align:center;padding:30px">Chargement des albums…</div></div>`:`<div class="filters">${[["all","Toutes"]].concat(RAR.slice().reverse().map(r=>[r.id,r.name])).map(([id,n])=>`<button data-f="${id}" class="${filt===id?"on":""}">${n}</button>`).join("")}<button data-s="1">Tri : ${sortBy==="pow"?"puissance":"rareté"}</button></div>
  <div class="muted" style="margin-bottom:8px">${Object.keys(S.coll).length} personnages uniques · ${S.opened} boosters ouverts${S.fakeouts?" · 😱 "+S.fakeouts+" fake out"+(S.fakeouts>1?"s":""):""}</div>
  <div class="misstog" data-miss="1"><span>👁 Afficher les cartes manquantes</span><span class="sw ${showMiss?"on":""}"><i></i></span></div>
  <button class="btn ghost sm" id="btnRecycle" style="margin-bottom:10px" ${sp?"":"disabled"}>♻️ Recycler les doublons inutiles (+${sp} 💠)</button>
  ${showMiss?`<div id="album"><div class="muted" style="text-align:center;padding:30px">Chargement de l'album…</div></div>${filt==="all"?`<div class="sec" style="margin-top:18px"><span class="t" style="font-size:15px">Tes autres cartes</span></div>`:""}`:""}
  ${!showMiss||filt==="all"?`<div class="grid">${(showMiss?list.filter(c=>RI[c.rarity]<3):list).map(c=>`<div data-id="${c.id}">${cardHTML(c,{lv:1,cnt:1,team:S.team.includes(c.id)})}</div>`).join("")||(showMiss?"":'<div class="muted" style="grid-column:1/-1;text-align:center;padding:30px">Aucune carte ici… ouvre des boosters !</div>')}</div>`:""}
- <p class="muted" style="margin-top:10px">Les doublons servent à faire évoluer tes persos (★). Le recyclage garde automatiquement les copies dont tu auras besoin.</p>`;
+ <p class="muted" style="margin-top:10px">Les doublons servent à faire évoluer tes persos (★). Le recyclage garde automatiquement les copies dont tu auras besoin.</p>`}`;
+ $("main").querySelectorAll("[data-cm]").forEach(b=>b.onclick=()=>{collMode=b.dataset.cm;try{localStorage.setItem("shk_cmode",collMode)}catch(_){}rColl()});
+ if(collMode==="anime"){$("q").oninput=e=>{query=e.target.value;const pos=e.target.selectionStart;rColl();const q=$("q");q.focus();q.setSelectionRange(pos,pos)};rAlbums();return}
  $("q").oninput=e=>{query=e.target.value;const pos=e.target.selectionStart;rColl();const q=$("q");q.focus();q.setSelectionRange(pos,pos)};
  $("main").querySelectorAll("[data-f]").forEach(b=>b.onclick=()=>{filt=b.dataset.f;rColl()});
  $("main").querySelector("[data-s]").onclick=()=>{sortBy=sortBy==="pow"?"rar":"pow";rColl()};
@@ -1487,9 +1500,9 @@ async function makeEnemies(w,s){const g=w*10+s,boss=s===10,R=WRAR[w];const n=bos
  if(boss)list.splice(1,0,mkFoe(await foeCard(R.b,w*999+77),1,true));return scaleFoes(list,stageRatio(w,s),enemyP(g)*.25)}
 
 // ===== adversaires d'un même anime + décor de leur univers =====
-const QM=`query($p:Int){Page(page:$p,perPage:25){media(type:ANIME,sort:POPULARITY_DESC,isAdult:false,genre_not_in:["Ecchi","Hentai"]){id title{romaji english} bannerImage coverImage{extraLarge} characters(sort:FAVOURITES_DESC,perPage:12){nodes{id name{full} image{large} favourites}}}}}`;
+const QM=`query($p:Int){Page(page:$p,perPage:25){media(type:ANIME,sort:POPULARITY_DESC,isAdult:false,genre_not_in:["Ecchi","Hentai"]){id title{romaji english} bannerImage coverImage{extraLarge} characters(sort:FAVOURITES_DESC,perPage:16){nodes{id name{full} image{large} favourites}}}}}`;
 const MPAGE={};
-async function animePage(p){if(MPAGE[p])return MPAGE[p];const key="otaku_mp2_"+p;try{const c=JSON.parse(localStorage.getItem(key)||"null");if(c&&Date.now()-c.t<7*86400000){MPAGE[p]=c.list;return c.list}}catch(_){}
+async function animePage(p){if(MPAGE[p])return MPAGE[p];const key="otaku_mp3_"+p;try{const c=JSON.parse(localStorage.getItem(key)||"null");if(c&&Date.now()-c.t<7*86400000){MPAGE[p]=c.list;return c.list}}catch(_){}
  let res;for(let a=0;a<3;a++){res=await fetch(API,{method:"POST",headers:{"Content-Type":"application/json",Accept:"application/json"},body:JSON.stringify({query:QM,variables:{p}})});if(res.status===429){await sleep(2500*(a+1));continue}break}
  if(!res.ok)throw new Error("HTTP "+res.status);const j=await res.json();const T=await favThresholds();
  const list=j.data.Page.media.map(m=>({id:m.id,title:m.title.english||m.title.romaji,bg:m.bannerImage||(m.coverImage&&m.coverImage.extraLarge),
@@ -2158,6 +2171,8 @@ const ACH=[
  {id:"ps",ic:"🎟️",n:"Saison accomplie",d:"Atteindre le palier 40 du passe",f:()=>passLvl(),t:40,rw:{frag:3}},
  {id:"pl20",ic:"⬆️",n:"Otaku confirmé",d:"Atteindre le niveau de compte 20",f:()=>(S.prof||{}).lvl||1,t:20,rw:{boosters:5},title:"Otaku confirmé"},
  {id:"fk",ic:"😱",n:"Retournement",d:"Vivre un fake out",f:()=>S.fakeouts||0,t:1,rw:{shards:150}},
+ {id:"alb1",ic:"📺",n:"Premier album",d:"Compléter l'album d'un anime",f:()=>Object.keys(S.albums||{}).length,t:1,rw:{boosters:3}},
+ {id:"alb10",ic:"📺",n:"Archiviste",d:"Compléter 10 albums d'anime",f:()=>Object.keys(S.albums||{}).length,t:10,rw:{card:"M"},title:"Archiviste"},
  {id:"syn",ic:"🔗",n:"Âmes liées",d:"Gagner un combat avec 3 persos du même anime",f:()=>S.synWin||0,t:1,rw:{boosters:2},title:"Lien indestructible"}];
 function hasR(r){return Object.values(S.coll).some(c=>c.rarity===r)?1:0}
 function crowns(){const st=S.story;if(!st)return 0;let n=0;for(let c=0;c<8;c++)if(st.done[c+"-4@2"])n++;return n}
@@ -2283,6 +2298,32 @@ function graidHTML(){const g=S.guild,R=graidState(),b=GBOSS[R.b],pct=R.hp/R.max*
  <div class="ghp"><i style="width:${pct}%"></i><span>${fmt(R.hp)} / ${fmt(R.max)} PV</span></div><div class="gtiers">${[25,50,75,100].map(t=>`<span class="${(100-pct)>=t?"on":""}">${t} %</span>`).join("")}</div></div></div>
  <button class="btn ${R.dead||R.used>=3?"ghost":"gold"}" id="gRaid" style="margin-top:8px" ${R.dead||R.used>=3||!S.team.length?"disabled":""}>${R.dead?"Boss vaincu 🏆":R.used>=3?"Reviens demain (3/3 attaques)":"⚔️ Attaquer · "+(3-R.used)+"/3 aujourd'hui"}</button>
  <div class="gboard">${board.map((x,i)=>`<div class="${x[2]?"me":""}"><span>${["🥇","🥈","🥉"][i]||"·"} ${esc(x[0])}</span><b>${fmt(x[1])}</b></div>`).join("")}</div></div>`}
+
+
+// ================= ALBUMS PAR ANIME (au moins 10 cartes par anime) =================
+const ALB_PAGES=4,ALB_MIN=10;let collMode="rar";try{collMode=localStorage.getItem("shk_cmode")||"rar"}catch(_){}
+async function albumList(){const out=[];for(let p=1;p<=ALB_PAGES;p++){try{(await animePage(p)).forEach(a=>{if(a.chars.length>=ALB_MIN&&!out.find(x=>x.id===a.id))out.push(a)})}catch(e){if(!out.length)throw e;break}}return out}
+function albRw(a){return{boosters:2,shards:150+a.chars.length*15}}
+async function rAlbums(){const el=$("albums");if(!el)return;let L;try{L=await albumList()}catch(e){el.innerHTML=`<div class="muted" style="text-align:center;padding:30px">Impossible de charger les albums (connexion ?).</div>`;return}
+ if(!$("albums"))return;const q=query.toLowerCase();if(q)L=L.filter(a=>a.title.toLowerCase().includes(q));S.albums=S.albums||{};
+ const prog=a=>a.chars.filter(c=>S.coll[c.id]).length;L.sort((a,b)=>(prog(b)/b.chars.length)-(prog(a)/a.chars.length)||b.chars.length-a.chars.length);
+ const done=L.filter(a=>prog(a)>=a.chars.length).length;
+ el.innerHTML=`<div class="muted" style="margin-bottom:8px">📺 ${L.length} animes · ${done} album${done>1?"s":""} complété${done>1?"s":""} · chaque album compte au moins ${ALB_MIN} cartes</div><div class="albgrid">${L.map(a=>{const n=prog(a),t=a.chars.length,full=n>=t,cl=S.albums[a.id];
+  return`<div class="albt ${full?"full":""}" data-alb="${a.id}"><div class="albbg" style="background-image:url('${esc((a.bg||"").replace(/'/g,"%27"))}')"></div><div class="albin"><b>${esc(a.title)}</b><div class="albp"><i style="width:${n/t*100}%"></i></div><span>${n} / ${t}${full?(cl?" · ✓ récompense prise":" · 🎁 à récupérer !"):""}</span></div>${full?'<div class="albok">✓</div>':""}</div>`}).join("")}</div>`;
+ el.querySelectorAll("[data-alb]").forEach(t=>t.onclick=()=>{const a=L.find(x=>String(x.id)===t.dataset.alb);if(a)showAlbum(a)})}
+function showAlbum(a){const p=$("picker"),n=a.chars.filter(c=>S.coll[c.id]).length,full=n>=a.chars.length;S.albums=S.albums||{};p.style.display="flex";
+ p.innerHTML=`<div style="width:100%;max-width:420px"><div style="display:flex;justify-content:space-between;align-items:center;margin:4px 0 10px"><div style="font-weight:900;font-size:18px;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">📺 ${esc(a.title)}</div><button class="btn ghost sm" style="width:auto" id="abClose">Fermer</button></div>
+ <div class="albhead" style="background-image:linear-gradient(180deg,#0003,#09090cee),url('${esc((a.bg||"").replace(/'/g,"%27"))}')"><div style="font-weight:900;font-size:26px">${n} / ${a.chars.length}</div><div class="albp big"><i style="width:${n/a.chars.length*100}%"></i></div>
+ <div style="font-size:12.5px;margin-top:6px">🎁 Album complet : <b>${rwText(albRw(a))}</b></div>${full&&!S.albums[a.id]?`<button class="btn gold" id="abClaim" style="margin-top:8px">Récupérer la récompense</button>`:S.albums[a.id]?'<div style="margin-top:6px;color:var(--ok);font-weight:800">✓ Album complété</div>':""}</div>
+ <div class="grid" style="margin-top:10px">${a.chars.map(c=>{const o=S.coll[c.id];return o?`<div data-aid="${c.id}">${cardHTML(o,{lv:1,cnt:1})}</div>`:`<div class="lk" data-alk="${c.id}">${cardHTML(Object.assign({},c,{star:0,lvl:0}))}<span class="lki">🔒</span></div>`}).join("")}</div>
+ <p class="muted" style="font-size:12px;margin:10px 0 30px">Les persos de cet album peuvent sortir dans les boosters Shōnen Mix et dans les boosters à thème de son genre.</p></div>`;
+ $("abClose").onclick=()=>{p.style.display="none";render()};
+ const cb=$("abClaim");if(cb)cb.onclick=async()=>{if(S.albums[a.id])return;S.albums[a.id]=1;save();await giveRw(albRw(a),"📺 Album "+a.title+" complété !");showAlbum(a)};
+ p.querySelectorAll("[data-aid]").forEach(d=>d.onclick=()=>{p.style.display="none";NAV=a.chars.filter(c=>S.coll[c.id]).map(c=>String(c.id));showDetail(d.dataset.aid)});
+ p.querySelectorAll("[data-alk]").forEach(d=>d.onclick=()=>{const c=a.chars.find(x=>String(x.id)===d.dataset.alk);toast("🔒 "+c.name+" · "+RAR[RI[c.rarity]].name+" · pas encore obtenu")})}
+// les persos des albums peuvent sortir des boosters (même rareté), pour que chaque album soit complétable
+function albumPoolPick(rid){const pool=[];for(let p=1;p<=ALB_PAGES;p++)(MPAGE[p]||[]).forEach(a=>{if(a.chars.length>=ALB_MIN)a.chars.forEach(c=>{if(c.rarity===rid)pool.push(c)})});return pool.length?Object.assign({},pool[Math.floor(Math.random()*pool.length)]):null}
+function albumWarm(){if(DEMO)return;for(let p=1;p<=ALB_PAGES;p++)if(!MPAGE[p])animePage(p).catch(()=>{})}
 
 // ================= MODE HISTOIRE =================
 // personnages originaux du jeu (dessinés ici) : le Gardien, Hoshi, le Brise-Paires
@@ -2607,7 +2648,7 @@ document.addEventListener("pointerdown",()=>{if(!M_.started){M_.started=true;mus
 document.addEventListener("visibilitychange",()=>{if(!AC)return;document.hidden?AC.suspend():AC.resume()});
 
 // ================= DÉMARRAGE =================
-load();dailyReset();tickBoost();initOpener();setMusicChip();applyDeco();$("cBell").onclick=showNotifs;$("cGift").onclick=showGifts;$("logoBtn").onclick=showProfile;initProfile();render();setTimeout(cloudInit,300);
+load();dailyReset();tickBoost();initOpener();setMusicChip();applyDeco();$("cBell").onclick=showNotifs;$("cGift").onclick=showGifts;$("logoBtn").onclick=showProfile;initProfile();render();setTimeout(cloudInit,300);setTimeout(albumWarm,4000);
 setInterval(()=>{const b=S.boosters;tickBoost();if(S.boosters!==b){save();if(view==="home")render()}try{mkTick()}catch(e){console.error(e)}try{notifWatch()}catch(e){}try{guildTick()}catch(e){console.error(e)}if(view==="mk")mkTimers();updateTop()},1000);
 document.addEventListener("visibilitychange",()=>{if(document.hidden)save()});
 </script>
