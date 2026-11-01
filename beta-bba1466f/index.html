@@ -1016,6 +1016,8 @@ nav button{font-size:9.5px}
 #shelf.series #shCancel{display:none!important}
 #shelf.series .bookstage.on~#shCancel{display:none}
 @media (max-height:760px){.mvflow{padding-top:10px;padding-bottom:14px}.mv,.bk3{transform-origin:center}.mvshop .mv{zoom:.86}.mvinfo{padding-top:6px}.mvbest{padding:7px}.mvperk{margin:7px 2px 9px}}
+.pprev{display:flex;flex-wrap:wrap;gap:4px 12px;margin-top:8px;padding:8px 10px;border-radius:10px;background:#0006;font-size:12px;color:var(--muted)}.pprev b{color:var(--ink)}.pprev em{font-style:normal;color:#3fd18b}
+.grank{display:flex;flex-direction:column;gap:6px}.gr{display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:12px;background:var(--bg2);border:1px solid var(--line)}.gr.me{border-color:var(--gc);box-shadow:inset 3px 0 0 var(--gc)}.gr .gp{width:22px;text-align:center;font-weight:900;color:var(--muted)}.gr:nth-child(1) .gp{color:#ffd34d}.gr:nth-child(2) .gp{color:#d9d9e0}.gr:nth-child(3) .gp{color:#e2a26a}
 .sumodes{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;margin-top:12px}
 .smd{display:flex;flex-direction:column;align-items:flex-start;gap:3px;padding:10px 9px;border-radius:10px;background:var(--bg2);border:1.5px solid var(--line);color:var(--ink);text-align:left;cursor:pointer}
 .smd .si{font-size:20px}.smd b{font-weight:900;font-size:14px}.smd small{font-size:10.5px;color:var(--muted);line-height:1.3}
@@ -1318,6 +1320,7 @@ header .hsp{flex:1}
 .emo{filter:grayscale(1) sepia(.6) saturate(1.5) brightness(1.08);font-style:normal}
 .wallet .ji{color:var(--gold);margin:0 3px 0 0}
 .mver{text-align:center;font:600 11px Inter;color:#5a534a;margin:16px 0 4px;letter-spacing:.06em}
+.card .cnt{display:block!important;position:absolute;top:auto;bottom:44px;right:5px;background:#c9a45c;color:#1a1612;font:800 10.5px/1 Inter;padding:3px 6px;border-radius:7px;z-index:3;box-shadow:0 0 0 1.5px #0008}
 </style>
 
 </head>
@@ -1439,6 +1442,9 @@ function stats(c){const r=RAR[RI[c.rarity]],k=clsOf(c);const pop=1+.15*(r.max-c.
  return{hp:Math.round(m*10*k.hp),atk:Math.round(m*k.atk),spd:Math.round(k.spd+c.star*2)}}
 function power(c){const s=stats(c);return Math.round(s.atk*3+s.hp/3+s.spd)}
 function needCopies(c){return c.star<5?c.star:0}
+function rebirthRefund(c){let copies=0,shards=0;for(let st=1;st<c.star;st++){copies+=st;shards+=RAR[RI[c.rarity]].shard*15*st}
+ let xp=c.xp;for(let l=1;l<c.lvl;l++)xp+=xpNeed(l);return{copies,shards,oni:Math.floor(xp*.7/ONIXP)}}
+function rebirthText(c){const R=rebirthRefund(c);return[R.shards?fmt(R.shards)+" 💠":"",R.oni?R.oni+" 🍙":"",R.copies?R.copies+" copie"+(R.copies>1?"s":""):""].filter(Boolean).join(" · ")||"rien"}
 function evoCost(c){return RAR[RI[c.rarity]].shard*15*c.star}
 function spare(c){let need=0;for(let s=c.star;s<5;s++)need+=s;return Math.max(0,c.n-1-need)}
 
@@ -1651,10 +1657,10 @@ function rHome(){if(!rHome.m){rHome.m=1;setTimeout(loadMascots,1500)}setTimeout(
 // ================= COLLECTION + DÉTAIL =================
 function canEvolve(c){return c.star<5&&(c.n-1+S.frag)>=needCopies(c)&&S.shards>=evoCost(c)}
 function rColl(){let list=Object.values(S.coll);const sp=list.reduce((a,c)=>a+spare(c)*RAR[RI[c.rarity]].shard,0);
- if(filt!=="all")list=list.filter(c=>c.rarity===filt);if(query)list=list.filter(c=>(c.name+" "+c.series).toLowerCase().includes(query.toLowerCase()));
- list.sort(sortBy==="pow"?(a,b)=>power(b)-power(a):(a,b)=>RI[b.rarity]-RI[a.rarity]||b.star-a.star||a.rank-b.rank);
+ if(filt==="dup")list=list.filter(c=>c.n>1);else if(filt!=="all")list=list.filter(c=>c.rarity===filt);if(query)list=list.filter(c=>(c.name+" "+c.series).toLowerCase().includes(query.toLowerCase()));
+ if(filt==="dup")list.sort((a,b)=>b.n-a.n||RI[b.rarity]-RI[a.rarity]);else list.sort(sortBy==="pow"?(a,b)=>power(b)-power(a):(a,b)=>RI[b.rarity]-RI[a.rarity]||b.star-a.star||a.rank-b.rank);
  $("main").innerHTML=`${sec("01","Collection","コレクション")}<input type="search" id="q" placeholder="Rechercher un personnage ou un anime" value="${esc(query)}">
- <div class="cmode"><button class="${collMode==="rar"?"on":""}" data-cm="rar">🗂️ Par rareté</button><button class="${collMode==="anime"?"on":""}" data-cm="anime">📺 Albums par anime</button></div>${collMode==="anime"?`<div id="albums"><div class="muted" style="text-align:center;padding:30px">Chargement des albums…</div></div>`:`<div class="filters">${[["all","Toutes"]].concat(RAR.slice().reverse().map(r=>[r.id,r.name])).map(([id,n])=>`<button data-f="${id}" class="${filt===id?"on":""}">${n}</button>`).join("")}<button data-s="1">Tri : ${sortBy==="pow"?"puissance":"rareté"}</button></div>
+ <div class="cmode"><button class="${collMode==="rar"?"on":""}" data-cm="rar">🗂️ Par rareté</button><button class="${collMode==="anime"?"on":""}" data-cm="anime">📺 Albums par anime</button></div>${collMode==="anime"?`<div id="albums"><div class="muted" style="text-align:center;padding:30px">Chargement des albums…</div></div>`:`<div class="filters">${[["all","Toutes"]].concat(RAR.slice().reverse().map(r=>[r.id,r.name])).concat([["dup","Doublons ("+Object.values(S.coll).filter(c=>c.n>1).length+")"]]).map(([id,n])=>`<button data-f="${id}" class="${filt===id?"on":""}">${n}</button>`).join("")}<button data-s="1">Tri : ${sortBy==="pow"?"puissance":"rareté"}</button></div>
  <div class="muted" style="margin-bottom:8px">${Object.keys(S.coll).length} personnages uniques · ${S.opened} boosters ouverts${S.fakeouts?" · 😱 "+S.fakeouts+" fake out"+(S.fakeouts>1?"s":""):""}</div>
  <div class="misstog" data-miss="1"><span>👁 Afficher les cartes manquantes</span><span class="sw ${showMiss?"on":""}"><i></i></span></div>
  <button class="btn ghost sm" id="btnRecycle" style="margin-bottom:10px" ${sp?"":"disabled"}>♻️ Recycler les doublons inutiles (+${sp} 💠)</button>
@@ -1705,12 +1711,12 @@ function showDetail(id){const c=S.coll[id];if(!c)return;id=String(id);const d=$(
  <div style="font-weight:900;font-size:19px">${esc(c.name)}</div><div class="muted">${esc(c.series)}</div><div class="dsrc">Décor : univers de ${esc(c.series)}</div>
  <div style="margin-top:6px;font-size:13px">${e.ic} ${e.name} · ${k.ic} ${k.name} · <span style="color:#ffd34d">${starsStr(c.star)}</span>${c.star>=5?" · <b style='color:#ffd34d'>ÉVEILLÉ</b>":""}</div>
  <div class="statgrid"><div><b>${fmt(s.hp)}</b>PV</div><div><b>${fmt(s.atk)}</b>Attaque</div><div><b>${s.spd}</b>Vitesse</div><div><b>${fmt(power(c))}</b>Puissance</div></div>
- <div class="box" style="text-align:left"><b>Niveau ${c.lvl} / ${maxLvl(c)}</b><div class="xpbar"><i style="width:${xpPct}%"></i></div><div class="muted" style="margin-top:3px">${c.lvl>=maxLvl(c)?"Niveau max : fais-le évoluer pour aller plus loin":fmt(c.xp)+" / "+fmt(xpNeed(c.lvl))+" XP"}</div>
+ <div class="box" style="text-align:left"><b>Niveau ${c.lvl} / ${maxLvl(c)}</b><div class="xpbar"><i style="width:${xpPct}%"></i></div><div class="muted" style="margin-top:3px">${c.lvl>=maxLvl(c)?"Niveau max : fais-le évoluer pour aller plus loin":fmt(c.xp)+" / "+fmt(xpNeed(c.lvl))+" XP"}</div>${c.lvl<maxLvl(c)?`<div class="pprev"><span>Puissance <b>${fmt(power(c))}</b></span><span>Niv. ${c.lvl+1} → <b>${fmt(power(Object.assign({},c,{lvl:c.lvl+1})))}</b></span><span>Niv. max ${maxLvl(c)} → <b>${fmt(power(Object.assign({},c,{lvl:maxLvl(c)})))}</b></span></div>`:""}
  <div class="row2" style="margin-top:8px"><button class="btn sm" id="dOni" ${S.oni<1||c.lvl>=maxLvl(c)?"disabled":""}>🍙 Nourrir (+${ONIXP} XP)</button><button class="btn sm ghost" id="dOni10" ${S.oni<1||c.lvl>=maxLvl(c)?"disabled":""}>🍙 ×10</button></div></div>
  <div class="box" style="text-align:left"><b>${c.star>=5?"Éveil complet ✨":"Évolution "+starsStr(c.star)+" → ★"+(c.star+1)}</b>
- ${c.star>=5?'<div class="muted">Ce personnage a atteint son vrai potentiel : son attaque spéciale est 50 % plus puissante.</div>':`<div class="muted">Coût : ${need} copie${need>1?"s":""} (tu en as ${c.n-1}${S.frag?" + "+S.frag+" 🌟 fragments":""}) et ${fmt(evoCost(c))} 💠<br>Gain : stats +30 %, niveau max +10${c.star===4?", <b>ÉVEIL</b> de l'attaque spéciale":""}</div>
+ ${c.star>=5?'<div class="muted">Ce personnage a atteint son vrai potentiel : son attaque spéciale est 50 % plus puissante.</div>':`<div class="muted">Coût : ${need} copie${need>1?"s":""} (tu en as ${c.n-1}${S.frag?" + "+S.frag+" 🌟 fragments":""}) et ${fmt(evoCost(c))} 💠<br>Gain : stats +30 %, niveau max +10${c.star===4?", <b>ÉVEIL</b> de l'attaque spéciale":""}</div><div class="pprev"><span>Puissance <b>${fmt(power(c))}</b></span><span>Après ★${c.star+1} → <b>${fmt(power(Object.assign({},c,{star:c.star+1})))}</b> <em>(+${fmt(power(Object.assign({},c,{star:c.star+1}))-power(c))})</em></span><span>★${c.star+1} niveau max → <b>${fmt(power(Object.assign({},c,{star:c.star+1,lvl:maxLvl(Object.assign({},c,{star:c.star+1}))})))}</b></span></div>
  <button class="btn gold sm" id="dEvo" style="margin-top:8px" ${canEvolve(c)?"":"disabled"}>✨ Faire évoluer</button>`}</div>
- <div class="box" style="text-align:left"><b>${k.ic} Technique : ${TECH[k.id].n}</b><div class="muted">${TECH[k.id].d}. Tous les 3 tours.</div></div>
+ ${c.lvl>1||c.star>1?`<div class="box" style="text-align:left"><b>轉 Renaissance</b><div class="muted">Remet ce perso au niveau 1 et ★1, et te rend ce que tu y as investi : ${rebirthText(c)}.</div><button class="btn ghost sm" id="dReb" style="margin-top:8px">Faire renaître</button></div>`:""}<div class="box" style="text-align:left"><b>${k.ic} Technique : ${TECH[k.id].n}</b><div class="muted">${TECH[k.id].d}. Tous les 3 tours.</div></div>
  <div class="box" style="text-align:left">${RI[c.rarity]>=3?`<b>✨ Ultime : <span id="uName">${esc(ultName(c,e,k))}</span></b><div class="muted">${k.ud}. Se déclenche avec une cinématique quand la jauge d'énergie est pleine.</div>${S.quotes&&S.quotes[c.id]?`<div class="muted" style="margin-top:6px;font-style:italic">« ${esc(S.quotes[c.id])} »</div>`:""}<div class="row2" style="margin-top:8px"><button class="btn ghost sm" id="uEdit" style="padding:6px 10px">✏️ Nom de l'ultime</button><button class="btn ghost sm" id="qEdit" style="padding:6px 10px">💬 Ma phrase</button></div>`:`<b>🔒 Ultime</b><div class="muted">Les attaques ultimes avec cinématique sont réservées aux cartes Légendaire, Mythique, Divin et Cosmos.</div>`}</div>
  <button class="btn ghost sm" id="dFav" style="margin-top:10px">${(S.prof&&S.prof.fav.includes(c.id))?"⭐ Retirer de mes préférées":"☆ Ajouter à mes préférées (profil)"}</button>
  <div class="row2" style="margin-top:8px"><button class="btn ${inTeam?"ghost":""} sm" id="dTeam">${inTeam?"Retirer de l'équipe":"Ajouter à l'équipe"}</button><button class="btn ghost sm" id="dClose">Fermer</button></div>
@@ -1725,6 +1731,7 @@ const qe=$("qEdit");if(qe)qe.onclick=()=>{S.quotes=S.quotes||{};modal(`<h3>Phras
  $("dClose").onclick=()=>{d.style.display="none";d.dataset.cid="";stopFx();render()};
  const feed=n=>{let used=0;while(used<n&&S.oni>0&&c.lvl<maxLvl(c)){S.oni--;used++;addXp(c,ONIXP)}bump("lvl",used);save();sfx.coin();showDetail(id)};
  $("dOni").onclick=()=>feed(1);$("dOni10").onclick=()=>feed(10);
+ const rb=$("dReb");if(rb)rb.onclick=()=>modal(`<h3>Faire renaître ${esc(c.name)} ?</h3><p class="muted">Il repassera <b>niveau 1 · ★1</b>${c.master?" et perdra sa maîtrise":""}. Tu récupères : <b>${rebirthText(c)}</b>.</p>`,[["Annuler"],["Renaissance",()=>{const R=rebirthRefund(c);c.n+=R.copies;S.shards+=R.shards;S.oni+=R.oni;c.lvl=1;c.xp=0;c.star=1;if(c.master)c.master=false;save();sfx.evo&&sfx.evo();toast("轉 "+c.name+" renaît · +"+fmt(R.shards)+" 💠 · +"+R.oni+" 🍙 · +"+R.copies+" copie"+(R.copies>1?"s":""));showDetail(id)}]]);
  const ev=$("dEvo");if(ev)ev.onclick=()=>{if(!canEvolve(c))return;let need=needCopies(c);const fromCopies=Math.min(need,c.n-1);c.n-=fromCopies;S.frag-=need-fromCopies;S.shards-=evoCost(c);c.star++;bump("lvl");save();sfx.evo();checkMaster(c);
   const r=d.querySelector(".card").getBoundingClientRect();sparksAt(r.left+r.width/2,r.top+r.height/2,"L",30);toast(c.star>=5?"✨ "+c.name+" s'est ÉVEILLÉ !":"⭐ "+c.name+" passe ★"+c.star);setTimeout(()=>showDetail(id),350)};
  $("dTeam").onclick=()=>{if(inTeam)S.team=S.team.filter(x=>x!==c.id);else{if(S.team.length>=5){toast("Équipe pleine (5 max). Retires-en un d'abord.");return}S.team.push(c.id)}save();showDetail(id)}}
@@ -1897,6 +1904,8 @@ function rGuild(){const g=S.guild;let h=sec("01","Guilde","ギルド");
   $("main").innerHTML=h;$("gCreate").onclick=createGuild;$("main").querySelectorAll("[data-gj]").forEach(b=>b.onclick=()=>{const x=NPCG[+b.dataset.gj];newGuild(x,false,x.n);toast(x.emblem+" Bienvenue dans "+x.name+" !");rGuild()});return}
  h+=`<div id="gBody"></div>`;$("main").innerHTML=h;gRefresh()}
 function gSig(g){const R=graidState();return g.lvl+"|"+g.members.length+"|"+(g.feed[0]&&g.feed[0].t)+"|"+(Date.now()>=g.chestAt)+"|"+Math.floor(R.hp/R.max*100)+"|"+R.used+"|"+R.dead}
+function guildRank(){const g=S.guild;const L=NPCG.filter(x=>!g||x.name!==g.name).map(x=>({n:x.name,e:x.emblem,c:x.color,l:x.lvl,m:x.n,me:false}));if(g)L.push({n:g.name,e:g.emblem,c:g.color,l:g.lvl,m:g.members.length,me:true,x:g.xp});
+ L.sort((a,b)=>b.l-a.l||b.m-a.m||(b.me?1:0)-(a.me?1:0));return`<div class="sec"><span class="no">順</span><span class="t">Classement des guildes</span><span class="jp">順位</span></div><div class="grank">${L.map((x,i)=>`<div class="gr ${x.me?"me":""}" style="--gc:${x.c}"><span class="gp">${i+1}</span><div class="gem2">${x.e}</div><div style="flex:1;min-width:0"><b>${esc(x.n)}</b><div class="muted" style="font-size:12px">Niveau ${x.l} · ${x.m} membres${x.me?" · ta guilde":""}</div></div></div>`).join("")}</div>`}
 function gRefresh(){const g=S.guild,el=$("gBody");if(!g||!el)return;guildTick.sig=gSig(g);const now=Date.now(),ready=now>=g.chestAt,pct=Math.min(100,g.xp/gNeed(g.lvl)*100),rw=chestRw(g);
  const next=DECOS.filter(d=>!g.unl[d.id]).slice(0,4),top=g.members.slice().sort((a,b)=>b.c-a.c);
  el.innerHTML=`${graidHTML()}<div class="ghead" style="--gc:${g.color}"><div class="gem2 big">${g.emblem}</div><div style="flex:1;min-width:0"><div class="gname">${esc(g.name)}</div>
@@ -1912,7 +1921,7 @@ function gRefresh(){const g=S.guild,el=$("gBody");if(!g||!el)return;guildTick.si
  <div class="gmem"><div class="gm me"><span>${g.leader?"👑":"⭐"} ${esc((S.prof&&S.prof.name)||"Toi")} (toi)</span><b>${fmt(g.my)} XP</b></div>${top.slice(0,15).map((m,i)=>`<div class="gm"><span>${i<3?["🥇","🥈","🥉"][i]:"·"} ${esc(m.n)}</span><b>${fmt(m.c)} XP</b></div>`).join("")}${top.length>15?`<div class="muted" style="padding:6px;font-size:12px">… et ${top.length-15} autres membres</div>`:""}</div>
  <div class="sec"><span class="no">03</span><span class="t">Activité</span><span class="jp">活動</span></div>
  <div class="hist box">${g.feed.slice(0,12).map(f=>`<div>${esc(f.x)} <span style="opacity:.6">· ${ago(f.t)}</span></div>`).join("")||'<div>Rien pour l\'instant.</div>'}</div>
- <button class="btn ghost sm" id="gLeave" style="margin:14px 0 6px">${g.leader?"Dissoudre la guilde":"Quitter la guilde"}</button>`;
+ ${guildRank()}<button class="btn ghost sm" id="gLeave" style="margin:14px 0 6px">${g.leader?"Dissoudre la guilde":"Quitter la guilde"}</button>`;
  $("gRaid").onclick=()=>{const R=graidState();if(R.dead||R.used>=3)return;if(!S.team.length){toast("Ajoute des persos à ton équipe");return}startBattle({type:"graid",enemies:[graidFoe()],loc:"storm",title:"🐉 Raid de guilde · "+GBOSS[R.b].n})};$("gChest").onclick=()=>{if(Date.now()<g.chestAt)return;const r=chestRw(g);S.boosters+=r.boosters||0;S.oni+=r.oni||0;S.shards+=r.shards||0;S.frag+=r.frag||0;g.chestAt=Date.now()+8*3600000;gxp(30,true);save();sfx.win();toast("🎁 Coffre de guilde : +"+rwText(r));updateTop();gRefresh()};
  $("gDeco").onclick=showDecos;
  $("gLeave").onclick=()=>modal(`<h3>${g.leader?"Dissoudre":"Quitter"} la guilde ?</h3><p class="muted">Tu garderas les décorations déjà équipées, mais plus les récompenses de guilde.</p>`,[["Annuler"],["Confirmer",()=>{S.guild=null;save();rGuild()}]])}
