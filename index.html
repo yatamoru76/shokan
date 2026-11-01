@@ -1961,16 +1961,16 @@ async function cloudOnLogin(){if(CL.busy)return;CL.busy=true;try{
  if(mine&&(S.cloudT||0)>=new Date(data.updated_at).getTime()-2000){await cloudPush(true);return}
  const localEmpty=Object.keys(S.coll).length<=0&&S.opened<1;
  if(localEmpty||mine&&(S.cloudT||0)<new Date(data.updated_at).getTime()){cloudApply(remote,data.updated_at);return}
- modal(`<h3>☁️ Deux sauvegardes trouvées</h3><p class="muted" style="text-align:left">Ton compte Discord a déjà une partie en ligne.<br><br>☁️ <b>En ligne</b> : ${cloudSummary(remote)}<br>📱 <b>Ce téléphone</b> : ${cloudSummary(S)}<br><br>Laquelle veux-tu garder ? L'autre sera remplacée.</p>`,
-  [["📱 Ce téléphone",()=>cloudPush(true).then(()=>toast("☁️ Partie du téléphone envoyée en ligne"))],["☁️ En ligne",()=>cloudApply(remote,data.updated_at)]])}
+ CL.hold=true;modal(`<h3>☁️ Deux sauvegardes trouvées</h3><p class="muted" style="text-align:left">Ton compte Discord a déjà une partie en ligne.<br><br>☁️ <b>En ligne</b> : ${cloudSummary(remote)}<br>📱 <b>Cet appareil</b> : ${cloudSummary(S)}<br><br>Laquelle veux-tu garder ? L'autre sera remplacée.</p>`,
+  [["📱 Cet appareil",()=>{CL.hold=false;cloudPush(true).then(()=>toast("☁️ Partie de cet appareil envoyée en ligne"))}],["☁️ En ligne",()=>cloudApply(remote,data.updated_at)]])}
  catch(e){CL.err=e.message||String(e);console.warn("cloud",e);toast("☁️ Sauvegarde en ligne indisponible pour l'instant")}finally{CL.busy=false;cloudUI()}}
-function cloudApply(remote,t){try{localStorage.setItem("otaku_v1",JSON.stringify(Object.assign({},remote,{cloudId:CL.user.id,cloudT:new Date(t).getTime()})))}catch(_){}toast("☁️ Partie récupérée !");setTimeout(()=>location.reload(),500)}
-async function cloudPush(force){if(!CL.ready||!CL.user)return;if(!force&&!CL.dirty)return;CL.dirty=false;clearTimeout(CL.t);
+function cloudApply(remote,t){CL.applying=true;CL.hold=true;CL.dirty=false;clearTimeout(CL.t);try{localStorage.setItem("otaku_v1",JSON.stringify(Object.assign({},remote,{cloudId:CL.user.id,cloudT:new Date(t).getTime()})))}catch(_){}toast("☁️ Partie récupérée !");setTimeout(()=>location.reload(),300)}
+async function cloudPush(force){if(!CL.ready||!CL.user||CL.applying||CL.hold)return;if(!force&&!CL.dirty)return;CL.dirty=false;clearTimeout(CL.t);
  const now=Date.now();S.cloudId=CL.user.id;S.cloudT=now;try{localStorage.setItem("otaku_v1",JSON.stringify(S))}catch(_){}
  const {error}=await CL.sb.from("saves").upsert({user_id:CL.user.id,data:S,name:(S.prof&&S.prof.name)||cloudName(),updated_at:new Date(now).toISOString()});
  if(error){CL.err=error.message;CL.dirty=true;console.warn("cloud push",error)}else{CL.last=now;CL.err=""}cloudUI()}
-function cloudDirty(){if(!CL.user)return;CL.dirty=true;clearTimeout(CL.t);CL.t=setTimeout(()=>cloudPush(false),15000)}
-save=(f=>function(){f();cloudDirty()})(save);
+function cloudDirty(){if(!CL.user||CL.applying||CL.hold)return;CL.dirty=true;clearTimeout(CL.t);CL.t=setTimeout(()=>cloudPush(false),15000)}
+save=(f=>function(){if(CL.applying)return;f();cloudDirty()})(save);
 document.addEventListener("visibilitychange",()=>{if(document.visibilityState==="hidden"&&CL.dirty)cloudPush(false)});
 function cloudBox(){if(!CL.ready&&!CL.user)return`<div class="cloudbox"><b>☁️ Sauvegarde en ligne</b><div class="muted" style="font-size:12px;margin-top:3px">Disponible quand tu joues depuis le lien du jeu : yatamoru76.github.io/shokan</div></div>`;
  if(!CL.user)return`<div class="cloudbox"><b>☁️ Sauvegarde en ligne</b><div class="muted" style="font-size:12px;margin:3px 0 8px">Connecte ton compte Discord pour ne jamais perdre ta partie et la retrouver sur n'importe quel appareil.</div><button class="btn dcbtn" data-cl="in">🎮 Se connecter avec Discord</button></div>`;
