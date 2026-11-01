@@ -937,6 +937,42 @@ nav button{font-size:9.5px}
 .adcc .card .ov .sr,.adcc .card .ce,.adcc .card .lv{display:none}
 .adg{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px}.adg label{font-size:12px;font-weight:700;display:flex;flex-direction:column;gap:3px}.adg input{width:100%;box-sizing:border-box;min-width:0;background:var(--bg);border:1px solid var(--line);border-radius:8px;color:var(--ink);font-size:15px;padding:7px}
 .frhit{display:flex;align-items:center;gap:8px;flex:1;min-width:0;cursor:pointer}.ppteam{display:grid;grid-template-columns:repeat(5,1fr);gap:5px}.ppteam .card .ov .sr,.ppteam .card .ce{display:none}.ppteam .card .nm{font-size:9px}
+.mvshop{width:100%;max-width:440px;display:flex;flex-direction:column;align-items:center;transition:opacity .5s,transform .6s}
+.mvshop.gone{opacity:0;transform:translateY(40px) scale(.95);pointer-events:none}
+.mvsearch{display:flex;gap:8px;width:100%;padding:0 16px;margin:4px 0 6px}
+.mvsearch input{flex:1;height:40px;border-radius:12px;border:1px solid #2c2824;background:#171513;color:#efe7da;padding:0 14px;font:500 14px Inter;outline:none}
+.mvsearch input:focus{border-color:#c9a45c88}
+.mvsearch button{width:40px;height:40px;border-radius:12px;border:1px solid #2c2824;background:#171513;color:#c9a45c;font-size:18px}
+.mvflow{width:100%;display:flex;gap:0;overflow-x:auto;scroll-snap-type:x mandatory;padding:18px calc(50% - 88px) 22px;scrollbar-width:none;perspective:900px}
+.mvflow::-webkit-scrollbar{display:none}
+.mv{flex:0 0 176px;scroll-snap-align:center;position:relative;transition:transform .08s linear,opacity .2s;cursor:pointer;transform-style:preserve-3d}
+.mvb{position:relative;width:176px;height:256px;border-radius:4px 10px 10px 4px;overflow:hidden;background:hsl(var(--mh) 30% 18%);box-shadow:0 20px 40px -12px #000,0 0 0 1px #ffffff14}
+.mv.cur .mvb{box-shadow:0 26px 50px -14px #000,0 0 0 1.5px #c9a45c99,0 0 40px -6px hsl(var(--mh) 70% 50% / .6)}
+.mvc{position:absolute;inset:0;background:center 18%/cover no-repeat}
+.mvtone{position:absolute;inset:0;background:linear-gradient(180deg,#0000 0,#0000 45%,#000d 88%),radial-gradient(circle,#ffffff12 1px,transparent 1.3px) 0 0/5px 5px}
+.mvb::before{content:"";position:absolute;left:0;top:0;bottom:0;width:10px;z-index:3;background:linear-gradient(90deg,#0009,#ffffff22 45%,#0004);}
+.mvtop{position:absolute;left:14px;right:8px;top:8px;display:flex;justify-content:space-between;align-items:center;z-index:2}
+.mvlogo{font:700 8.5px "Noto Sans JP";letter-spacing:.08em;color:#fff;background:hsl(var(--mh) 70% 42%);padding:2px 6px;border-radius:3px}
+.mvvol{font:800 10px Inter;color:#fff;background:#000a;padding:2px 6px;border-radius:3px;letter-spacing:.06em}
+.mvtitle{position:absolute;left:14px;right:10px;bottom:34px;z-index:2}
+.mvtitle b{display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;font:800 17px/1.12 "Shippori Mincho B1",serif;color:#fff;text-shadow:0 2px 10px #000}
+.mvfoot{position:absolute;left:14px;right:10px;bottom:11px;display:flex;align-items:center;gap:8px;z-index:2;font:700 11px Inter;color:#fff}
+.mvbar{flex:1;height:4px;border-radius:2px;background:#ffffff33;overflow:hidden}.mvbar i{display:block;height:100%;background:#c9a45c}
+.mvmax{position:absolute;right:8px;top:30px;z-index:2;font:800 9px Inter;letter-spacing:.06em;text-transform:uppercase;color:#fff;padding:2px 6px;border-radius:3px;background:color-mix(in srgb,var(--rc) 75%,#000);box-shadow:0 0 10px color-mix(in srgb,var(--rc) 60%,transparent)}
+.mv .skj{display:none}
+.mvspine{position:absolute;left:0;top:0;width:18px;height:256px;transform-origin:left;transform:rotateY(90deg);background:hsl(var(--mh) 50% 22%)}
+.mv.pulled{transition:transform .5s cubic-bezier(.3,1.3,.4,1)!important;transform:perspective(900px) translateY(-30px) scale(1.08)!important}
+.mvdots{display:flex;gap:6px;height:6px;margin-top:-6px}.mvdots i{width:6px;height:6px;border-radius:3px;background:#3a352f;transition:all .25s}.mvdots i.on{width:18px;background:#c9a45c}
+.mvinfo{width:100%;padding:12px 16px 0;transition:opacity .3s}
+.mvh b{display:block;font:800 20px "Shippori Mincho B1",serif;color:#efe7da}.mvh span{font-size:12.5px;color:#9a9082}
+.mvrow{display:flex;flex-wrap:wrap;gap:6px;margin:10px 0}
+.mvr{display:inline-flex;align-items:center;gap:6px;padding:5px 9px;border-radius:99px;background:#171513;border:1px solid #2c2824;font-size:11.5px;color:#cfc6b8}.mvr i{width:8px;height:8px;border-radius:50%;background:var(--rc)}.mvr b{color:#fff}
+.mvbest{display:flex;align-items:center;gap:12px;padding:10px;border-radius:14px;background:#171513;border:1px solid #2c2824}
+.mvbi{width:46px;height:60px;border-radius:8px;flex:none;background:center/cover;box-shadow:0 0 0 1.5px var(--rc)}
+.mvbi.sil{filter:brightness(0) drop-shadow(0 0 0 #fff);box-shadow:0 0 0 1.5px var(--rc),0 0 16px color-mix(in srgb,var(--rc) 50%,transparent);background-color:#000}
+.mvbest small{display:block;font-size:11px;color:#9a9082}.mvbest b{display:block;font:800 15px "Shippori Mincho B1",serif;color:#efe7da}.mvbest span{font:700 12px Inter}
+.mvperk{margin:10px 2px 12px;font-size:12.5px;color:#9a9082;line-height:1.45}.mvperk b{color:#c9a45c}
+.mvinfo .btn{width:100%}
 .sumodes{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;margin-top:12px}
 .smd{display:flex;flex-direction:column;align-items:flex-start;gap:3px;padding:10px 9px;border-radius:10px;background:var(--bg2);border:1.5px solid var(--line);color:var(--ink);text-align:left;cursor:pointer}
 .smd .si{font-size:20px}.smd b{font-weight:900;font-size:14px}.smd small{font-size:10.5px;color:var(--muted);line-height:1.3}
@@ -2370,9 +2406,8 @@ function panelsSVG(seed){const R=rnd(seed*7919+13),W=200,H=290;let p="",y=8;
 function showShelf(P,paid,multi,series){const sp=PK(S.pack||"mix"),o=$("shelf");Object.assign(SH,{P,paid,multi:multi||0,state:"shelf",cards:null,series:series||null,album:null});const KJS=["漫","巻","話","冊","画","物","語"];
  const spine=(r,k)=>{const R=rnd(r*31+k*7+sp.h);const h=150+R()*36|0,w=30+R()*14|0,hue=(sp.h+(R()*80-40))|0,lean=R()<.12?(R()<.5?-5:5):0;
   const A=series&&series[(r*7+k)%series.length];return`<div class="spine ${A?"ser":""}" data-k="${r}-${k}" data-a="${A?(r*7+k)%series.length:""}" style="height:${h}px;width:${A?w+8:w}px;--sh:${hue};transform:rotate(${lean}deg)"><span class="skj">${A?KJS[(r*7+k)%7]:sp.kj}</span><span class="stt">${esc(A?A.title:sp.name)}</span><span class="svol">${multi?"×"+multi:(1+(R()*40|0))}</span></div>`};
- o.innerHTML=`<div class="shint" id="shHint">${series?"📚 Choisis une série : tes 5 cartes viendront de cet anime":"📚 Tire un manga de l'étagère"}</div>
-${series?`<div class="shsub">Séries où il te manque des persos · 1 nouveau perso garanti</div>`:""}
- <div class="shelfbox" id="shBox">${[0,1].map(r=>`<div class="shrow">${[...Array(7)].map((_,k)=>spine(r,k)).join("")}</div><div class="plank"></div>`).join("")}</div>
+ o.innerHTML=`<div class="shint" id="shHint">${series?"巻 Choisis ton manga<span class=\"muted\">Les 5 cartes viendront de la série choisie</span>":"📚 Tire un manga de l'étagère"}</div>
+ ${series?mvShop(series):`<div class="shelfbox" id="shBox">${[0,1].map(r=>`<div class="shrow">${[...Array(7)].map((_,k)=>spine(r,k)).join("")}</div><div class="plank"></div>`).join("")}</div>`}
  <div class="bookstage" id="bkStage"><div class="bookwrap" id="bkWrap"><div class="book" id="book">
   <div class="bk-page" id="bkPage"></div><div id="bkLeaves"></div><div class="bk-edge" id="bkEdge"></div><div class="bk-top" id="bkTop"></div>
   <div class="bk-cover" id="bkCover"><div class="cf" style="background:${packBg(sp)}"><div class="ctone"></div><span class="ckj">${sp.kj}</span><span class="ctt">${esc(sp.name)}</span><span class="cvol">${multi?"COFFRET ×"+multi:"VOL. "+(1+Math.random()*40|0)}</span><span class="cbar">オタク · ${multi?multi*5:5} CARTES</span></div><div class="cb">${panelsSVG(77)}</div></div>
@@ -2385,7 +2420,7 @@ ${series?`<div class="shsub">Séries où il te manque des persos · 1 nouveau pe
   el.onpointerdown=e=>{if(SH.state!=="shelf")return;e.preventDefault();dn=true;sx=e.clientX;sy=e.clientY;t0=performance.now();try{el.setPointerCapture(e.pointerId)}catch(_){}el.classList.add("hold");sfx.swipe()};
   el.onpointermove=e=>{if(!dn)return;const d=Math.min(110,Math.hypot(e.clientX-sx,e.clientY-sy));el.style.transform=`${base} translateY(${-d*.45}px) translateX(${(e.clientX-sx)*.15}px) rotate(${(e.clientX-sx)*.06}deg) scale(${1+d*.002})`;if(d>75){dn=false;pullBook(el)}};
   el.onpointerup=el.onpointercancel=e=>{if(!dn)return;dn=false;const d=Math.hypot(e.clientX-sx,e.clientY-sy);if(d<10&&performance.now()-t0<400){pullBook(el);return}el.classList.remove("hold");el.style.transform=base}})}
-async function pullBook(el){if(SH.state!=="shelf")return;if(SH.series){const a=SH.series[+el.dataset.a||0];SH.album=a;SH.P=drawSeries(a);SH.P.catch(()=>{});const cf=$("bkCover").querySelector(".cf");if(a.bg)cf.style.background=`linear-gradient(#0003,#000a),url('${a.bg}') center/cover`;cf.querySelector(".ctt").textContent=a.title;cf.querySelector(".ckj").textContent=el.querySelector(".skj").textContent}SH.state="pulling";sfx.whoosh();el.classList.add("pulled");$("shCancel").style.visibility="hidden";
+async function pullBook(el){if(SH.state!=="shelf")return;if(SH.series){const a=SH.series[+el.dataset.a||0];SH.album=a;const vol0=albInfo(a).vol;const cf=$("bkCover").querySelector(".cf");cf.style.background=`linear-gradient(#0000 40%,#000c),url('${cssU(albCover(a))}') center 20%/cover`;cf.querySelector(".ctt").textContent=a.title;cf.querySelector(".ckj").textContent="";const cv=cf.querySelector(".cvol");if(cv)cv.textContent="VOL. "+vol0;SH.P=drawSeries(a);SH.P.catch(()=>{})}SH.state="pulling";sfx.whoosh();el.classList.add("pulled");$("shCancel").style.visibility="hidden";
  $("shBox").querySelectorAll(".spine").forEach(x=>{if(x!==el)x.classList.add("dim")});$("shHint").textContent="…";
  let res;try{const w=setTimeout(()=>$("shHint").textContent="Le manga s'ouvre doucement…",800);res=await SH.P;clearTimeout(w)}catch(e){$("shelf").style.display="none";packError(e);return}
  SH.cards=res;const flat=SH.multi?res.flat():res;const best=flat.reduce((m,c)=>RI[c.rarity]>RI[m]?c.rarity:m,"C");SH.best=best;
@@ -2424,17 +2459,50 @@ function rarOfRank(rk){return RAR.find(r=>rk>=r.min&&rk<=r.max)||RAR[0]}
 async function seriesAlbums(){if(!DEMO){try{const L=ALBS||await albumList();if(L&&L.length)return L}catch(_){}}
  const G={};for(let p=1;p<=8;p++)demoPage(p).forEach((c,i)=>{const rk=(p-1)*50+i+1;(G[c.series]=G[c.series]||[]).push(Object.assign({},c,{rarity:rarOfRank(rk).id,rank:rk}))});
  return Object.entries(G).filter(([,v])=>v.length>=5).map(([t,v],k)=>({id:k+1,title:t,bg:null,chars:v}))}
-async function showSeriesShelf(paid){const o=$("shelf");o.innerHTML=`<div class="shint">📚 L'étagère se remplit…</div>`;o.style.display="flex";
+async function showSeriesShelf(paid){const o=$("shelf");o.innerHTML=`<div class="shint">巻 La librairie ouvre ses portes…</div>`;o.style.display="flex";
  let L;try{L=await seriesAlbums()}catch(e){o.style.display="none";packError(e);return}
- const miss=a=>a.chars.filter(c=>!S.coll[c.id]).length;const cand=L.filter(a=>miss(a)>0);const src=(cand.length>=7?cand:L).slice();
- const pickN=[];while(pickN.length<7&&src.length){pickN.push(src.splice(Math.floor(Math.random()*Math.min(src.length,40)),1)[0])}
- showShelf(null,paid,0,pickN)}
-async function drawSeries(a){const rs=rollPack();const used=new Set();const pickR=rid=>{let i=RI[rid];while(i>=0){const c=a.chars.filter(x=>x.rarity===RAR[i].id&&!used.has(x.id));if(c.length){const x=c[Math.floor(Math.random()*c.length)];used.add(x.id);return Object.assign({},x)}i--}
+ SH.allAlb=L.filter(a=>a.chars.length>=5);const pk=mvPickSeries(SH.allAlb);SH.base=pk;showShelf(null,paid,0,pk);SH.cur=-1;mvBind()}
+async function drawSeries(a){S.mvol=S.mvol||{};const vol=(S.mvol[a.id]||0)+1;S.mvol[a.id]=vol;const rs=rollPack();const used=new Set();const pickR=rid=>{let i=RI[rid];while(i>=0){const c=a.chars.filter(x=>x.rarity===RAR[i].id&&!used.has(x.id));if(c.length){const x=c[Math.floor(Math.random()*c.length)];used.add(x.id);return Object.assign({},x)}i--}
   const any=a.chars.filter(x=>!used.has(x.id));const x=any.length?any[Math.floor(Math.random()*any.length)]:a.chars[0];used.add(x.id);return Object.assign({},x)};
  let cards=rs.map(r=>pickR(r.id));
  if(!cards.some(c=>!S.coll[c.id])){const m=a.chars.filter(c=>!S.coll[c.id]&&!used.has(c.id)).sort((x,y)=>RI[x.rarity]-RI[y.rarity]);if(m.length)cards[0]=Object.assign({},m[0])}
+ if(vol%5===0&&!cards.some(c=>RI[c.rarity]>=2)){const hi=a.chars.filter(c=>RI[c.rarity]>=2&&!cards.some(x=>x.id===c.id)).sort((x,y)=>RI[x.rarity]-RI[y.rarity]);if(hi.length){const k=cards.reduce((m,c,i)=>RI[c.rarity]<RI[cards[m].rarity]?i:m,0);cards[k]=Object.assign({},hi[Math.floor(Math.random()*Math.min(hi.length,6))])}}
  cards.sort((x,y)=>RI[x.rarity]-RI[y.rarity]);await preload(cards,1500);return cards}
 async function drawBonus(minIdx){const r=rollRarity(minIdx);const c=await charAt(r.min+Math.floor(Math.random()*(r.max-r.min+1)),r);await preload([c],1500);return Object.assign({},c,{bonus:true})}
+
+// ===== Mode Manga : librairie en couverflow =====
+const cssU=u=>esc(u||"").replace(/'/g,"%27");
+function albCover(a){const top=a.chars.slice().sort((x,y)=>RI[y.rarity]-RI[x.rarity]||x.rank-y.rank);return(top.find(c=>c.img)||{}).img||a.bg||""}
+function albInfo(a){const own=a.chars.filter(c=>S.coll[c.id]).length,cnt={};a.chars.forEach(c=>cnt[c.rarity]=(cnt[c.rarity]||0)+1);
+ const best=a.chars.slice().sort((x,y)=>RI[y.rarity]-RI[x.rarity]||x.rank-y.rank)[0];const vol=((S.mvol||{})[a.id]||0)+1;return{own,tot:a.chars.length,cnt,best,vol,special:vol%5===0}}
+function mvItem(a,i){const f=albInfo(a),hue=(a.id*47)%360;
+ return`<div class="mv" data-a="${i}" style="--mh:${hue}"><div class="mvb"><div class="mvc" style="background-image:url('${cssU(albCover(a))}')"></div><div class="mvtone"></div>
+  <div class="mvtop"><span class="mvlogo">召喚コミックス</span><span class="mvvol">${f.special?"★ ":""}VOL.${f.vol}</span></div>
+  <div class="mvtitle"><b>${esc(a.title)}</b></div>
+  <div class="mvfoot"><div class="mvbar"><i style="width:${f.own/f.tot*100}%"></i></div><span>${f.own}/${f.tot}</span></div>
+  <span class="mvmax" style="--rc:var(--${f.best.rarity})">${RAR[RI[f.best.rarity]].name}</span><span class="skj">巻</span></div><div class="mvspine"></div></div>`}
+function mvShop(series){return`<div class="mvshop" id="shBox"><div class="mvsearch"><input id="mvQ" placeholder="Chercher un anime…" autocomplete="off"><button id="mvRe" title="Autres séries">↻</button></div>
+ <div class="mvflow" id="mvFlow">${series.map(mvItem).join("")}</div><div class="mvdots" id="mvDots"></div><div class="mvinfo" id="mvInfo"></div></div>`}
+function mvFill(series){SH.series=series;$("mvFlow").innerHTML=series.length?series.map(mvItem).join(""):`<div class="muted" style="padding:60px 20px;text-align:center">Aucune série trouvée</div>`;$("mvFlow").scrollLeft=0;mvBindItems();mvLayout()}
+function mvLayout(){const fl=$("mvFlow");if(!fl)return;const its=[...fl.querySelectorAll(".mv")];if(!its.length){$("mvInfo").innerHTML="";return}const c=fl.scrollLeft+fl.clientWidth/2;let bi=0,bd=1e9;
+ its.forEach((el,i)=>{const m=el.offsetLeft+el.offsetWidth/2,d=(m-c)/el.offsetWidth;if(Math.abs(d)<bd){bd=Math.abs(d);bi=i}const ad=Math.min(1.6,Math.abs(d));
+  el.style.transform=`perspective(900px) translateZ(${-ad*120}px) rotateY(${Math.max(-48,Math.min(48,-d*42))}deg) scale(${1-ad*.08})`;el.style.zIndex=100-Math.round(ad*10);el.style.opacity=1-ad*.35;el.classList.toggle("cur",ad<.5)});
+ if(SH.cur!==bi||!$("mvInfo").innerHTML){SH.cur=bi;mvInfo(bi)}$("mvDots").innerHTML=its.length>1?its.map((_,i)=>`<i class="${i===bi?"on":""}"></i>`).join(""):""}
+function mvInfo(i){const a=SH.series[i];if(!a)return;const f=albInfo(a);const top=RAR.slice().reverse().filter(r=>f.cnt[r.id]).slice(0,4);const bo=S.coll[f.best.id];
+ $("mvInfo").innerHTML=`<div class="mvh"><b>${esc(a.title)}</b><span>${a.parts>1?a.parts+" saisons · ":""}${f.tot} personnages</span></div>
+ <div class="mvrow">${top.map(r=>{const own=a.chars.filter(c=>c.rarity===r.id&&S.coll[c.id]).length;return`<span class="mvr" style="--rc:var(--${r.id})"><i></i>${r.name} <b>${own}/${f.cnt[r.id]}</b></span>`}).join("")}</div>
+ <div class="mvbest"><div class="mvbi ${bo?"":"sil"}" style="background-image:url('${cssU(f.best.img)}');--rc:var(--${f.best.rarity})"></div><div><small>Le plus rare de la série</small><b>${bo?esc(f.best.name):"? ? ?"}</b><span style="color:var(--${f.best.rarity})">${RAR[RI[f.best.rarity]].name}${bo?" · obtenu":""}</span></div></div>
+ <div class="mvperk">${f.special?`<b>★ Tome spécial</b> : une carte Épique ou mieux garantie !`:`Tome ${f.vol} · prochain tome spécial au tome ${Math.ceil(f.vol/5)*5}`}${f.tot-f.own>0?` · <b>1 perso inédit garanti</b>`:""}</div>
+ <button class="btn" id="mvGo">Lire ce manga</button>`;$("mvGo").onclick=()=>mvPick(i)}
+function mvPick(i){if(SH.state!=="shelf")return;const fl=$("mvFlow"),el=fl.querySelectorAll(".mv")[i];if(!el)return;const cur=SH.cur;
+ if(cur!==i){fl.scrollTo({left:el.offsetLeft-(fl.clientWidth-el.offsetWidth)/2,behavior:"smooth"});return}
+ sfx.select&&sfx.select();$("shBox").querySelector(".mvsearch").style.visibility="hidden";$("mvInfo").style.opacity="0";pullBook(el)}
+function mvBindItems(){$("mvFlow").querySelectorAll(".mv").forEach(el=>el.onclick=()=>mvPick(+el.dataset.a))}
+function mvBind(){const fl=$("mvFlow");let raf=0;fl.onscroll=()=>{if(!raf)raf=requestAnimationFrame(()=>{raf=0;mvLayout()})};mvBindItems();setTimeout(mvLayout,30);
+ const all=SH.allAlb||[];$("mvQ").oninput=e=>{const q=e.target.value.trim().toLowerCase();if(!q){mvFill(SH.base);return}mvFill(all.filter(a=>a.title.toLowerCase().includes(q)).slice(0,12))};
+ $("mvRe").onclick=()=>{$("mvQ").value="";SH.base=mvPickSeries(all);mvFill(SH.base);sfx.select&&sfx.select()}}
+function mvPickSeries(L){const miss=a=>a.chars.filter(c=>!S.coll[c.id]).length;const cand=L.filter(a=>miss(a)>0);const src=(cand.length>=7?cand:L).slice();const out=[];
+ while(out.length<7&&src.length)out.push(src.splice(Math.floor(Math.random()*Math.min(src.length,45)),1)[0]);return out}
 
 // ================= INVOCATION À L'ENCRE =================
 const INKC={C:{c:"#151515",n:"noire"},R:{c:"#1f6fe0",n:"bleue"},E:{c:"#8a3ff0",n:"violette"},L:{c:"#e09a00",n:"dorée"},M:{c:"#e01e3c",n:"rouge sang"},D:{c:"#f2c200",n:"or éclatant",g:1},X:{c:"#7b5cff",n:"cosmique",g:1,rb:1}};
