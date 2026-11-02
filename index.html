@@ -1428,7 +1428,7 @@ header .hsp{flex:1}
  <div id="modal" class="ovl"><div class="mbox" id="mbox"></div></div>
  <div id="toast"></div>
 </div>
-<script>window.SHK_VER="02/11 20h30"
+<script>window.SHK_VER="02/11 20h55"
 
 const BETA=true;const PUBLIC=true;
 
@@ -3867,7 +3867,8 @@ function showMore(){const gn=(S.gifts||[]).length,fp=((typeof FR!=="undefined"&&
    ${R("友","#0e7490","Amis & messages","Discussion, autocollants, combats amicaux","friends",nb(fp))}
    ${R("贈","#be123c","Boîte à cadeaux","Récompenses à récupérer","gifts",nb(gn))}
    ${R("顔","#e8322b","Mon profil","Vitrine, titre, statistiques","profile")}
-   ${R("話","#5865f2","Discord","Rejoindre la communauté Shōkan","discord")}</div>
+   ${R("話","#5865f2","Discord","Rejoindre la communauté Shōkan","discord")}
+   ${R("援","#e11d48","❤️ Soutenez-nous","Un don libre pour aider le jeu à continuer","don")}</div>
   <div class="mgrp">Réglages</div><div class="mlist">
    ${R("設","#4b5563","Paramètres","Compte, sauvegarde, code cadeau","set")}
    ${R("言","#4b5563","Langue",(LANGS.find(l=>l[0]===LANG)||[0,"Français"])[1],"lang")}${R("音","#4b5563",M_&&M_.on?"Musique activée":"Musique coupée","Toucher pour changer","music")}</div><div class="mver">Version ${window.SHK_VER||"locale"}</div>`;
@@ -3876,7 +3877,9 @@ function showMore(){const gn=(S.gifts||[]).length,fp=((typeof FR!=="undefined"&&
   if(a==="music"){$("cMusic").click();showMore();return}if(a==="lang"){hideMore();langPicker();return}
   hideMore();if(a==="close")return;
   if(a.startsWith("v:")){view=a.slice(2);setNav();render();$("main").scrollTop=0;return}
-  ({pass:()=>showPass(),friends:()=>showFriends(),gifts:()=>showGifts(),ach:()=>showAch(),set:()=>showSettings(),profile:()=>showProfile(),discord:()=>window.open("https://discord.gg/txsMTWrdZ","_blank")})[a]()})}
+  ({pass:()=>showPass(),friends:()=>showFriends(),gifts:()=>showGifts(),ach:()=>showAch(),set:()=>showSettings(),profile:()=>showProfile(),discord:()=>window.open("https://discord.gg/txsMTWrdZ","_blank"),don:()=>showDon()})[a]()})}
+const DON_URL="https://www.paypal.com/qrcodes/p2pqrc/UVM6Z3NTHPHYW";
+function showDon(){modal(`<div style="text-align:center"><div style="font:900 40px 'Noto Sans JP',serif;color:#ff4d6d">援</div><h3 style="margin:2px 0 8px">Soutenez Shōkan ❤️</h3><p class="muted" style="font-size:13px;line-height:1.5">Shōkan est un jeu <b>gratuit</b>, fait par un fan pour les fans. Si tu l'aimes, un petit don m'aide à payer l'hébergement et à continuer les mises à jour.</p><p class="muted" style="font-size:12px;line-height:1.45">Le don est libre, du montant que tu veux, et se fait via <b>PayPal</b>. Il ne donne <b>aucun avantage</b> dans le jeu : c'est juste un grand merci ! 🙏</p></div>`,[["Plus tard"],["❤️ Faire un don",()=>{try{window.open(DON_URL,"_blank","noopener")}catch(_){location.href=DON_URL}}]])}
 const PCOL={coll:"#2fa8ff",home:"#ff6a1a",adv:"#ff2d55",team:"#3fd18b",mk:"#ffb21c",guild:"#a46bff",evt:"#ff4fa3"};
 const HEADS={coll:["集","Ma collection","Chaque personnage invoqué rejoint ton album. Fais-les évoluer et range-les par anime.","COLLECTION"],home:["召","Invoquer","Trois rituels, trois façons de tenter ta chance.","INVOCATION"],adv:["戦","Combat","Histoire, mondes, tour infinie et arène.","COMBAT"],team:["隊","Mon équipe","Cinq combattants et des synergies à trouver.","ÉQUIPE"],mk:["商","Marché","Les autres invocateurs y proposent leurs cartes : enchéris, échange, revends.","MARCHÉ"],guild:["団","Guilde","Un clan, un coffre commun et un boss à abattre ensemble.","GUILDE"],evt:["祭","Événements","Ce qui se passe aujourd'hui : missions, raid et bonus.","ÉVÉNEMENTS"]};
 function v2Head(){const H=HEADS[view];if(!H)return;const m=$("main");const old=m.querySelector(":scope>.ptop");if(old)old.remove();
