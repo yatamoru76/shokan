@@ -1382,6 +1382,7 @@ header .hsp{flex:1}
 .hsum .ht{position:relative;flex:1;min-width:0}.hsum .ht b{display:block;font:800 18px var(--min)}.hsum .ht small{display:block;font-size:12.5px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .hsum .hn{position:relative;font:700 12px Inter;color:hsl(var(--h) 62% 70%);white-space:nowrap}.hsum .hgo{position:relative;font-size:22px;color:var(--muted)}
 .mdesc{font-size:12px;color:var(--muted);margin:10px 4px 0;line-height:1.4}
+.holi{display:flex;align-items:center;gap:12px;margin-top:14px;padding:12px 14px;border-radius:16px;background:linear-gradient(90deg,#3a1d0c,#171513 70%);border:1px solid #c9a45c66;cursor:pointer}.holi .hic{font-size:30px}.holi div{flex:1;min-width:0}.holi b{display:block;font:800 16px var(--min)}.holi small{font-size:12px;color:var(--muted)}.holi .hgo{color:var(--gold);font-size:22px}
 </style>
 
 <link rel="manifest" href="manifest.webmanifest"><meta name="theme-color" content="#09090c"><link rel="icon" href="icon-192.png"><link rel="apple-touch-icon" href="icon-192.png"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="description" content="Shōkan · jeu gratuit de cartes anime : ouvre des mangas, collectionne, combats, guildes et arène."></head>
@@ -1427,7 +1428,7 @@ header .hsp{flex:1}
  <div id="modal" class="ovl"><div class="mbox" id="mbox"></div></div>
  <div id="toast"></div>
 </div>
-<script>window.SHK_VER="02/11 07h04";
+<script>window.SHK_VER="02/11 07h10";
 const BETA=true;const PUBLIC=true;
 
 "use strict";
@@ -2597,6 +2598,30 @@ async function drawSeries(a){S.mvol=S.mvol||{};const vol=(S.mvol[a.id]||0)+1;S.m
  cards.sort((x,y)=>RI[x.rarity]-RI[y.rarity]);await preload(cards,1500);return cards}
 async function drawBonus(minIdx){const r=rollRarity(minIdx);const c=await charAt(r.min+Math.floor(Math.random()*(r.max-r.min+1)),r);await preload([c],1500);return Object.assign({},c,{bonus:true})}
 
+// ================= CADEAUX DES FÊTES =================
+const LUNAR={2027:"02-06",2028:"01-26",2029:"02-13",2030:"02-03",2031:"01-23",2032:"02-11"};
+function easter(y){const a=y%19,b=Math.floor(y/100),c=y%100,d=Math.floor(b/4),e=b%4,f=Math.floor((b+8)/25),g=Math.floor((b-f+1)/3),h=(19*a+b-d-g+15)%30,i=Math.floor(c/4),k=c%4,l=(32+2*e+2*i-h-k)%7,m=Math.floor((a+11*h+22*l)/451),mo=Math.floor((h+l-7*m+114)/31),da=((h+l-7*m+114)%31)+1;return new Date(y,mo-1,da)}
+const LAUNCH=new Date(2026,10,1);
+function holidays(y){const D=(m,d)=>new Date(y,m-1,d),H=[];const add=(id,ic,n,from,days,rw,card,msg)=>H.push({id,ic,n,from,to:new Date(from.getTime()+days*86400000),rw,card,msg});
+ add("ny","🎆","Bonne année !",D(1,1),3,{boosters:5,shards:500,oni:10},"L","Une nouvelle année d'invocations commence. Que tes tirages soient légendaires !");
+ if(LUNAR[y]){const [m,d]=LUNAR[y].split("-").map(Number);add("lunar","🧧","Nouvel An lunaire",D(m,d),3,{boosters:3,shards:388,oni:8},null,"Une enveloppe rouge pour te porter chance.")}
+ add("valentin","💝","Saint-Valentin",D(2,13),3,{boosters:3,shards:214,oni:5},null,"Pour toi et tes persos préférés.");
+ add("avril","🐟","Poisson d'avril",D(4,1),1,{boosters:1,shards:41,oni:1},null,"Ce n'est pas une blague : voici un vrai cadeau.");
+ const e=easter(y);add("paques","🥚","Pâques",new Date(e.getTime()-86400000),3,{boosters:3,shards:250,oni:6},null,"Des œufs remplis de boosters !");
+ add("kodomo","🎏","Kodomo no Hi",D(5,5),1,{boosters:2,shards:150,oni:5},null,"La fête des enfants au Japon : les carpes koinobori flottent pour toi.");
+ add("tanabata","🎋","Tanabata",D(7,7),1,{boosters:2,shards:177,oni:5},null,"Accroche ton vœu au bambou… et ouvre ces boosters.");
+ add("ete","🏖️","Vacances d'été",D(7,14),3,{boosters:3,shards:300,oni:6},null,"L'été est là : profite-en pour compléter tes albums.");
+ add("halloween","🎃","Halloween",D(10,29),5,{boosters:4,shards:331,oni:13},"E","Des bonbons… et des Échos un peu effrayants.");
+ const age=y-LAUNCH.getFullYear();if(age>=1)add("anniv","🎂",age+(age>1?"ᵉ":"ᵉʳ")+" anniversaire de Shōkan",D(11,1),7,{boosters:10,shards:1000*age,oni:20,frag:2},"M","Merci de faire vivre Shōkan depuis "+age+" an"+(age>1?"s":"")+" !");
+ add("noel","🎄","Joyeux Noël !",D(12,24),3,{boosters:6,shards:600,oni:15,frag:1},"M","Le Père Noël a déposé quelque chose sous le sapin d'invocation…");
+ add("reveillon","🥂","Réveillon",D(12,31),1,{boosters:2,shards:231,oni:5},null,"Dernière soirée de l'année : fête-la avec tes persos.");
+ return H}
+function curHoliday(){const n=new Date();for(const y of [n.getFullYear()-1,n.getFullYear()])for(const h of holidays(y))if(n>=h.from&&n<h.to)return Object.assign({y},h);return null}
+async function holiCheck(){const h=curHoliday();if(!h)return;S.holi=S.holi||{};const key=h.id+h.y;if(S.holi[key])return;S.holi[key]=Date.now();save();
+ const rw=Object.assign({},h.rw);if(h.card){try{const r=RAR[RI[h.card]];const c=await charAt(r.min+Math.floor(Math.random()*(r.max-r.min+1)),r);rw.cardObj=slim(c)}catch(_){}}
+ addGift(h.ic,h.n,h.msg+(h.card?" ("+RAR[RI[h.card]].name+" garantie)":""),rw);toast(h.ic+" "+h.n+" : un cadeau t'attend dans la boîte !");try{sfx.coin()}catch(_){}}
+setTimeout(holiCheck,2500);setInterval(holiCheck,30*60000);
+
 // ================= MESSAGERIE ENTRE AMIS + AUTOCOLLANTS =================
 const CHT={with:null,msgs:[],unread:{},open:false};
 const STK_TXT=["GG","MDR","!!","…","Merci !","Trop fort","Nooon","Let's go","Hein ?","Bonne nuit","ドン","すごい","Pardon","À l'aide","Je reviens","On joue ?"];
@@ -3666,7 +3691,7 @@ const SVGI={card:'<svg viewBox="0 0 24 24"><rect x="5" y="3.5" width="14" height
 const EMAP={"🎴":"s:card","💠":"s:gem","🍙":"s:oni","⚡":"s:bolt","🔍":"s:search","🔎":"s:search",
  "🏆":"賞","🎁":"贈","⚙️":"設","⚙":"設","⚔️":"戦","⚔":"戦","🗡️":"刃","🗼":"塔","📖":"物","🖌️":"筆","📚":"巻","👥":"友","🔥":"炎","♻️":"還","👀":"見","👁️":"見","👁":"見","🛡️":"盾","💥":"撃","🎟️":"券","🔒":"封","🔓":"開","📺":"映","🗂️":"類","🎵":"音","🔇":"静","🏯":"城","👑":"王","💎":"宝","🌟":"★","⭐":"★","✨":"✦","💰":"金","🛒":"商","📜":"巻","🎯":"的","🏅":"章","🥇":"金","🥈":"銀","🥉":"銅","💀":"死","🔮":"魔","🍀":"運","🎲":"運","📅":"暦","✏️":"筆","⏩":"»","🎉":"祝","💬":"話","📢":"告","⏳":"時","⌛":"時","🔄":"換","🔁":"換","🤝":"交","📦":"箱","👤":"人","🏠":"家","🔔":"鈴","🎶":"音","🌸":"桜","📊":"表","🧭":"道","🎊":"祝","🪙":"銭","🧧":"封","📮":"便","✉️":"便","📩":"便","🗓️":"暦","🏳️":"降","🚪":"出","🔑":"鍵","❌":"✕","✅":"✓","✔️":"✓","⚠️":"!","🔴":"生","💬":"話","🤝":"友","📨":"便"};
 const EMRX=/\p{Extended_Pictographic}(?:️|‍\p{Extended_Pictographic}️?)*/gu;
-const EM_SKIP="#chat .chl,#chat .chi,.stkchips,#skTxt,.card,#battle,#live,svg,.jk,.ji,.emo,input,textarea,script,style,canvas,#inkS .isleg,.cine,#cine";
+const EM_SKIP=".holi .hic,#chat .chl,#chat .chi,.stkchips,#skTxt,.card,#battle,#live,svg,.jk,.ji,.emo,input,textarea,script,style,canvas,#inkS .isleg,.cine,#cine";
 function emoNode(t){const s=t.nodeValue;EMRX.lastIndex=0;if(!EMRX.test(s))return;const p=t.parentElement;if(!p||p.closest(EM_SKIP))return;
  const f=document.createDocumentFragment();let last=0;s.replace(EMRX,(m,i)=>{if(i>last)f.appendChild(document.createTextNode(s.slice(last,i)));const k=EMAP[m]||EMAP[m.replace(/️/g,"")];let el;
   if(k&&k.startsWith("s:")){el=document.createElement("i");el.className="ji";el.innerHTML=SVGI[k.slice(2)]}else if(k){el=document.createElement("i");el.className="jk";el.textContent=k;if(["金","銀","銅"].includes(k)&&/🥇|🥈|🥉/.test(m))el.classList.add("md","md-"+k)}else{el=document.createElement("span");el.className="emo";el.textContent=m}
@@ -3754,6 +3779,7 @@ function rHub(){const P=PK(S.pack),ev=EV(),st=storyState(),A=arenaState(),R=aran
  const recent=all.slice(-5).reverse(),team=teamCards(),md=sumMode();
  const ENSO=`<svg viewBox="0 0 150 150"><path d="M75 12 A63 63 0 1 1 30 31" fill="none" stroke="#c9a45c" stroke-width="7" stroke-linecap="round" opacity=".9"/><path d="M75 20 A55 55 0 1 1 36 37" fill="none" stroke="#c9a45c" stroke-width="1.5" opacity=".35"/></svg>`;
  $("main").innerHTML=`<div class="greet">おかえり<b>${esc(S.prof.name)}</b></div>
+ ${(()=>{const h=typeof curHoliday==="function"&&curHoliday();return h?`<div class="holi" id="hHoli"><span class="hic">${h.ic}</span><div><b>${esc(h.n)}</b><small>Événement en cours · jusqu'au ${new Date(h.to.getTime()-1).toLocaleDateString("fr-FR",{day:"numeric",month:"long"})} · ton cadeau est dans la boîte</small></div><span class="hgo">›</span></div>`:""})()}
  <div class="hsum" id="hSum" style="--h:${P.h}">${ambHTML(AMB[P.id]||"dust",P.h)}<span class="hk">${P.kj}</span><div class="ht"><b>Invoquer</b><small>${esc(P.name)} · ${SUMS[md].n}</small></div><span class="hn">${S.boosters>0?S.boosters+" dispo":fmtT(S.nextAt-Date.now())}</span><span class="hgo">›</span></div>
  <div class="duo"><div class="pn p2" id="hStory" style="--kc:#d6452f"><span class="k2">物</span><span class="t2">Histoire</span><div class="h2">${st.fin?"Terminée":"Chapitre "+(st.ch+1)}</div><div class="s2">${st.fin?"Rejoue en difficulté supérieure":esc(CH_NAMES[Math.min(st.ch,CHAP-1)])}</div><div class="xpbar"><i style="width:${spct}%"></i></div><span class="go">Continuer ›</span></div>
   <div class="pn p3" id="hArena" style="--kc:#c9a45c"><span class="k2">闘</span><span class="t2">Arène</span><div class="h2">${R.ic} ${esc(R.n)}</div><div class="s2">${fmt(A.pts)} points</div><span class="go">Combattre ›</span></div></div>
@@ -3773,7 +3799,7 @@ function rHub(){const P=PK(S.pack),ev=EV(),st=storyState(),A=arenaState(),R=aran
  <div class="betaft">召喚 · SHŌKAN</div>`;
  setTimeout(()=>document.querySelectorAll("#main .cloudslot").forEach(el=>{if(CL.user)el.innerHTML="";else cloudBind(el)}),0);
  const go=v=>{view=v;setNav();render();$("main").scrollTop=0};
- $("hSum").onclick=()=>go("home");
+ $("hSum").onclick=()=>go("home");const hh=$("hHoli");if(hh)hh.onclick=()=>showGifts();
  $("hStory").onclick=showStory;$("hArena").onclick=showArena;
  $("main").querySelectorAll("[data-q]").forEach(el=>el.onclick=()=>{const q=el.dataset.q;if(q==="pass")showPass();else if(q==="tower")towerPrompt();else if(q==="pity")go("home");else go(q)});
  $("main").querySelectorAll(".tile").forEach(el=>el.onclick=()=>{const t=el.dataset.t;if(t==="raid")go("evt");else go(t.slice(2))});
