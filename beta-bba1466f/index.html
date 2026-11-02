@@ -1376,6 +1376,12 @@ header .hsp{flex:1}
 .card .cnt{display:block!important;position:absolute;top:auto;bottom:44px;right:5px;background:#c9a45c;color:#1a1612;font:800 10.5px/1 Inter;padding:3px 6px;border-radius:7px;z-index:3;box-shadow:0 0 0 1.5px #0008}
 .lgrid{display:grid;grid-template-columns:repeat(2,1fr);gap:7px;margin-top:10px}.lgrid button{padding:10px;border-radius:12px;border:1px solid var(--line);background:#0e0d0c;color:var(--ink);font:600 14px Inter}.lgrid button.on{border-color:var(--acc);background:#2a1612}
 .lgbox{margin-bottom:10px}
+.hsum{position:relative;display:flex;align-items:center;gap:12px;margin-top:14px;padding:14px 16px;border-radius:18px;border:1px solid hsl(var(--h) 55% 50% / .45);background:radial-gradient(80% 120% at 0% 50%,hsl(var(--h) 70% 40% / .35),transparent 70%),#171513;cursor:pointer;overflow:hidden}
+.hsum>.amb{position:absolute;inset:0;pointer-events:none;overflow:hidden}
+.hsum .hk{position:relative;width:48px;height:48px;border-radius:50%;display:flex;align-items:center;justify-content:center;font:800 26px var(--min);color:#fff;box-shadow:inset 0 0 0 2px hsl(var(--h) 62% 64%);flex:none}
+.hsum .ht{position:relative;flex:1;min-width:0}.hsum .ht b{display:block;font:800 18px var(--min)}.hsum .ht small{display:block;font-size:12.5px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.hsum .hn{position:relative;font:700 12px Inter;color:hsl(var(--h) 62% 70%);white-space:nowrap}.hsum .hgo{position:relative;font-size:22px;color:var(--muted)}
+.mdesc{font-size:12px;color:var(--muted);margin:10px 4px 0;line-height:1.4}
 </style>
 
 </head>
@@ -3680,7 +3686,7 @@ function v2Top(){initProfile();const P=S.prof;
  const un=(S.notifs||[]).filter(n=>!n.r).length;$("cBell").innerHTML=BELL+(un?`<span class="bdg">${un>9?"9+":un}</span>`:"");
  const h=$("hAv"),src=myAvatar();if(h.dataset.src!==src||!h.innerHTML){h.dataset.src=src;h.innerHTML=avHTML()}
  $("hName").textContent=P.name;$("hLv").textContent="Niv. "+P.lvl;try{$("hXp").style.width=Math.min(100,P.xp/pNeed(P.lvl)*100)+"%"}catch(_){}
- $("fabN").textContent="∞";if(view==="home"){const bo=$("btnOpen");if(bo&&!busy)bo.textContent="Ouvrir · ∞";const t=$("tmr");if(t)t.textContent="Boosters illimités (bêta)"}
+ altarBtn();$("fabN").textContent="∞";if(view==="home"){const bo=$("btnOpen");if(bo&&!busy)bo.textContent="Ouvrir · ∞";const t=$("tmr");if(t)t.textContent="Boosters illimités (bêta)"}
  const d=document.querySelectorAll("#nav .dot");dailyReset();
  d[0].style.display=(questsReady()||!S.daily.login||passReady()||achReady())&&view!=="hub"?"block":"none";
  d[1].style.display=Object.values(S.coll).some(c=>canEvolve(c))&&view!=="coll"?"block":"none";
@@ -3721,22 +3727,35 @@ function v2Head(){const H=HEADS[view];if(!H)return;const m=$("main");const old=m
  let extra="";if(view==="coll"){const L=Object.values(S.coll),u=L.length,tot=RAR[0].max,dup=L.reduce((a,c)=>a+Math.max(0,(c.n||1)-1),0),pc=u/tot,C=2*Math.PI*36;
   extra=`<div class="enso"><svg viewBox="0 0 86 86"><circle cx="43" cy="43" r="36" fill="none" stroke="#2c2824" stroke-width="5"/><circle cx="43" cy="43" r="36" fill="none" stroke="#c9a45c" stroke-width="6" stroke-linecap="round" stroke-dasharray="${Math.max(2,pc*C)} ${C}" transform="rotate(-100 43 43)"/><text x="43" y="48" text-anchor="middle" font-size="15" font-weight="800" fill="#efe7da" font-family="Shippori Mincho B1,serif">${(pc*100).toFixed(1).replace(".",",")}%</text></svg><div class="ev"><div><b>${fmt(u)}</b>personnages sur ${fmt(tot)}</div><div><b>${fmt(dup)}</b>exemplaires en double</div><div><b>${L.filter(c=>c.master).length}</b>maîtrisés</div></div></div>`}
  const fs=m.querySelector(".sec");if(fs&&["Collection","Aventure","Marché","Guilde","Équipe","Mon équipe","Événements"].includes((fs.querySelector(".t")||{}).textContent))fs.style.display="none";
- const d=document.createElement("div");d.className="ptop";d.innerHTML=`<div class="nobori">${H[0]}<small>${H[3]}</small></div><div class="pt"><h1>${H[1]}</h1><p>${H[2]}</p>${extra}</div>`;m.prepend(d)}
+ const d=document.createElement("div");d.className="ptop";d.innerHTML=`<div class="nobori">${H[0]}<small>${H[3]}</small></div><div class="pt"><h1>${H[1]}</h1><p>${H[2]}</p>${extra}</div>`;m.prepend(d);if(view==="home")homeAltar()}
 ["rColl","rTeam","rAdv","rMarket","rGuild","rEvt","rHome"].forEach(n=>{const f=window[n]||eval(n);const w=function(){const r=f.apply(this,arguments);try{v2Head()}catch(e){console.warn(e)}return r};eval(n+"=w")});
 const ONO=["ドン","ゴゴゴ","バーン","ドドド"];
 const AMB={mix:"dust",shonen:"ember",seinen:"rain",shojo:"petal",josei:"bokeh",isekai:"spark",fantasy:"spark",mecha:"grid",scifi:"star",sport:"speed",romance:"petal",comedy:"confetti",sol:"leaf",psy:"ripple",horror:"fog"};
 function ambHTML(t,h){const R=(a,b)=>a+Math.random()*(b-a);let n={dust:16,ember:16,rain:28,petal:12,bokeh:9,spark:14,grid:0,star:22,speed:10,confetti:16,leaf:10,ripple:3,fog:3}[t]||0,s="";
  for(let i=0;i<n;i++){const st=`left:${R(0,100)}%;top:${R(0,100)}%;animation-delay:-${R(0,8).toFixed(2)}s;animation-duration:${R(t==="rain"?.7:3,t==="rain"?1.3:t==="ripple"?6:9).toFixed(2)}s;--s:${R(.6,1.4).toFixed(2)};--hh:${(h+R(-25,25))|0}`;s+=`<i style="${st}"></i>`}
  return`<div class="amb a-${t}">${s}</div>`}
+
+function altarHTML(){const P=PK(S.pack),md=sumMode();const ENSO=`<svg viewBox="0 0 150 150"><path d="M75 12 A63 63 0 1 1 30 31" fill="none" stroke="#c9a45c" stroke-width="7" stroke-linecap="round" opacity=".9"/><path d="M75 20 A55 55 0 1 1 36 37" fill="none" stroke="#c9a45c" stroke-width="1.5" opacity=".35"/></svg>`;
+ return`<div class="altar" id="altar" style="--h:${P.h}">${ambHTML(AMB[P.id]||"dust",P.h)}<div class="torii"></div><button class="arr l" data-d="-1">‹</button><button class="arr r" data-d="1">›</button><div class="circ">${ENSO}<span>${P.kj}</span></div><h2>${esc(P.name)}</h2><div class="pd">${esc(P.d)}</div>
+  <div class="modes">${["ink","manga","booster"].map(k=>`<button class="mode ${md===k?"on":""}" data-m="${k}"><i>${SUMS[k].ic}</i><b>${SUMS[k].n}</b><small>${{ink:"Calligraphie notée",manga:"Série au choix",booster:"Rapide, ×5 / ×10"}[k]}</small></button>`).join("")}</div>
+  <div class="mdesc">${SUMS[md].d}</div>
+  <button class="btn go" id="aOpen"></button></div>`}
+function homeAltar(){const m=$("main");if(!m||m.querySelector("#altar"))return;const top=m.querySelector(":scope>.ptop");const d=document.createElement("div");d.innerHTML=altarHTML();const el=d.firstElementChild;if(top)top.after(el);else m.prepend(el);
+ ["#pack",".sumodes","#btnOpen"].forEach(q=>{const x=m.querySelector(q);if(x)x.style.display="none"});
+ const bb=$("btnBuy");if(bb)bb.innerHTML=`Acheter un booster · ${PACKCOST} 💠`;
+ m.querySelectorAll(".sec").forEach(sc=>{const t=(sc.querySelector(".t")||{}).textContent;if(t==="Ta collection"){sc.style.display="none";let n=sc.nextElementSibling;for(let k=0;k<2&&n;k++){if(n.classList.contains("stats")||n.classList.contains("muted"))n.style.display="none";n=n.nextElementSibling}}
+  if(t==="Choisis ton booster"){const x=sc.querySelector(".t");x.textContent="Tous les boosters"}});
+ el.querySelectorAll("[data-m]").forEach(b=>b.onclick=()=>{S.summon=b.dataset.m;save();sfx.select&&sfx.select();rHome()});
+ el.querySelectorAll(".arr").forEach(b=>b.onclick=()=>{if(busy)return;const i=PACKS.findIndex(x=>x.id===(S.pack||"mix"));S.pack=PACKS[(i+ +b.dataset.d+PACKS.length)%PACKS.length].id;save();sfx.select&&sfx.select();rHome()});
+ $("aOpen").onclick=()=>{if(S.boosters>0&&!busy)openPack(false)};altarBtn()}
+function altarBtn(){const b=$("aOpen");if(!b)return;b.disabled=busy||S.boosters<1;b.textContent=busy?"Ouverture…":S.boosters>0?"Invoquer · "+SUMS[sumMode()].n+" · "+S.boosters+" dispo":"Prochain booster dans "+fmtT(S.nextAt-Date.now())}
 function rHub(){const P=PK(S.pack),ev=EV(),st=storyState(),A=arenaState(),R=arank(A.pts);const all=Object.values(S.coll);initProfile();
  const spct=Math.min(100,Math.round(Object.keys(st.done).length/(CHAP*STAGES*3)*100));
  const mis=QUESTS.filter(q=>S.daily.claimed[q.k]).length,PS=passState(),pl=passLvl(),left=PITY-S.pity;
  const recent=all.slice(-5).reverse(),team=teamCards(),md=sumMode();
  const ENSO=`<svg viewBox="0 0 150 150"><path d="M75 12 A63 63 0 1 1 30 31" fill="none" stroke="#c9a45c" stroke-width="7" stroke-linecap="round" opacity=".9"/><path d="M75 20 A55 55 0 1 1 36 37" fill="none" stroke="#c9a45c" stroke-width="1.5" opacity=".35"/></svg>`;
  $("main").innerHTML=`<div class="greet">おかえり<b>${esc(S.prof.name)}</b></div>
- <div class="altar" style="--h:${P.h}">${ambHTML(AMB[P.id]||"dust",P.h)}<div class="torii"></div><button class="arr l" data-d="-1">‹</button><button class="arr r" data-d="1">›</button><div class="circ">${ENSO}<span>${P.kj}</span></div><h2>${esc(P.name)}</h2><div class="pd">${esc(P.d)}</div><button class="chg" id="hPick">Changer de booster ›</button>
-  <div class="modes">${["ink","manga","booster"].map(k=>`<button class="mode ${md===k?"on":""}" data-m="${k}"><i>${SUMS[k].ic}</i><b>${SUMS[k].n}</b><small>${{ink:"Calligraphie notée",manga:"Série au choix",booster:"Rapide, ×5 / ×10"}[k]}</small></button>`).join("")}</div>
-  <button class="btn go" id="hOpen">${S.boosters>0?"Invoquer · "+SUMS[md].n:"Prochain booster dans "+fmtT(S.nextAt-Date.now())}</button></div>
+ <div class="hsum" id="hSum" style="--h:${P.h}">${ambHTML(AMB[P.id]||"dust",P.h)}<span class="hk">${P.kj}</span><div class="ht"><b>Invoquer</b><small>${esc(P.name)} · ${SUMS[md].n}</small></div><span class="hn">${S.boosters>0?S.boosters+" dispo":fmtT(S.nextAt-Date.now())}</span><span class="hgo">›</span></div>
  <div class="duo"><div class="pn p2" id="hStory" style="--kc:#d6452f"><span class="k2">物</span><span class="t2">Histoire</span><div class="h2">${st.fin?"Terminée":"Chapitre "+(st.ch+1)}</div><div class="s2">${st.fin?"Rejoue en difficulté supérieure":esc(CH_NAMES[Math.min(st.ch,CHAP-1)])}</div><div class="xpbar"><i style="width:${spct}%"></i></div><span class="go">Continuer ›</span></div>
   <div class="pn p3" id="hArena" style="--kc:#c9a45c"><span class="k2">闘</span><span class="t2">Arène</span><div class="h2">${R.ic} ${esc(R.n)}</div><div class="s2">${fmt(A.pts)} points</div><span class="go">Combattre ›</span></div></div>
  ${sec("一","Aujourd'hui","今日")}
@@ -3755,9 +3774,7 @@ function rHub(){const P=PK(S.pack),ev=EV(),st=storyState(),A=arenaState(),R=aran
  <div class="betaft">召喚 · BÊTA PRIVÉE</div>`;
  setTimeout(()=>document.querySelectorAll("#main .cloudslot").forEach(el=>{if(CL.user)el.innerHTML="";else cloudBind(el)}),0);
  const go=v=>{view=v;setNav();render();$("main").scrollTop=0};
- $("main").querySelectorAll("[data-m]").forEach(b=>b.onclick=()=>{S.summon=b.dataset.m;save();sfx.select&&sfx.select();rHub()});
- $("main").querySelectorAll(".arr").forEach(b=>b.onclick=()=>{const i=PACKS.findIndex(x=>x.id===(S.pack||"mix"));S.pack=PACKS[(i+ +b.dataset.d+PACKS.length)%PACKS.length].id;save();sfx.select&&sfx.select();rHub()});
- $("hOpen").onclick=()=>{go("home");if(S.boosters>0)setTimeout(()=>openPack(false),60)};$("hPick").onclick=()=>go("home");
+ $("hSum").onclick=()=>go("home");
  $("hStory").onclick=showStory;$("hArena").onclick=showArena;
  $("main").querySelectorAll("[data-q]").forEach(el=>el.onclick=()=>{const q=el.dataset.q;if(q==="pass")showPass();else if(q==="tower")towerPrompt();else if(q==="pity")go("home");else go(q)});
  $("main").querySelectorAll(".tile").forEach(el=>el.onclick=()=>{const t=el.dataset.t;if(t==="raid")go("evt");else go(t.slice(2))});
