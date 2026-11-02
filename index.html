@@ -1428,20 +1428,20 @@ header .hsp{flex:1}
  <div id="modal" class="ovl"><div class="mbox" id="mbox"></div></div>
  <div id="toast"></div>
 </div>
-<script>window.SHK_VER="02/11 20h00"
+<script>window.SHK_VER="02/11 20h15"
 
 const BETA=true;const PUBLIC=true;
 
 "use strict";
 // ================= DONNÉES =================
 const RAR=[
- {id:"C",name:"Commun",min:1101,max:3100,odds:62,shard:1,base:100},
+ {id:"C",name:"Commun",min:1101,max:3100,odds:62.188,shard:1,base:100},
  {id:"R",name:"Rare",min:401,max:1100,odds:27,shard:3,base:140},
  {id:"E",name:"Épique",min:201,max:400,odds:8.5,shard:10,base:195},
  {id:"L",name:"Légendaire",min:61,max:200,odds:1.2,shard:40,base:265},
- {id:"M",name:"Mythique",min:21,max:60,odds:.4,shard:150,base:350},
- {id:"D",name:"Divin",min:7,max:20,odds:.08,shard:400,base:450},
- {id:"X",name:"Cosmos",min:1,max:6,odds:.02,shard:1000,base:560}];
+ {id:"M",name:"Mythique",min:21,max:60,odds:.25,shard:150,base:350},
+ {id:"D",name:"Divin",min:7,max:20,odds:.05,shard:400,base:450},
+ {id:"X",name:"Cosmos",min:1,max:6,odds:.012,shard:1000,base:560}];
 const RI={};RAR.forEach((r,i)=>RI[r.id]=i);
 const CLS=[
  {id:"war",name:"Guerrier",ic:"⚔️",hp:1,atk:1,spd:100,ult:"Frappe dévastatrice",ud:"Inflige 260 % de dégâts à un ennemi"},
@@ -1462,7 +1462,7 @@ const EVENTS=[
  {n:"Mardi Éclats",d:"Éclats gagnés en combat ×2",k:"shard"},{n:"Mercredi Boosters",d:"Un booster gratuit toutes les 10 minutes",k:"refill"},
  {n:"Jeudi Onigiri",d:"Onigiri gagnés ×2",k:"oni"},{n:"Vendredi Légendaire",d:"Chances de Légendaire ×2",k:"leg"},
  {n:"Samedi Raid",d:"5 essais de Raid au lieu de 3",k:"raid"}];
-const MAXB=10,PACKCOST=60,PITY=120,ONICOST=25,ONIXP=400;
+const MAXB=10,PACKCOST=100,PITY=120,ONICOST=25,ONIXP=400;
 const API="https://graphql.anilist.co";
 const Q=`query($page:Int){Page(page:$page,perPage:50){characters(sort:FAVOURITES_DESC){id name{full} image{large} favourites media(perPage:3,sort:POPULARITY_DESC){nodes{isAdult title{romaji english}}}}}}`;
 const today=()=>new Date().toDateString();
@@ -1518,7 +1518,7 @@ function spare(c){let need=0;for(let s=c.star;s<5;s++)need+=s;return Math.max(0,
 // ================= BOOSTERS =================
 function tickBoost(){const now=Date.now();if(S.boosters>=MAXB){S.nextAt=0;return}if(!S.nextAt)S.nextAt=now+refillMs();
  const was=S.boosters;while(S.boosters<MAXB&&now>=S.nextAt){S.boosters++;S.nextAt+=refillMs()}if(S.boosters>=MAXB){S.nextAt=0;if(was<MAXB&&typeof notify==="function")notify("🎴","Ta réserve de boosters gratuits est pleine !",true)}}
-const GUAR={R:85,E:12,L:2.5,M:.4,D:.08,X:.02};
+const GUAR={R:85.188,E:12,L:2.5,M:.25,D:.05,X:.012};
 function rollRarity(minIdx){const ev=EV().k;const pool=RAR.slice(minIdx).map(r=>({r,o:(minIdx?GUAR[r.id]:r.odds)*((ev==="myth"&&r.id==="M")||(ev==="leg"&&r.id==="L")?2:1)}));
  const tot=pool.reduce((a,x)=>a+x.o,0);let x=Math.random()*tot;for(const p of pool){if((x-=p.o)<=0)return p.r}return pool[0].r}
 function rollPack(){const rs=[];for(let i=0;i<5;i++)rs.push(rollRarity(i===4?1:0));
@@ -1963,7 +1963,7 @@ function guildTick(){const g=S.guild;if(!g)return;const now=Date.now(),dt=Math.m
  const sig=gSig(g);
  if(view==="guild"&&sig!==guildTick.sig&&!document.querySelector("#modal[style*='flex']")&&!document.querySelector("#picker[style*='flex']"))gRefresh();guildTick.sig=sig;
  const cb=$("gChest");if(cb&&cb.disabled)cb.textContent="Prochain coffre dans "+fmtT(g.chestAt-Date.now());if(Math.random()<.05)save()}
-function chestRw(g){return bonusRw({boosters:1+Math.floor(g.lvl/3)+Math.floor(g.members.length/25),oni:3+g.lvl,shards:40*g.lvl+4*g.members.length,frag:g.lvl>=10?1:0})}
+function chestRw(g){return bonusRw({boosters:1+Math.floor(g.lvl/3)+Math.floor(g.members.length/25),oni:3+g.lvl,shards:25*g.lvl+4*g.members.length,frag:g.lvl>=10?1:0})}
 function rGuild(){const g=S.guild;let h=sec("01","Guilde","ギルド");
  if(!g){h+=`<div class="box"><b>🏯 Fonde ta guilde</b><div class="muted" style="margin:4px 0 10px">Le fondateur devient <b>chef</b> et reçoit <b>+10 %</b> sur toutes les récompenses de guilde.</div><button class="btn" id="gCreate">Créer une guilde</button></div>
   <div class="sec"><span class="no">02</span><span class="t">Ou rejoins une guilde</span><span class="jp">参加</span></div>${NPCG.map((x,i)=>`<div class="gl" style="--gc:${x.color}"><div class="gem2">${x.emblem}</div><div style="flex:1"><b>${esc(x.name)}</b><div class="muted" style="font-size:12px">Niveau ${x.lvl} · ${x.n} membres</div></div><button class="btn ghost sm" data-gj="${i}" style="width:auto">Rejoindre</button></div>`).join("")}
@@ -3030,7 +3030,7 @@ async function showArena(practice){if(!practice&&pvpOn())return showArenaOnline(
  p.querySelectorAll("[data-ao]").forEach(b=>b.onclick=()=>{if(A.used>=ATIX)return;const o=opp[+b.dataset.ao];const en=o.team.map(c=>mkFoe(c,1,false));scaleFoes(en,o.ratio*.92,1);p.style.display="none";
   startBattle({type:"arena",practice:!!practice,oi:+b.dataset.ao,opp:o,enemies:en,title:(practice?"🤖 Entraînement · ":"🏟️ Arène · ")+o.name,loc:"arena"})})}
 function arenaEnd(c,won){const A=arenaState(),o=c.opp;if(c.practice){if(won){S.shards+=20}return`<p class="muted">🤖 Entraînement : pas de points de classement.</p>${won?"<p>+20 💠</p>":""}`}A.used++;bump("arena");const R0=arank(A.pts);let d;
- if(won){d=o.gain;A.pts+=d;A.w++;S.shards+=40+Math.round(o.ratio*30)}else{d=-Math.round(8+4/o.ratio);A.pts=Math.max(0,A.pts+d);A.l++}
+ if(won){d=o.gain;A.pts+=d;A.w++;S.shards+=30+Math.round(o.ratio*20)}else{d=-Math.round(8+4/o.ratio);A.pts=Math.max(0,A.pts+d);A.l++}
  A.best=Math.max(A.best,A.pts);A.wkBest=Math.max(A.wkBest,A.pts);A.hist.unshift(`${won?"✅":"❌"} ${esc(o.name)} · ${d>0?"+":""}${d} pts · ${new Date().toLocaleTimeString("fr-FR",{hour:"2-digit",minute:"2-digit"})}`);A.hist=A.hist.slice(0,20);A.opp=null;
  const R1=arank(A.pts);let up="";if(ARANK.indexOf(R1)>ARANK.indexOf(R0)){up=`<p style="font-size:18px">${R1.ic} <b style="color:${R1.c}">Promotion : ${R1.n} !</b></p>`;if(!A.reached[R1.n]){A.reached[R1.n]=1;addGift(R1.ic,"Arène : rang "+R1.n,"Première promotion à ce rang !",AWEEK[ARANK.indexOf(R1)])}}
  return`<p>🏟️ <b>${d>0?"+":""}${d} points</b> · ${R1.ic} ${R1.n} (${fmt(A.pts)})</p>${won?`<p>+${40+Math.round(o.ratio*30)} 💠</p>`:""}${up}`}
@@ -3510,9 +3510,9 @@ async function runBattle(){const maxR=B.cfg.type==="raid"||B.cfg.type==="graid"?
  if(B&&B.finisher&&B.finisher.side==="a"&&RI[B.finisher.rarity]>=4&&!B.skip&&alive(B.allies).length)await legendaryFinish(B.finisher);if(B)endBattle()}
 function endBattle(){const c=B.cfg,fr=a=>a.reduce((x,u)=>x+Math.max(0,u.hp),0)/Math.max(1,a.reduce((x,u)=>x+u.maxhp,0));B.timeUp=c.type!=="raid"&&c.type!=="graid"&&alive(B.allies).length>0&&alive(B.enemies).length>0;const won=alive(B.allies).length>0&&(c.type==="raid"||c.type==="graid"||!alive(B.enemies).length||(B.timeUp&&fr(B.allies)>fr(B.enemies)));if(won&&B.syn&&B.syn.maxSeries>=3&&c.type!=="raid"&&c.type!=="graid")S.synWin=(S.synWin||0)+1;const dead=B.allies.filter(u=>u.hp<=0).length;
  let html="",xp=0;
- if(c.type==="raid"){S.raid.tries++;S.raid.best=Math.max(S.raid.best,B.dmg);bump("raid");const sh=Math.round(30+Math.log10(B.dmg+10)*25),on=2+Math.floor(Math.log10(B.dmg+10));
+ if(c.type==="raid"){S.raid.tries++;S.raid.best=Math.max(S.raid.best,B.dmg);bump("raid");const sh=Math.round(20+Math.log10(B.dmg+10)*18),on=2+Math.floor(Math.log10(B.dmg+10));
   S.shards+=sh;S.oni+=on;xp=200;html=`<div style="width:90px;margin:0 auto">${cardHTML(B.enemies[0].card)}</div><h2>Raid terminé</h2><div class="power">${fmt(B.dmg)}</div><div class="muted">dégâts infligés${B.dmg>=S.raid.best?" · 🏆 nouveau record du jour !":""}</div><p>+${sh} 💠 · +${on} 🍙</p>`}
- else if(c.type==="graid"){const R=graidState();R.used++;bump("graid");const d=B.dmg;graidHit(d,true);gxp(60,true);gfeed("⚔️ "+((S.prof&&S.prof.name)||"Toi")+" inflige "+fmt(d)+" dégâts à "+GBOSS[R.b].n);const sh=Math.round(40+Math.log10(d+10)*30);S.shards+=sh;xp=220;
+ else if(c.type==="graid"){const R=graidState();R.used++;bump("graid");const d=B.dmg;graidHit(d,true);gxp(60,true);gfeed("⚔️ "+((S.prof&&S.prof.name)||"Toi")+" inflige "+fmt(d)+" dégâts à "+GBOSS[R.b].n);const sh=Math.round(25+Math.log10(d+10)*20);S.shards+=sh;xp=220;
   html=`<div style="width:90px;margin:0 auto">${cardHTML(B.enemies[0].card)}</div><h2>Raid de guilde</h2><div class="power">${fmt(d)}</div><div class="muted">dégâts infligés · ${R.dead?"🏆 BOSS VAINCU !":"PV restants : "+fmt(R.hp)}</div><p>+${sh} 💠</p>`;sfx.win()}
  else if(c.type==="friendly"){if(won)S.wins++;pxp(won?20:8);html=`<div style="font-size:34px">${won?"🏆":"💀"}</div><h2>${won?"Victoire !":"Défaite…"}</h2>`+friendlyEnd(c,won);xp=won?200:80;won?sfx.win():sfx.lose()}
  else if(c.type==="arena"){S.wins+=won?1:0;if(won)bump("win");pxp(won?30:10);html=`<div style="font-size:34px">${won?"🏆":"💀"}</div><h2>${won?"Victoire !":"Défaite…"}</h2>`+(c.online?(arenaOnlineEnd(c,won),'<div id="arRes"><p class="muted">Mise à jour du classement…</p></div>'):arenaEnd(c,won));xp=won?400:120;won?sfx.win():sfx.lose()}
@@ -4448,7 +4448,7 @@ function aiMove(){const P=G.units.filter(u=>u.side==="a"&&u.hp>0&&u.t<=0),E=G.un
 
 function end(){if(G.over)return;G.over=true;let win;
  if(G.crA!==G.crE)win=G.crA>G.crE;else{const f=s=>G.towers.filter(t=>t.side===s).reduce((a,t)=>a+t.hp/t.maxhp,0);const a=f("a"),e=f("e");win=Math.abs(a-e)<.01?null:a>e}
- const sh=win?40+G.diff*25:win===null?15:8;S.shards+=sh;S.duel=S.duel||{w:0,l:0};if(win)S.duel.w++;else if(win===false)S.duel.l++;try{pxp(win?30:10)}catch(_){}save();try{updateTop()}catch(_){}
+ const sh=win?30+G.diff*15:win===null?12:6;S.shards+=sh;S.duel=S.duel||{w:0,l:0};if(win)S.duel.w++;else if(win===false)S.duel.l++;try{pxp(win?30:10)}catch(_){}save();try{updateTop()}catch(_){}
  try{win?sfx.win():sfx.lose()}catch(_){}
  const r=root.querySelector("#dRes");r.innerHTML=`<div style="font-size:44px">${win?"🏆":win===null?"🤝":"💀"}</div><h2>${win?"Victoire !":win===null?"Égalité":"Défaite…"}</h2><div style="font-size:26px;letter-spacing:4px"><span style="color:#6fb8ff">${"👑".repeat(G.crA)||"0"}</span> · <span style="color:#ff7a7a">${"👑".repeat(G.crE)||"0"}</span></div><p class="muted">${G.crA===G.crE&&win!==null?"Égalité de couronnes : départagé aux PV des tours.":""}</p><p>+${sh} 💠</p><button class="btn gold" id="dAgain">Rejouer</button><button class="btn ghost" id="dOut">Quitter</button>`;
  let extra="";try{if(G.ctx&&G.ctx.onEnd)extra=G.ctx.onEnd(win,G.crA,G.crE)||""}catch(e){console.warn(e)}if(extra)r.querySelector("h2").insertAdjacentHTML("afterend",`<p style="font-weight:800;color:#ffd34d">${extra}</p>`);
@@ -4593,10 +4593,11 @@ window.gvgState=st;
 })();
 
 // ================= ANNONCE DE MISE À JOUR (une fois par joueur) =================
-(function(){const KEY="shk_upd",VER="2026-11-02";let seen=null;try{seen=localStorage.getItem(KEY)}catch(_){}
- if(seen===VER)return;
+(function(){const KEY="shk_upd",VER="2026-11-02b";let seen=null;try{seen=localStorage.getItem(KEY)}catch(_){}
+ if(seen===VER)return;const BAL=`Les Mythique, Divin et Cosmos sont plus rares, un booster acheté coûte 100 💠 au lieu de 60, et l'Arène et les raids donnent un peu moins d'éclats. Le but : que chaque grosse carte reste un vrai événement.`;
  const isNew=!S.opened&&!Object.keys(S.coll||{}).length;const mark=()=>{try{localStorage.setItem(KEY,VER)}catch(_){}};
  if(isNew){mark();return}
+ if(seen==="2026-11-02"){setTimeout(()=>{try{if(["tuto","duel"].some(id=>{const e=document.getElementById(id);return e&&e.classList.contains("on")}))return;modal(`<div style="text-align:center"><div style="font:900 34px 'Noto Sans JP',serif;color:#ffd34d">衡</div><h3 style="margin:2px 0 8px">Équilibrage du jeu</h3><p class="muted" style="font-size:13px;line-height:1.5">${BAL}</p></div>`,[["Compris !",()=>mark()]]);mark()}catch(e){console.warn(e)}},1600);return}
  const it=(ic,t,d)=>`<div style="display:flex;gap:10px;align-items:flex-start;margin:9px 0;text-align:left"><span style="font-size:22px;line-height:1">${ic}</span><div><b style="font-size:14px">${t}</b><div class="muted" style="font-size:12.5px;line-height:1.4;margin-top:2px">${d}</div></div></div>`;
  const H=`<div style="text-align:center"><div style="font:900 34px 'Noto Sans JP',serif;color:#ffd34d">新</div><h3 style="margin:2px 0 4px">Mise à jour de Shōkan !</h3><div class="muted" style="font-size:12px">Voici ce qui change</div></div>
  <div style="max-height:56vh;overflow:auto;margin-top:6px">
@@ -4605,6 +4606,7 @@ window.gvgState=st;
  ${it("🔥","Éléments et classes revus","Les persos connus ont maintenant l'élément et la classe qui leur correspondent (Natsu est Feu, Gray est Eau…). Vérifie ton équipe !")}
  ${it("⚖️","Combats rééquilibrés","Fini les défaites avec une équipe plus forte : au dernier tour, l'équipe qui a le plus de PV gagne. La puissance reflète mieux les dégâts.")}
  ${it("🎴","Plus d'invocations","Réserve de 10 invocations gratuites, une de plus toutes les 20 minutes. Les doublons s'affichent avec leur progression d'évolution.")}
+ ${it("⚖️","Équilibrage",BAL)}
  ${it("🎵","Musiques japonaises","Chaque menu a sa musique traditionnelle. Nouveau réglage pour couper les effets sonores sans couper la musique.")}
  </div>`;
  setTimeout(()=>{try{const busy=["tuto","duel"].some(id=>{const e=document.getElementById(id);return e&&e.classList.contains("on")});if(busy)return;
