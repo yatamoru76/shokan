@@ -1428,7 +1428,7 @@ header .hsp{flex:1}
  <div id="modal" class="ovl"><div class="mbox" id="mbox"></div></div>
  <div id="toast"></div>
 </div>
-<script>window.SHK_VER="02/11 19h45"
+<script>window.SHK_VER="02/11 19h50"
 
 const BETA=true;const PUBLIC=true;
 
@@ -3968,7 +3968,7 @@ function show(n){i=n;const s=STEPS[i];if(s.at)s.at();const dots=STEPS.map((_,k)=
 addEventListener("resize",()=>{if(el.classList.contains("on"))place()});
 window.startTuto=function(){el.classList.add("on");show(0)};
 // bouton « Revoir le tutoriel » dans les réglages
-const _st=showSettings;showSettings=function(){const r=_st.apply(this,arguments);try{const p=$("picker"),box=p.firstElementChild;if(box&&!p.querySelector(".tutobox")){const d=document.createElement("div");d.className="box tutobox";d.innerHTML=`<b>🧭 Tutoriel</b><button class="btn ghost sm" id="stTuto" style="margin-top:8px">Revoir le tutoriel</button>`;box.insertBefore(d,box.children[1]||null);d.querySelector("#stTuto").onclick=()=>{p.style.display="none";startTuto()}}}catch(e){console.warn(e)}return r};
+const _st=showSettings;showSettings=function(){const r=_st.apply(this,arguments);try{const p=$("picker"),box=p.firstElementChild;if(box&&!p.querySelector(".tutobox")){const d=document.createElement("div");d.className="box tutobox";d.innerHTML=`<b>🧭 Tutoriel</b><button class="btn ghost sm" id="stTuto" style="margin-top:8px">Revoir le tutoriel</button><div class="muted" style="font-size:11px;margin-top:8px;text-align:center">Version du jeu : ${window.SHK_VER||"?"}</div>`;box.insertBefore(d,box.children[1]||null);d.querySelector("#stTuto").onclick=()=>{p.style.display="none";startTuto()}}}catch(e){console.warn(e)}return r};
 // nouveau joueur : aucune carte ouverte et tutoriel jamais vu
 if(!S.tuto&&!S.opened&&!Object.keys(S.coll).length)setTimeout(startTuto,900);
 })();
