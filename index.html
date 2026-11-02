@@ -471,7 +471,7 @@ header .chip{padding:3px 6px;font-size:11px}
 /* ===== boosters à thème ===== */
 .packs{display:flex;gap:8px;overflow-x:auto;padding:2px 2px 10px;scrollbar-width:none;margin:0 -2px}
 .packs::-webkit-scrollbar{display:none}
-.pcard{flex:none;width:76px;height:104px;border-radius:12px;position:relative;overflow:hidden;cursor:pointer;display:flex;align-items:flex-end;justify-content:center;padding:6px;border:2px solid transparent;opacity:.75;transition:transform .15s,opacity .15s}
+.pcard{flex:none;width:76px;height:104px;border-radius:12px;position:relative;overflow:hidden;isolation:isolate;-webkit-mask-image:-webkit-radial-gradient(white,black);cursor:pointer;display:flex;align-items:flex-end;justify-content:center;padding:6px;border:2px solid transparent;opacity:.75;transition:transform .15s,opacity .15s}
 .pcard.on{border-color:#fff;opacity:1;transform:translateY(-3px);box-shadow:0 8px 20px -6px #000}
 .pcard .pkj{position:absolute;top:6px;left:0;right:0;text-align:center;font-family:"Noto Sans JP";font-weight:900;font-size:40px;color:#fff;opacity:.9;text-shadow:0 3px 10px #0006}
 .pcard .pn{position:relative;font-weight:800;font-size:10.5px;color:#fff;text-align:center;line-height:1.1;text-shadow:0 1px 4px #000a}
@@ -814,7 +814,7 @@ nav button{font-size:9.5px}
 .dcban{display:flex;align-items:center;gap:10px;background:linear-gradient(135deg,#5865f2,#3c45a5);color:#fff;text-decoration:none;border-radius:14px;padding:11px 12px;margin:0 0 10px;box-shadow:0 8px 20px -10px #5865f2}.dcic{font-size:24px}
 .cloudbox{background:var(--bg2);border:1px solid var(--line);border-radius:14px;padding:11px 12px;margin-bottom:10px}.cloudbox.on{border-color:#5865f288}
 .dcbtn{background:#5865f2!important;color:#fff!important;box-shadow:0 8px 20px -10px #5865f2!important}.clav{width:38px;height:38px;border-radius:50%;object-fit:cover;background:#5865f2;display:flex;align-items:center;justify-content:center;flex:none}
-.pcard.wimg{box-shadow:inset 0 0 0 2px hsla(var(--ph),90%,60%,.6)}.pcard.wimg .pkj{opacity:.38;font-size:46px;top:auto;bottom:16px;text-shadow:0 2px 12px #000}
+.pcard.wimg{background:hsl(var(--ph),55%,12%);isolation:isolate;-webkit-mask-image:-webkit-radial-gradient(white,black)}.pcard.wimg::before{content:"";position:absolute;inset:3px;border-radius:9px;background:var(--art);z-index:0}.pcard.wimg::after{content:"";position:absolute;inset:0;border-radius:inherit;box-shadow:inset 0 0 0 2px hsla(var(--ph),90%,60%,.75);z-index:2;pointer-events:none}.pcard.wimg .pkj,.pcard.wimg .pn{z-index:1}.pcard.wimg .pkj{opacity:.38;font-size:46px;top:auto;bottom:16px;text-shadow:0 2px 12px #000}
 .pack .art.wimg .kj{opacity:.35}
 
 /* ===== version PC / tablette : l'interface s'adapte à la taille de l'écran ===== */
@@ -1428,7 +1428,7 @@ header .hsp{flex:1}
  <div id="modal" class="ovl"><div class="mbox" id="mbox"></div></div>
  <div id="toast"></div>
 </div>
-<script>window.SHK_VER="02/11 19h15"
+<script>window.SHK_VER="02/11 19h30"
 
 const BETA=true;const PUBLIC=true;
 
@@ -1704,7 +1704,7 @@ function sec(no,t,jp){return`<div class="sec"><span class="no">${no}</span><span
 function rHome(){if(!rHome.m){rHome.m=1;setTimeout(loadMascots,1500)}setTimeout(()=>document.querySelectorAll("#main .cloudslot").forEach(el=>{if(CL.user)el.innerHTML="";else cloudBind(el)}),0);const k=counts(),ev=EV(),tot=Object.keys(S.coll).length;
  $("main").innerHTML=`<div class="event" style="margin-top:10px"><b>${ev.n}</b> <span class="muted">· ${ev.d}</span></div>
  ${sec("01","Choisis ton booster","ブースター")}
- <div class="packs" id="packs">${PACKS.map(p=>`<div class="pcard ${p.id===(S.pack||"mix")?"on":""} ${MIMG[p.id]?"wimg":""}" data-pk="${p.id}" style="--ph:${p.h};background:${packArt(p)}"><span class="pkj">${p.kj}</span><span class="pn">${p.name}</span></div>`).join("")}</div>
+ <div class="packs" id="packs">${PACKS.map(p=>`<div class="pcard ${p.id===(S.pack||"mix")?"on":""} ${MIMG[p.id]?"wimg":""}" data-pk="${p.id}" style="--ph:${p.h};${MIMG[p.id]?`--art:${packArt(p)}`:`background:${packArt(p)}`}"><span class="pkj">${p.kj}</span><span class="pn">${p.name}</span></div>`).join("")}</div>
  <div class="pack" id="pack"><div class="art ${MIMG[PK(S.pack).id]?"wimg":""}" style="background:${packArt(PK(S.pack),"15%")}"><span class="kj">${PK(S.pack).kj}</span></div><div class="inf"><div class="bn">${PK(S.pack).name}</div><div class="muted">${PK(S.pack).d}</div>
  <div class="tags"><span class="tag">5 cartes</span><span class="tag a">Rare garantie</span><span class="tag">Mythique sûre en ${PITY}</span></div><div class="muted" id="tmr" style="margin-top:auto;font-size:12px"></div></div></div>
  <div class="row2" style="margin-top:10px"><button class="btn" id="btnOpen" style="flex:1.4"></button><button class="btn ghost" id="btnBuy">${PACKCOST} 💠</button></div><div class="multi" style="${isBeta()&&sumMode()!=="booster"?"display:none":""}"><span class="muted">Ouvrir d'un coup :</span><button class="btn ghost sm" data-multi="5">×5</button><button class="btn ghost sm" data-multi="10">×10</button><button class="btn ghost sm" data-multi="all">Tout</button></div>${isBeta()?`<div class="sumodes">${["ink","manga","booster"].map(k=>`<button class="smd ${sumMode()===k?"on":""}" data-sum="${k}"><span class="si">${SUMS[k].ic}</span><b>${SUMS[k].n}</b><small>${SUMS[k].d}</small></button>`).join("")}</div>`:""}<div class="sumtog" style="${isBeta()?"display:none":""}"><span class="muted">Invocation :</span>${typeof BETA!=="undefined"?`<button class="${sumMode()==="ink"?"on":""}" data-sum="ink">🖌️ Encre</button>`:""}<button class="${sumMode()==="manga"?"on":""}" data-sum="manga">📚 Manga</button><button class="${sumMode()==="booster"?"on":""}" data-sum="booster">🎴 Booster</button></div><div class="err" id="err"></div>
