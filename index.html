@@ -1428,7 +1428,7 @@ header .hsp{flex:1}
  <div id="modal" class="ovl"><div class="mbox" id="mbox"></div></div>
  <div id="toast"></div>
 </div>
-<script>window.SHK_VER="02/11 21h00"
+<script>window.SHK_VER="02/11 22h00"
 
 const BETA=true;const PUBLIC=true;
 
@@ -4646,6 +4646,46 @@ window.gvgState=st;
  if(upd!=="2026-11-02b")return; // l'annonce de mise à jour passe d'abord, le remerciement viendra à l'ouverture suivante
  setTimeout(()=>{try{if(["tuto","duel"].some(id=>{const e=document.getElementById(id);return e&&e.classList.contains("on")}))return;if($("modal").style.display==="flex")return;
   modal(`<div style="text-align:center"><div style="font:900 40px 'Noto Sans JP',serif;color:#ff4d6d">謝</div><h3 style="margin:2px 0 8px">Merci de jouer à Shōkan ! 🙏</h3><p class="muted" style="font-size:13px;line-height:1.5">Le jeu est et restera <b>gratuit</b>. Si tu veux m'aider à payer l'hébergement et à continuer les mises à jour, tu trouveras maintenant un bouton <b>❤️ Soutenez-nous</b> dans le Menu.</p><p class="muted" style="font-size:12px">Don libre via PayPal, sans aucun avantage en jeu. Rien d'obligatoire, jouer suffit déjà à me faire plaisir !</p></div>`,[["Merci, plus tard",()=>mark()],["❤️ Soutenir",()=>{mark();showDon()}]]);mark()}catch(e){console.warn(e)}},1700)})();
+// ================= ÉCRAN TITRE =================
+(function(){
+const css=document.createElement("style");css.textContent=`
+#titleS{position:fixed;inset:0;z-index:10000;display:flex;flex-direction:column;align-items:center;justify-content:center;overflow:hidden;cursor:pointer;user-select:none;-webkit-user-select:none;padding:20px 0 40px;box-sizing:border-box;
+ background:radial-gradient(120% 70% at 50% 40%,#2a1420 0,#120a12 45%,#050407 100%);color:#f4eefc;transition:opacity .6s ease,transform .6s ease}
+#titleS.out{opacity:0;transform:scale(1.06);pointer-events:none}
+#titleS .tstage{position:relative;width:min(78vw,52vh,440px);aspect-ratio:1;display:flex;align-items:center;justify-content:center;flex:none}
+#titleS .tsun{position:absolute;inset:7%;border-radius:50%;background:radial-gradient(circle,#c8282e 0,#9e1b22 60%,#5a0e14 100%);box-shadow:0 0 120px #c8282e66;animation:tsun 6s ease-in-out infinite alternate}
+@keyframes tsun{to{transform:scale(1.03)}}
+#titleS svg.tenso{position:absolute;inset:-6%;width:112%;height:112%;transform:rotate(-20deg)}
+#titleS svg.tenso path{fill:none;stroke:#0b0709;stroke-linecap:round;stroke-dasharray:1200;stroke-dashoffset:1200;animation:tdraw 1.6s .2s cubic-bezier(.6,0,.2,1) forwards}
+@keyframes tdraw{to{stroke-dashoffset:0}}
+#titleS .tlogo{position:relative;z-index:3;text-align:center;animation:tin .9s .6s both}
+@keyframes tin{from{opacity:0;transform:translateY(16px) scale(.96);filter:blur(6px)}}
+#titleS .tkj{font:900 min(28vw,18vh,160px)/1 "Noto Sans JP",serif;color:#fff;letter-spacing:-.04em;text-shadow:0 4px 0 #000,0 0 40px #ff3d4d88,0 10px 40px #000}
+#titleS .tname{font:900 min(8.5vw,5.4vh,44px)/1 sans-serif;letter-spacing:.42em;margin:8px 0 0 .42em;color:#ffd34d;text-shadow:0 3px 0 #000,0 0 18px #ffd34d55}
+#titleS .tsub{font-size:min(3.3vw,13px);letter-spacing:.3em;color:#e9dcc6;margin-top:8px;opacity:.85;text-transform:uppercase}
+#titleS .tcards{position:relative;width:100%;height:min(26vw,15vh,136px);margin-top:min(-5vh,-26px);z-index:4;flex:none}
+#titleS .tcards i{position:absolute;left:50%;top:0;height:100%;aspect-ratio:2.5/3.5;border-radius:9px;background-size:cover;background-position:center 18%;border:2px solid #ffd34d;box-shadow:0 12px 30px #000c;opacity:0;animation:tcard .7s cubic-bezier(.2,1.4,.5,1) forwards}
+@keyframes tcard{from{opacity:0;transform:var(--t0)}to{opacity:1;transform:var(--t1)}}
+#titleS .thello{margin-top:18px;font-size:13px;color:#e9dcc6;opacity:.9;z-index:2;animation:tin .8s 1.4s both}
+#titleS .ttap{margin-top:12px;z-index:2;font-weight:800;font-size:15px;letter-spacing:.12em;color:#fff;padding:12px 26px;border-radius:999px;border:1px solid #ffffff44;background:#00000055;backdrop-filter:blur(4px);animation:tpulse 1.6s ease-in-out infinite,tin .8s 1.3s both}
+@keyframes tpulse{50%{opacity:.45;transform:scale(.97)}}
+#titleS .tver{position:absolute;bottom:calc(env(safe-area-inset-bottom) + 12px);font-size:11px;color:#ffffff66;z-index:2}
+#titleS .tpet{position:absolute;top:-20px;width:10px;height:7px;border-radius:60% 0 60% 0;background:#ffb7cf;opacity:.85;animation:tfall linear infinite}
+@keyframes tfall{to{transform:translate(var(--dx),110vh) rotate(720deg)}}`;
+document.head.appendChild(css);
+const el=document.createElement("div");el.id="titleS";
+let imgs=[];try{imgs=Object.values(MIMG||{}).filter(Boolean).slice(0,3)}catch(_){}
+const cards=imgs.length===3?`<div class="tcards">${imgs.map((u,i)=>{const a=(i-1)*14,x=`${i-1} * min(17vw,10vh,92px)`,y=Math.abs(i-1)*10;return`<i style="background-image:url('${String(u).replace(/'/g,"%27")}');--t0:translate(calc(-50% + ${x}),40vh) rotate(${a}deg);--t1:translate(calc(-50% + ${x}),${y}px) rotate(${a}deg);animation-delay:${.9+i*.12}s;z-index:${i===1?2:1}"></i>`}).join("")}</div>`:"";
+let hello="";try{const n=S.prof&&S.prof.name;if(n&&(S.opened||Object.keys(S.coll||{}).length))hello=`Bon retour, <b>${esc(n)}</b> !`}catch(_){}
+el.innerHTML=`<div class="tstage"><div class="tsun"></div><svg class="tenso" viewBox="0 0 200 200"><path d="M100 18 A82 82 0 1 1 42 42" stroke-width="13"/><path d="M100 26 A74 74 0 1 1 50 47" stroke-width="2" style="opacity:.5"/></svg>
+ <div class="tlogo"><div class="tkj">召喚</div><div class="tname">SHŌKAN</div><div class="tsub">Cartes · Combats · Guildes</div></div></div>${cards}
+ ${hello?`<div class="thello">${hello}</div>`:""}<div class="ttap">TOUCHE POUR COMMENCER</div><div class="tver">Version ${window.SHK_VER||""} · jeu de fan gratuit</div>`;
+for(let i=0;i<18;i++){const p=document.createElement("span");p.className="tpet";p.style.left=Math.random()*100+"%";p.style.setProperty("--dx",(Math.random()*160-80)+"px");p.style.animationDuration=(6+Math.random()*7)+"s";p.style.animationDelay=(-Math.random()*10)+"s";el.appendChild(p)}
+document.body.appendChild(el);
+let gone=false;function go(){if(gone)return;gone=true;try{sfx.start&&sfx.start()}catch(_){}el.classList.add("out");setTimeout(()=>el.remove(),650);removeEventListener("keydown",key)}
+function key(e){if(["Enter"," ","Escape"].includes(e.key)){e.preventDefault();go()}}
+el.addEventListener("click",go);addEventListener("keydown",key);
+})();
 </script>
 <script>if("serviceWorker"in navigator)addEventListener("load",()=>navigator.serviceWorker.register("sw.js").catch(()=>{}))</script></body>
 </html>
