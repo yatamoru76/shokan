@@ -1428,7 +1428,7 @@ header .hsp{flex:1}
  <div id="modal" class="ovl"><div class="mbox" id="mbox"></div></div>
  <div id="toast"></div>
 </div>
-<script>window.SHK_VER="02/11 19h30"
+<script>window.SHK_VER="02/11 19h45"
 
 const BETA=true;const PUBLIC=true;
 
@@ -2724,7 +2724,7 @@ function mvPickSeries(L){const miss=a=>a.chars.filter(c=>!S.coll[c.id]).length;c
 const INKC={C:{c:"#151515",n:"noire"},R:{c:"#1f6fe0",n:"bleue"},E:{c:"#8a3ff0",n:"violette"},L:{c:"#e09a00",n:"dorée"},M:{c:"#e01e3c",n:"rouge sang"},D:{c:"#f2c200",n:"or éclatant",g:1},X:{c:"#7b5cff",n:"cosmique",g:1,rb:1}};
 const IS={};
 function showInk(P,paid,multi){const sp=PK(S.pack||"mix"),o=$("inkS");Object.assign(IS,{P,paid,multi:multi||0,state:"paint",cards:null,best:null,shown:null,fake:null,cov:0,col:"#151515",stage:0,hue:0,dabs:0,inside:0,ink:1});
- o.innerHTML=`<div class="ishint" id="isHint">🖌️ Remplis le kanji en restant <b>dans les traits</b> : ton encre est limitée !</div>
+ o.innerHTML=`<div class="ishint" id="isHint">🖌️ Remplis le kanji <b>sans déborder</b>, l'encre est limitée. Précision <b>A (80 %)</b> = 6e carte</div>
  <div class="ispaper" id="isPaper"><canvas id="isCv"></canvas><div class="isflood" id="isFlood"></div>
   <div class="ispack" id="isPack"><div class="ispk" style="background:${packBg(sp)}"><span class="kj">${sp.kj}</span><span class="nm">${esc(sp.name)}</span><span class="ct">${multi?multi+" BOOSTERS":"5 CARTES"}</span></div></div></div>
  <div class="isrow"><span>Kanji</span><div class="isbar"><i id="isPr"></i></div></div><div class="isrow"><span>🖌️ Encre</span><div class="isbar ink"><i id="isInk"></i></div><b id="isPrec">—</b></div>
@@ -2739,7 +2739,7 @@ function showInk(P,paid,multi){const sp=PK(S.pack||"mix"),o=$("inkS");Object.ass
  const m=document.createElement("canvas");m.width=W;m.height=H;const mg=m.getContext("2d");mg.font=IS.font;mg.textAlign="center";mg.textBaseline="middle";mg.fillStyle="#000";mg.fillText(sp.kj,W/2,H/2+fs*.03);
  const d=mg.getImageData(0,0,W,H).data;IS.mask=d;IS.mw=W;IS.mh=H;const st=Math.max(5,Math.round(W/46));IS.pts=[];for(let y=st/2|0;y<H;y+=st)for(let x=st/2|0;x<W;x+=st)if(d[(y*W+x)*4+3]>120)IS.pts.push({x,y,c:0});
  if(IS.pts.length<20){for(let y=H*.2;y<H*.8;y+=st)for(let x=W*.2;x<W*.8;x+=st)IS.pts.push({x,y,c:0})}
- IS.R=Math.max(10,W/22);IS.cap=Math.max(160,Math.round(IS.pts.length*.42));
+ IS.R=Math.max(10,W/22);IS.cap=Math.max(140,Math.round(IS.pts.length*.36));
  P.then(res=>{IS.cards=res;const flat=IS.multi?res.flat():res;const best=flat.reduce((a,c)=>RI[c.rarity]>RI[a]?c.rarity:a,"C");IS.best=best;
   IS.fake=RI[best]>=3&&Math.random()<.22?RAR[Math.max(1,RI[best]-1-(Math.random()<.4?1:0))].id:null;IS.shown=IS.fake||best}).catch(e=>{IS.err=e});
  $("isCancel").onclick=()=>{if(IS.state!=="paint"||IS.cov>.02)return;o.style.display="none";busy=false;updateTop()};
@@ -2759,7 +2759,7 @@ function inkDab(x,y,r){const g=IS.g,c=inkColor();g.save();if(IS.stage>0&&INKC[IS
  const rr=(r+IS.R*.25)**2;for(const p of IS.pts)if(!p.c&&(p.x-x)**2+(p.y-y)**2<rr)p.c=1;
  if(IS.state==="paint"&&IS.mask){IS.dabs++;const xi=Math.round(x),yi=Math.round(y);if(xi>=0&&yi>=0&&xi<IS.mw&&yi<IS.mh&&IS.mask[(yi*IS.mw+xi)*4+3]>100)IS.inside++;IS.ink=Math.max(0,1-IS.dabs/IS.cap);const ib=$("isInk");if(ib){ib.style.width=IS.ink*100+"%";ib.style.background=IS.ink<.2?"#e8202a":"#f2f2f4"}const pr=$("isPrec");if(pr&&IS.dabs>8){const q=IS.inside/IS.dabs;pr.textContent=inkGrade(q);pr.style.color=GRC[inkGrade(q)]}}}
 const GRC={S:"#ffd23a",A:"#4da3ff",B:"#c9c9d1",C:"#8b8b94"};
-function inkGrade(q){return q>=.8?"S":q>=.66?"A":q>=.5?"B":"C"}
+function inkGrade(q){return q>=.9?"S":q>=.8?"A":q>=.62?"B":"C"}
 function inkSpatter(x,y,r){const g=IS.g;g.save();g.fillStyle=inkColor();g.globalAlpha=.9;for(let i=0;i<4+Math.random()*5;i++){const a=Math.random()*6.28,dd=r*(1.4+Math.random()*2.2);g.beginPath();g.arc(x+Math.cos(a)*dd,y+Math.sin(a)*dd,Math.random()*r*.28+1,0,7);g.fill()}g.restore()}
 function inkProgress(){const c=IS.pts.filter(p=>p.c).length/IS.pts.length;IS.cov=c;const goal=.62;$("isPr").style.width=Math.min(100,c/goal*100)+"%";
  if(IS.shown){if(IS.stage===0&&c>.18){IS.stage=1;inkReveal(IS.shown,false)}
