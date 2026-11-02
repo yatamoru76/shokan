@@ -1428,7 +1428,7 @@ header .hsp{flex:1}
  <div id="modal" class="ovl"><div class="mbox" id="mbox"></div></div>
  <div id="toast"></div>
 </div>
-<script>window.SHK_VER="02/11 20h55"
+<script>window.SHK_VER="02/11 21h00"
 
 const BETA=true;const PUBLIC=true;
 
@@ -4638,6 +4638,14 @@ window.gvgState=st;
  setTimeout(()=>{try{const busy=["tuto","duel"].some(id=>{const e=document.getElementById(id);return e&&e.classList.contains("on")});if(busy)return;
   modal(H,[["Compris !",()=>{mark()}],["Voir la guilde ▶",()=>{mark();view="guild";setNav();render()}]]);mark()}catch(e){console.warn(e)}},1600)})();
 
+
+// ---- petit mot de remerciement + bouton de soutien (une seule fois) ----
+(function(){let upd=null,don=null;try{upd=localStorage.getItem("shk_upd");don=localStorage.getItem("shk_don")}catch(_){}
+ if(don)return;const mark=()=>{try{localStorage.setItem("shk_don","1")}catch(_){}};
+ if(!S.opened&&!Object.keys(S.coll||{}).length){mark();return}
+ if(upd!=="2026-11-02b")return; // l'annonce de mise à jour passe d'abord, le remerciement viendra à l'ouverture suivante
+ setTimeout(()=>{try{if(["tuto","duel"].some(id=>{const e=document.getElementById(id);return e&&e.classList.contains("on")}))return;if($("modal").style.display==="flex")return;
+  modal(`<div style="text-align:center"><div style="font:900 40px 'Noto Sans JP',serif;color:#ff4d6d">謝</div><h3 style="margin:2px 0 8px">Merci de jouer à Shōkan ! 🙏</h3><p class="muted" style="font-size:13px;line-height:1.5">Le jeu est et restera <b>gratuit</b>. Si tu veux m'aider à payer l'hébergement et à continuer les mises à jour, tu trouveras maintenant un bouton <b>❤️ Soutenez-nous</b> dans le Menu.</p><p class="muted" style="font-size:12px">Don libre via PayPal, sans aucun avantage en jeu. Rien d'obligatoire, jouer suffit déjà à me faire plaisir !</p></div>`,[["Merci, plus tard",()=>mark()],["❤️ Soutenir",()=>{mark();showDon()}]]);mark()}catch(e){console.warn(e)}},1700)})();
 </script>
 <script>if("serviceWorker"in navigator)addEventListener("load",()=>navigator.serviceWorker.register("sw.js").catch(()=>{}))</script></body>
 </html>
