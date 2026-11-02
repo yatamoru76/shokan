@@ -1428,7 +1428,7 @@ header .hsp{flex:1}
  <div id="modal" class="ovl"><div class="mbox" id="mbox"></div></div>
  <div id="toast"></div>
 </div>
-<script>window.SHK_VER="02/11 19h50"
+<script>window.SHK_VER="02/11 20h00"
 
 const BETA=true;const PUBLIC=true;
 
@@ -4249,6 +4249,8 @@ window.sigIsTop=isTop;window.sigActive=()=>OL.length;
 const css=document.createElement("style");css.textContent=`
 #duel{position:fixed;inset:0;z-index:300;display:none;flex-direction:column;background:radial-gradient(120% 80% at 50% 0%,#1c1430,#07060c);color:#f4eefc;user-select:none;-webkit-user-select:none;touch-action:none}
 #duel.on{display:flex}
+#duel{align-items:center}#duel>.dtop,#duel>.dbot,#duel>.dwrap{width:100%;max-width:560px;box-sizing:border-box}#duel .dhand{justify-content:center}#duel .dcard{max-width:96px}#duel .dnext{max-width:56px}
+@media (min-width:900px){#duel>.dtop,#duel>.dbot,#duel>.dwrap{max-width:620px}#duel .dcard{max-width:104px}#duel .dcard:hover{transform:translateY(-4px)}#duel canvas{cursor:crosshair}#duel .dbot{padding-bottom:18px}}
 #duel .mgov{position:absolute;left:0;right:0;height:34%;pointer-events:none;z-index:1;display:none}
 #duel .mgov.on{display:block}
 #duel .mgov .strip{position:absolute;inset:0 3%;display:grid;grid-template-columns:.78fr 1.22fr;gap:7px;transform:skewY(-5deg);animation:mgIn .2s cubic-bezier(.2,1.4,.5,1) both}
@@ -4356,6 +4358,7 @@ function play(side,slot,x,y){const P=side==="a";const hand=P?G.hand:G.ehand,deck
  if(P){G.next=rest.includes(di)?di:rest[0]}else{G.enext=rest[Math.floor(Math.random()*rest.length)]}
  if(P){G.sel=-1;drawHand();try{sfx.whoosh()}catch(_){}}return true}
 
+addEventListener("keydown",e=>{if(!G||G.over||!root.classList.contains("on"))return;const n=+e.key;if(n>=1&&n<=4){G.sel=G.sel===n-1?-1:n-1;try{sfx.select()}catch(_){}drawHand();e.preventDefault()}else if(e.key==="Escape"){G.sel=-1;drawHand()}});
 function toLogical(e){const r=cv.getBoundingClientRect();return[(e.clientX-r.left)/r.width*W,(e.clientY-r.top)/r.height*H]}
 function okZone(x,y){return y>RIV+18&&y<H-8&&x>14&&x<W-14}
 cv.addEventListener("pointermove",e=>{if(!G||G.over||G.sel<0){if(G)G.ghost=null;return}const[x,y]=toLogical(e);G.ghost={x,y}});
