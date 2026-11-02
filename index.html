@@ -1428,7 +1428,7 @@ header .hsp{flex:1}
  <div id="modal" class="ovl"><div class="mbox" id="mbox"></div></div>
  <div id="toast"></div>
 </div>
-<script>window.SHK_VER="02/11 20h15"
+<script>window.SHK_VER="02/11 20h30"
 
 const BETA=true;const PUBLIC=true;
 
@@ -2732,11 +2732,11 @@ function showInk(P,paid,multi){const sp=PK(S.pack||"mix"),o=$("inkS");Object.ass
  <button class="btn ghost sm" id="isCancel" style="width:auto;padding:8px 22px;margin-top:12px">Annuler</button>`;
  o.style.display="flex";sfx.packIn&&sfx.packIn();
  const pap=$("isPaper"),cv=$("isCv");const W=pap.clientWidth,H=pap.clientHeight,dpr=Math.min(2,window.devicePixelRatio||1);cv.width=W*dpr;cv.height=H*dpr;cv.style.width=W+"px";cv.style.height=H+"px";
- const g=cv.getContext("2d");g.scale(dpr,dpr);IS.g=g;IS.W=W;IS.H=H;IS.kj=sp.kj;
+ const g=cv.getContext("2d");g.scale(dpr,dpr);IS.g=g;IS.W=W;IS.H=H;IS.sh=pickInkShape();IS.kj=IS.sh.ch||IS.sh.nm;IS.th=INK_TH[IS.sh.d];
  const fs=Math.min(W,H)*.8;IS.font=`900 ${fs}px "Noto Sans JP","Hiragino Sans","Yu Gothic",sans-serif`;
- g.font=IS.font;g.textAlign="center";g.textBaseline="middle";g.fillStyle="#00000010";g.fillText(sp.kj,W/2,H/2+fs*.03);g.lineWidth=2;g.strokeStyle="#0000002e";g.setLineDash([6,5]);g.strokeText(sp.kj,W/2,H/2+fs*.03);g.setLineDash([]);
+ inkDraw(g,"guide");{const T=IS.th,h=$("isHint");if(h)h.innerHTML=`🖌️ Peins <b>${IS.sh.ch?IS.sh.ch+" · "+IS.sh.mean:IS.sh.nm}</b> · <b style="color:${T.c}">${T.n}</b> · 6e carte dès <b>${Math.round(T.A*100)} %</b> de précision${IS.sh.d===1?" (note max : A)":""}`}
  // points d'échantillonnage du kanji
- const m=document.createElement("canvas");m.width=W;m.height=H;const mg=m.getContext("2d");mg.font=IS.font;mg.textAlign="center";mg.textBaseline="middle";mg.fillStyle="#000";mg.fillText(sp.kj,W/2,H/2+fs*.03);
+ const m=document.createElement("canvas");m.width=W;m.height=H;const mg=m.getContext("2d");inkDraw(mg,"mask","#000");
  const d=mg.getImageData(0,0,W,H).data;IS.mask=d;IS.mw=W;IS.mh=H;const st=Math.max(5,Math.round(W/46));IS.pts=[];for(let y=st/2|0;y<H;y+=st)for(let x=st/2|0;x<W;x+=st)if(d[(y*W+x)*4+3]>120)IS.pts.push({x,y,c:0});
  if(IS.pts.length<20){for(let y=H*.2;y<H*.8;y+=st)for(let x=W*.2;x<W*.8;x+=st)IS.pts.push({x,y,c:0})}
  IS.R=Math.max(10,W/22);IS.cap=Math.max(140,Math.round(IS.pts.length*.36));
@@ -2752,6 +2752,29 @@ function showInk(P,paid,multi){const sp=PK(S.pack||"mix"),o=$("inkS");Object.ass
   if(now-lastSnd>90&&typeof noise==="function"){lastSnd=now;noise(.06,.05,1800+Math.random()*900)}
   lx=x;ly=y;lt=now;inkProgress()};
  cv.onpointerup=cv.onpointercancel=()=>{dn=false}}
+
+// ---- invocation à l'encre : un kanji ou un dessin différent à chaque fois, avec sa difficulté ----
+const INK_TH={1:{S:.94,A:.86,B:.66,n:"Facile",c:"#3ddc84"},2:{S:.9,A:.8,B:.62,n:"Moyen",c:"#ffb547"},3:{S:.85,A:.74,B:.58,n:"Difficile",c:"#ff5a5a"}};
+const INK_K=[["人","personne",1],["山","montagne",1],["川","rivière",1],["口","bouche",1],["十","dix",1],["大","grand",1],["王","roi",1],["日","soleil",1],
+ ["火","feu",2],["水","eau",2],["木","arbre",2],["月","lune",2],["花","fleur",2],["刀","sabre",2],["心","cœur",2],["空","ciel",2],["雨","pluie",2],["光","lumière",2],
+ ["龍","dragon",3],["鬼","démon",3],["夢","rêve",3],["魂","âme",3],["桜","cerisier",3],["風","vent",3],["雷","foudre",3],["戦","combat",3],["魔","magie",3]];
+const INK_D=[
+ ["Lune","lune",1,(o,W,H,s)=>{o.beginPath();o.arc(W/2,H/2,s*.34,0,7);o.fill();o.globalCompositeOperation="destination-out";o.beginPath();o.arc(W/2+s*.17,H/2-s*.07,s*.3,0,7);o.fill()}],
+ ["Fleur de cerisier","sakura",1,(o,W,H,s)=>{for(let i=0;i<5;i++){const a=i*1.2566-1.5708;o.save();o.translate(W/2+Math.cos(a)*s*.19,H/2+Math.sin(a)*s*.19);o.rotate(a+1.5708);o.beginPath();o.ellipse(0,0,s*.12,s*.17,0,0,7);o.fill();o.restore()}
+  o.globalCompositeOperation="destination-out";for(let i=0;i<5;i++){const a=i*1.2566-1.5708;o.beginPath();o.arc(W/2+Math.cos(a)*s*.37,H/2+Math.sin(a)*s*.37,s*.045,0,7);o.fill()}o.beginPath();o.arc(W/2,H/2,s*.06,0,7);o.fill()}],
+ ["Mont Fuji","fuji",1,(o,W,H,s)=>{const c=W/2,y=H/2;o.beginPath();o.moveTo(c-s*.44,y+s*.3);o.lineTo(c-s*.1,y-s*.24);o.lineTo(c+s*.1,y-s*.24);o.lineTo(c+s*.44,y+s*.3);o.closePath();o.fill();o.globalCompositeOperation="destination-out";o.beginPath();o.moveTo(c-s*.1,y-s*.24);o.lineTo(c-s*.17,y-s*.11);o.lineTo(c-s*.07,y-s*.15);o.lineTo(c,y-s*.08);o.lineTo(c+s*.07,y-s*.15);o.lineTo(c+s*.17,y-s*.11);o.lineTo(c+s*.1,y-s*.24);o.closePath();o.lineWidth=s*.02;o.stroke()}],
+ ["Ensō","cercle zen",2,(o,W,H,s)=>{o.lineWidth=s*.12;o.lineCap="round";o.beginPath();o.arc(W/2,H/2,s*.31,-1.1,4.7);o.stroke()}],
+ ["Torii","portail",2,(o,W,H,s)=>{const c=W/2,y=H/2;o.fillRect(c-s*.26,y-s*.2,s*.08,s*.5);o.fillRect(c+s*.18,y-s*.2,s*.08,s*.5);o.fillRect(c-s*.34,y-s*.17,s*.68,s*.07);o.beginPath();o.moveTo(c-s*.44,y-s*.36);o.quadraticCurveTo(c,y-s*.28,c+s*.44,y-s*.36);o.lineTo(c+s*.4,y-s*.26);o.quadraticCurveTo(c,y-s*.2,c-s*.4,y-s*.26);o.closePath();o.fill()}],
+ ["Shuriken","étoile ninja",2,(o,W,H,s)=>{const c=W/2,y=H/2;o.beginPath();for(let i=0;i<8;i++){const a=i*.7854-1.5708,r=i%2?s*.11:s*.4;o.lineTo(c+Math.cos(a)*r,y+Math.sin(a)*r)}o.closePath();o.fill();o.globalCompositeOperation="destination-out";o.beginPath();o.arc(c,y,s*.05,0,7);o.fill()}],
+ ["Grande vague","vague",3,(o,W,H,s)=>{const c=W/2,y=H/2;o.lineWidth=s*.085;o.lineCap="round";o.beginPath();o.moveTo(c-s*.42,y+s*.28);o.bezierCurveTo(c-s*.2,y+s*.2,c-s*.25,y-s*.35,c+s*.1,y-s*.3);o.bezierCurveTo(c+s*.35,y-s*.27,c+s*.38,y,c+s*.18,y+s*.02);o.bezierCurveTo(c+s*.05,y+s*.03,c+s*.02,y-s*.1,c+s*.12,y-s*.12);o.stroke();
+  o.beginPath();o.moveTo(c-s*.42,y+s*.38);o.quadraticCurveTo(c,y+s*.3,c+s*.42,y+s*.38);o.stroke()}]];
+function pickInkShape(){const all=[...INK_K.map(([ch,mean,d])=>({ch,mean,d})),...INK_D.map(([nm,mean,d,f])=>({nm,mean,d,f}))];let sh;do{sh=all[Math.floor(Math.random()*all.length)]}while(all.length>1&&sh.ch&&sh.ch===pickInkShape.last);pickInkShape.last=sh.ch;return sh}
+function inkDraw(ctx,mode,style){const W=IS.W,H=IS.H,sh=IS.sh,fs=Math.min(W,H)*.8;
+ if(sh.ch){ctx.save();ctx.font=IS.font;ctx.textAlign="center";ctx.textBaseline="middle";
+  if(mode==="guide"){ctx.fillStyle="#00000010";ctx.fillText(sh.ch,W/2,H/2+fs*.03);ctx.lineWidth=2;ctx.strokeStyle="#0000002e";ctx.setLineDash([6,5]);ctx.strokeText(sh.ch,W/2,H/2+fs*.03);ctx.setLineDash([])}
+  else{if(style)ctx.fillStyle=style;ctx.fillText(sh.ch,W/2,H/2+fs*.03)}ctx.restore();return}
+ const k=2,o=document.createElement("canvas");o.width=W*k;o.height=H*k;const og=o.getContext("2d");og.scale(k,k);const st=mode==="guide"?"#000":style||"#000";og.fillStyle=st;og.strokeStyle=st;sh.f(og,W,H,Math.min(W,H));
+ ctx.save();if(mode==="guide")ctx.globalAlpha=.09;ctx.drawImage(o,0,0,W,H);ctx.restore()}
 function inkColor(){if(IS.stage===0)return"#151515";const k=INKC[IS.stage===1?IS.shown:IS.best];if(k.rb){IS.hue=(IS.hue+2)%360;return`hsl(${IS.hue},90%,55%)`}return k.c}
 function inkDab(x,y,r){const g=IS.g,c=inkColor();g.save();if(IS.stage>0&&INKC[IS.stage===1?IS.shown:IS.best].g){g.shadowColor=c;g.shadowBlur=10}
  g.globalAlpha=.16;g.fillStyle=c;g.beginPath();g.arc(x+(Math.random()-.5)*2,y+(Math.random()-.5)*2,r*1.35,0,7);g.fill();
@@ -2759,7 +2782,7 @@ function inkDab(x,y,r){const g=IS.g,c=inkColor();g.save();if(IS.stage>0&&INKC[IS
  const rr=(r+IS.R*.25)**2;for(const p of IS.pts)if(!p.c&&(p.x-x)**2+(p.y-y)**2<rr)p.c=1;
  if(IS.state==="paint"&&IS.mask){IS.dabs++;const xi=Math.round(x),yi=Math.round(y);if(xi>=0&&yi>=0&&xi<IS.mw&&yi<IS.mh&&IS.mask[(yi*IS.mw+xi)*4+3]>100)IS.inside++;IS.ink=Math.max(0,1-IS.dabs/IS.cap);const ib=$("isInk");if(ib){ib.style.width=IS.ink*100+"%";ib.style.background=IS.ink<.2?"#e8202a":"#f2f2f4"}const pr=$("isPrec");if(pr&&IS.dabs>8){const q=IS.inside/IS.dabs;pr.textContent=inkGrade(q);pr.style.color=GRC[inkGrade(q)]}}}
 const GRC={S:"#ffd23a",A:"#4da3ff",B:"#c9c9d1",C:"#8b8b94"};
-function inkGrade(q){return q>=.9?"S":q>=.8?"A":q>=.62?"B":"C"}
+function inkGrade(q){const t=IS.th||INK_TH[2];return q>=t.S?"S":q>=t.A?"A":q>=t.B?"B":"C"}
 function inkSpatter(x,y,r){const g=IS.g;g.save();g.fillStyle=inkColor();g.globalAlpha=.9;for(let i=0;i<4+Math.random()*5;i++){const a=Math.random()*6.28,dd=r*(1.4+Math.random()*2.2);g.beginPath();g.arc(x+Math.cos(a)*dd,y+Math.sin(a)*dd,Math.random()*r*.28+1,0,7);g.fill()}g.restore()}
 function inkProgress(){const c=IS.pts.filter(p=>p.c).length/IS.pts.length;IS.cov=c;const goal=.62;$("isPr").style.width=Math.min(100,c/goal*100)+"%";
  if(IS.shown){if(IS.stage===0&&c>.18){IS.stage=1;inkReveal(IS.shown,false)}
@@ -2774,12 +2797,12 @@ function inkReveal(r,up){const k=INKC[r],ri=RI[r];const col=k.rb?"#a970ff":k.c;
 async function inkDone(){IS.state="fill";$("isHint").innerHTML="…";
  if(!IS.cards){try{await IS.P}catch(e){$("inkS").style.display="none";packError(e);return}await sleep(30)}
  if(IS.stage<2){IS.stage=2}
- const q=IS.dabs?IS.inside/IS.dabs:0,gr=IS.cov>=.62?inkGrade(q):"C";IS.grade=gr;let bonusP=null;
+ const q=IS.dabs?IS.inside/IS.dabs:0;let gr=IS.cov>=.62?inkGrade(q):"C";if(IS.sh&&IS.sh.d===1&&gr==="S")gr="A";IS.grade=gr;let bonusP=null;
  if(!IS.multi&&(gr==="S"||gr==="A"))bonusP=drawBonus(gr==="S"?2:1).catch(()=>null);
  const g=IS.g,r=IS.best,k=INKC[r],ri=RI[r],fs=Math.min(IS.W,IS.H)*.8;
  for(let i=1;i<=12;i++){g.save();g.font=IS.font;g.textAlign="center";g.textBaseline="middle";g.globalAlpha=i/12*.5;
   if(k.rb){const gr=g.createLinearGradient(0,0,IS.W,IS.H);["#ff3d6e","#ffd23a","#34d399","#4da3ff","#a970ff"].forEach((c,j)=>gr.addColorStop(j/4,c));g.fillStyle=gr}else g.fillStyle=k.c;
-  if(k.g||ri>=4){g.shadowColor=k.rb?"#a970ff":k.c;g.shadowBlur=18}g.fillText(IS.kj,IS.W/2,IS.H/2+fs*.03);g.restore();await sleep(28)}
+  if(k.g||ri>=4){g.shadowColor=k.rb?"#a970ff":k.c;g.shadowBlur=18}inkDraw(g,"fill",g.fillStyle);g.restore();await sleep(28)}
  sfx.flip&&sfx.flip(Math.min(4,ri));if(ri>=3&&sfx.hype)sfx.hype(Math.min(4,ri-1));
  const pb=$("isPaper").getBoundingClientRect();sparksAt(pb.left+pb.width/2,pb.top+pb.height/2,r,ri>=5?40:ri>=3?22:10);
  const fl=$("isFlood");fl.style.background=k.rb?"radial-gradient(circle,#fff 0,#a970ff 35%,#4de1ff 60%,#0b0b10 100%)":`radial-gradient(circle,${ri>=5?"#fff":k.c} 0,${k.c} 40%,#0b0b10 100%)`;fl.classList.add("on");
