@@ -5057,10 +5057,35 @@ const css=document.createElement("style");css.textContent=`
 #dlg.cv2 .dnx2{position:absolute;right:24px;bottom:14px;font-size:11px;letter-spacing:.2em;color:#fff8;animation:ceye 1.6s infinite}
 #dlg.cv2.shk{animation:shk .5s}@keyframes shk{20%{transform:translate(-6px,3px)}40%{transform:translate(5px,-4px)}60%{transform:translate(-3px,2px)}}
 #dlg.cv2 .dfl{position:absolute;inset:0;background:#c43cff;opacity:0;pointer-events:none;z-index:3}#dlg.cv2 .dfl.on{animation:cfl .5s}
+
+#lore .cpic{width:100%;height:auto;display:block}
+#lore .cpair{position:absolute;left:0;right:0;bottom:13%;height:auto;z-index:2;display:flex;justify-content:center}
+#lore .cpair>div{width:64%;margin:0 -9%;-webkit-mask:radial-gradient(ellipse 62% 70% at 50% 42%,#000 50%,transparent 78%);mask:radial-gradient(ellipse 62% 70% at 50% 42%,#000 50%,transparent 78%);align-self:flex-end}
+#lore .cpair .pa{animation:cslL 1.6s cubic-bezier(.2,1,.3,1) backwards}#lore .cpair .pb{animation:cslR 1.6s .25s cubic-bezier(.2,1,.3,1) backwards}
+@keyframes cslL{from{transform:translateX(-25%);opacity:0}}@keyframes cslR{from{transform:translateX(25%);opacity:0}}
+#lore .czoom{position:absolute;inset:0;z-index:2;overflow:hidden;-webkit-mask:radial-gradient(ellipse 80% 70% at 50% 45%,#000 55%,transparent 85%);mask:radial-gradient(ellipse 80% 70% at 50% 45%,#000 55%,transparent 85%)}
+#lore .czoom img{position:absolute;left:50%;top:50%;width:190%;max-width:none;transform:translate(-50%,-38%) scale(1.15);animation:czoom 6s ease-out forwards;filter:contrast(1.08) saturate(1.1)}
+@keyframes czoom{to{transform:translate(-50%,-40%) scale(1)}}
+#lore .cvil{-webkit-mask:radial-gradient(ellipse 60% 75% at 50% 45%,#000 55%,transparent 85%);mask:radial-gradient(ellipse 60% 75% at 50% 45%,#000 55%,transparent 85%);width:min(110vw,560px)!important}
+#lore .cbreak{position:absolute;left:50%;top:50%;width:min(120vw,600px);transform:translate(-50%,-50%);z-index:2;aspect-ratio:540/722}
+#lore .cbreak>div{position:absolute;inset:0;-webkit-mask:radial-gradient(ellipse 60% 70% at 50% 45%,#000 55%,transparent 85%);mask:radial-gradient(ellipse 60% 70% at 50% 45%,#000 55%,transparent 85%)}
+#lore .cbreak .hL{clip-path:polygon(0 0,49% 0,46% 30%,52% 45%,47% 62%,51% 100%,0 100%);animation:sL 1.8s 1.4s cubic-bezier(.5,0,.8,.4) forwards}
+#lore .cbreak .hR{clip-path:polygon(49% 0,100% 0,100% 100%,51% 100%,47% 62%,52% 45%,46% 30%);animation:sR 1.8s 1.4s cubic-bezier(.5,0,.8,.4) forwards}
+#lore .cbreak .cline{position:absolute;left:48%;top:10%;width:4px;height:0;background:#ffd6f6;box-shadow:0 0 20px 6px #ff4dd2;animation:cl 1.2s .2s forwards,clo .6s 1.5s forwards}
+@keyframes cl{to{height:70%}}@keyframes clo{to{opacity:0}}
+#dlg.cv2 .db .bimg{width:100%;height:auto;display:block;-webkit-mask:radial-gradient(ellipse 62% 72% at 50% 42%,#000 52%,transparent 80%);mask:radial-gradient(ellipse 62% 72% at 50% 42%,#000 52%,transparent 80%)}
+#dlg.cv2 .db{filter:none!important;width:min(100vw,480px)!important;bottom:120px!important}
+#dlg.cv2 .db.l{left:-12%!important}#dlg.cv2 .db.r{right:-12%!important}
+#dlg.cv2 .db.dim{filter:brightness(.35) blur(1px)!important}
+#tuto .kiko svg{display:none}
+#tuto .kiko{background:url(img/kiko.webp) center 30%/cover;border-radius:50%;-webkit-mask:radial-gradient(circle,#000 58%,transparent 72%);mask:radial-gradient(circle,#000 58%,transparent 72%);filter:none!important}
 `;document.head.appendChild(css);
 
+// ---------- illustrations ----------
+const IM={g:"img/gardien.webp",h:"img/hoshi.webp",v:"img/brise.webp",k:"img/kiko.webp"};
+const pic=(k,c)=>`<img class="${c||"cpic"}" src="${IM[k]}" draggable="false" alt="">`;
 // ---------- dialogues ----------
-const BUST={h:bustHoshi,g:bustHero,v:bustVillain},RIM={h:"#ffd34d",g:"#ff7a3d",v:"#c43cff"},SIDE={h:"r",g:"l",v:"r"};
+const BUST={h:()=>pic("h","bimg"),g:()=>pic("g","bimg"),v:()=>pic("v","bimg")},RIM={h:"#ffd34d",g:"#ff7a3d",v:"#c43cff"},SIDE={h:"r",g:"l",v:"r"};
 dialog=function(lines,done){const o=$("dlg");let i=0,typing=null,full="",last=null;o.classList.add("cv2");o.style.display="flex";
  const vill=lines.some(l=>l[0]==="v");
  o.innerHTML=`<div class="dsc">${scene(vill?{s1:"#12061f",s2:"#2a0c38",orb:"#c43cff",m3:"#2a1240",m2:"#180a28",m1:"#07030c",ec:"#c43cff",en:14,oy:26}:{s1:"#1a1240",s2:"#ff8a5c",orb:"#ffd9a0",ec:"#ffcf7a",en:14,oy:40})}</div><div class="dtint"></div>
@@ -5084,16 +5109,16 @@ const SKIES=[["#1a1240","#ff8a5c","#ffd9a0"],["#0b1a3a","#3b9cff","#cfe8ff"],["#
 const _shots=loreShots;
 loreShots=function(ch,boss){const base=_shots(ch,boss),img=boss&&boss.img?esc(boss.img):"";
  if(ch>=CHAP){
-  base[0].h=scene({s1:"#05020c",s2:"#2a0c38",orb:"#c43cff",noOrb:1,m3:"#1a0828",m2:"#10061a",m1:"#05020a",ec:"#ff4dd2",en:26})+`<div class="cmask">${maskSVG("shat")}</div>`;base[0].k="k3";base[0].fl=1;
+  base[0].h=scene({s1:"#05020c",s2:"#2a0c38",orb:"#c43cff",noOrb:1,m3:"#1a0828",m2:"#10061a",m1:"#05020a",ec:"#ff4dd2",en:26})+`<div class="cbreak"><div class="hL">${pic("v")}</div><div class="hR">${pic("v")}</div><i class="cline"></i></div>`;base[0].k="k3";base[0].fl=1;
   base[1].k="k1";base[2].k="k2";
-  base[3].h=scene({s1:"#2a1650",s2:"#ffb36b",orb:"#fff0c8",oy:62,ec:"#ffd34d",en:26})+`<div class="cduo">${FULL_HERO}${FULL_HOSHI}</div>`;base[3].k="k2";
+  base[3].h=scene({s1:"#2a1650",s2:"#ffb36b",orb:"#fff0c8",oy:62,ec:"#ffd34d",en:26})+`<div class="cpair"><div class="pa">${pic("g")}</div><div class="pb">${pic("h")}</div></div>`;base[3].k="k2";
   return base}
  const [s1,s2,orb]=SKIES[ch%8],col=ECOL[ch%8];
  base[0].h=`<div class="csc" style="background:radial-gradient(circle at 50% 46%,${col}55,#05030c 70%)"></div><div class="cring" style="--c:${col}"></div><div class="cring" style="--c:${col};animation-delay:1.2s"></div><div class="cecho" style="--c:${col}"><img src="${img}" referrerpolicy="no-referrer" draggable="false"></div>${embers(col,22)}`;base[0].k="k1";base[0].fl=1;
- base[1].h=scene({s1,s2,orb,oy:34,ec:col,en:16})+`<div class="ckj" style="--c:${col}">${KJ[ch]||"光"}</div><div class="ccomet" style="--c:${col}"></div><div class="cduo">${FULL_HERO}${FULL_HOSHI}</div>`;base[1].k="k2";
+ base[1].h=scene({s1,s2,orb,oy:34,ec:col,en:16})+`<div class="ckj" style="--c:${col}">${KJ[ch]||"光"}</div><div class="ccomet" style="--c:${col}"></div><div class="cpair"><div class="pa">${pic("g")}</div><div class="pb">${pic("h")}</div></div>`;base[1].k="k2";
  base[2].h=`<div class="csc" style="background:radial-gradient(circle at 50% 45%,#2a1650,#05020c 70%)"></div>`+base[2].h+embers("#c9a8ff",12);base[2].k="k3";
- base[3].h=scene({s1:"#05020a",s2:"#1a0628",noOrb:1,m3:"#12061c",m2:"#0b0412",m1:"#030106",ec:"#c43cff",en:10})+`<div class="cmask">${maskSVG()}</div>`;base[3].k="k1";base[3].fl=1;const vcap=base[3].cap;base[3].cap="";
- base.splice(4,0,{bg:"#000",h:scene({s1:"#0a0312",s2:"#2a0c38",orb:"#c43cff",oy:22,m3:"#1a0828",m2:"#10061a",m1:"#05020a",ec:"#c43cff",en:16})+`<div class="cbolt"></div><div class="cvil">${bustVillain()}</div>`,cap:vcap,snd:null,k:"k2"});
+ base[3].h=`<div class="csc" style="background:#05020a"></div><div class="czoom">${pic("v")}</div>`+embers("#c43cff",12);base[3].k="k1";base[3].fl=1;const vcap=base[3].cap;base[3].cap="";
+ base.splice(4,0,{bg:"#000",h:scene({s1:"#0a0312",s2:"#2a0c38",orb:"#c43cff",oy:22,m3:"#1a0828",m2:"#10061a",m1:"#05020a",ec:"#c43cff",en:16})+`<div class="cbolt"></div><div class="cvil">${pic("v")}</div>`,cap:vcap,snd:null,k:"k2"});
  const nc=ECOL[(ch+1)%8],nx=base[base.length-1];
  nx.h=`<div class="portal" style="--c:${nc}"><i></i><i></i><i></i></div><div class="ctitle" style="--c:${nc}"><small>${ch+1<CHAP?"CHAPITRE "+(ch+2):"FINAL"}</small><b>${ch+1<CHAP?CH_NAMES[ch+1]:"Le Cœur du Néant"}</b><i></i></div>`;nx.k="k3";nx.fl=1;
  return base};
