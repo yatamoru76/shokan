@@ -1472,7 +1472,7 @@ header .hsp{flex:1}
  <div id="modal" class="ovl"><div class="mbox" id="mbox"></div></div>
  <div id="toast"></div>
 </div>
-<script>window.SHK_VER="03/11 17h40"
+<script>window.SHK_VER="03/11 18h40"
 
 const BETA=true;const PUBLIC=true;
 
@@ -4926,6 +4926,164 @@ function prune(){const m=$("main");if(!m)return;const kids=[...m.children];
 }
 const _r=render;render=function(){const r=_r.apply(this,arguments);try{prune()}catch(e){console.warn(e)}return r};
 try{prune()}catch(_){}
+})();
+</script><script>// ================= CINÉMATIQUES « ANIME » + NOUVEAUX CHARA DESIGNS (version test) =================
+(function(){
+// ---------- chara design ----------
+const DEFS=`<defs>
+<linearGradient id="cdSkin" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffe6d2"/><stop offset="1" stop-color="#f3c3a6"/></linearGradient>
+<linearGradient id="cdHood" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#2b3a7a"/><stop offset="1" stop-color="#121a3c"/></linearGradient>
+<linearGradient id="cdScarf" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#ff4d2e"/><stop offset="1" stop-color="#b3201a"/></linearGradient>
+<linearGradient id="cdGold" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff2a8"/><stop offset=".55" stop-color="#ffd34d"/><stop offset="1" stop-color="#e09a1c"/></linearGradient>
+<linearGradient id="cdCloak" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#2a0f45"/><stop offset="1" stop-color="#07020f"/></linearGradient>
+<radialGradient id="cdIrisR" cx=".5" cy=".4" r=".6"><stop offset="0" stop-color="#ffd0a0"/><stop offset=".5" stop-color="#ff5a2a"/><stop offset="1" stop-color="#7a1205"/></radialGradient>
+<radialGradient id="cdIrisG" cx=".5" cy=".4" r=".6"><stop offset="0" stop-color="#fff6c8"/><stop offset=".5" stop-color="#ffb02e"/><stop offset="1" stop-color="#8a4a00"/></radialGradient>
+<radialGradient id="cdVeye" cx=".5" cy=".5" r=".5"><stop offset="0" stop-color="#fff"/><stop offset=".35" stop-color="#ff4dd2"/><stop offset="1" stop-color="#ff4dd200"/></radialGradient>
+</defs>`;
+const eye=(x,y,iris,flip)=>`<g transform="translate(${x} ${y}) scale(${flip?-1:1} 1)"><path d="M-13 -2 Q-2 -12 13 -5 L12 -2 Q0 -8 -12 0Z" fill="#1a1020"/><ellipse cx="0" cy="4" rx="9" ry="10" fill="#fff"/><ellipse cx="0" cy="5" rx="7" ry="9" fill="url(#${iris})"/><ellipse cx="0" cy="6" rx="3.4" ry="5" fill="#1a0a10"/><circle cx="-2.5" cy="1" r="2.6" fill="#fff"/><circle cx="2.8" cy="9" r="1.2" fill="#fff" opacity=".8"/></g>`;
+// Le Gardien : capuche bleu nuit, mèches sombres, écharpe rouge, regard déterminé
+const N_HERO=`<svg viewBox="0 0 200 260" xmlns="http://www.w3.org/2000/svg">${DEFS}
+<path d="M18 260 Q22 170 100 150 Q178 170 182 260Z" fill="url(#cdHood)"/>
+<path d="M60 162 Q100 186 140 162 L150 182 Q100 214 50 182Z" fill="url(#cdScarf)"/><path d="M138 176 Q168 196 176 236 L156 232 Q150 204 128 188Z" fill="#c22a1c"/>
+<path d="M100 22 Q160 26 168 104 Q166 150 140 164 L60 164 Q34 150 32 104 Q40 26 100 22Z" fill="url(#cdHood)"/>
+<path d="M58 70 Q100 46 142 70 L146 132 Q122 162 100 164 Q78 162 54 132Z" fill="url(#cdSkin)"/>
+<path d="M54 74 L66 52 L74 72 L86 46 L94 70 L106 44 L114 70 L126 48 L132 72 L146 56 L146 84 Q100 64 54 88Z" fill="#141a33"/>
+<path d="M70 66 L62 94 L78 78Z M128 64 L140 96 L124 80Z" fill="#141a33"/>
+${eye(80,104,"cdIrisR")}${eye(120,104,"cdIrisR",1)}
+<path d="M68 92 L92 98 M132 92 L108 98" stroke="#141a33" stroke-width="3.5" stroke-linecap="round"/>
+<path d="M98 120 L101 128 L97 129" stroke="#c98b74" stroke-width="1.6" fill="none"/><path d="M90 140 Q100 143 110 139" stroke="#7a3a30" stroke-width="2.2" fill="none" stroke-linecap="round"/>
+<path d="M100 22 Q160 26 168 104 Q164 70 140 52 Q120 40 100 40 Q80 40 60 52 Q36 70 32 104 Q40 26 100 22Z" fill="#33448c" opacity=".6"/>
+<path d="M150 200 L162 212 M40 210 L52 200" stroke="#5b6fd0" stroke-width="2" opacity=".6"/></svg>`;
+// Hoshi : longs cheveux dorés, barrette étoile, grands yeux ambrés, tenue blanche et or
+const N_HOSHI=`<svg viewBox="0 0 200 260" xmlns="http://www.w3.org/2000/svg">${DEFS}
+<path d="M40 70 Q30 180 24 250 L70 236 L62 120Z M160 70 Q170 180 176 250 L130 236 L138 120Z" fill="url(#cdGold)"/>
+<path d="M30 260 Q36 178 100 160 Q164 178 170 260Z" fill="#fbf6ee"/><path d="M78 168 L100 200 L122 168 L114 164 L100 184 L86 164Z" fill="#ffd34d"/>
+<path d="M100 196 l5 10 11 1 -8 8 3 11 -11 -6 -11 6 3 -11 -8 -8 11 -1Z" fill="#ffd34d" stroke="#fff6c8" stroke-width="1.2"/>
+<path d="M60 76 Q100 52 140 76 L142 130 Q122 162 100 164 Q78 162 58 130Z" fill="url(#cdSkin)"/>
+<path d="M100 18 Q156 20 164 86 Q150 64 136 60 L140 96 Q122 70 104 64 L110 92 Q90 68 70 66 L66 98 Q58 74 40 92 Q42 22 100 18Z" fill="url(#cdGold)"/>
+<path d="M60 40 Q100 26 130 40" stroke="#fff6c8" stroke-width="3" fill="none" opacity=".7"/>
+<g transform="translate(142 52) rotate(18)"><path d="M0 -14 L4 -4 L14 -4 L6 3 L9 13 L0 7 L-9 13 L-6 3 L-14 -4 L-4 -4Z" fill="#fff6a8" stroke="#ffb02e" stroke-width="1.5"/></g>
+${eye(80,108,"cdIrisG")}${eye(120,108,"cdIrisG",1)}
+<path d="M70 92 Q80 88 90 92 M110 92 Q120 88 130 92" stroke="#b07a1c" stroke-width="2.4" fill="none" stroke-linecap="round"/>
+<ellipse cx="70" cy="128" rx="7" ry="3.5" fill="#ff8fb0" opacity=".45"/><ellipse cx="130" cy="128" rx="7" ry="3.5" fill="#ff8fb0" opacity=".45"/>
+<path d="M92 138 Q100 145 108 138" stroke="#a33a5a" stroke-width="2.2" fill="none" stroke-linecap="round"/>
+<g fill="#fff6c8"><circle cx="30" cy="40" r="2"/><circle cx="178" cy="120" r="2.4"/><circle cx="20" cy="150" r="1.6"/></g></svg>`;
+// Le Brise-Paires : grande cape, cornes d'ombre, masque de porcelaine coupé en deux (blanc / noir), yeux magenta
+const N_VILLAIN=`<svg viewBox="0 0 200 260" xmlns="http://www.w3.org/2000/svg">${DEFS}
+<path d="M70 40 Q50 6 30 2 Q52 24 56 60Z M130 40 Q150 6 170 2 Q148 24 144 60Z" fill="#14061f" stroke="#7a2cff" stroke-width="1.5"/>
+<path d="M4 260 Q10 150 100 128 Q190 150 196 260Z" fill="url(#cdCloak)"/>
+<path d="M20 260 Q40 190 70 176 M180 260 Q160 190 130 176" stroke="#c43cff" stroke-width="2" fill="none" opacity=".5"/>
+<path d="M100 26 Q162 30 164 110 Q160 160 100 176 Q40 160 36 110 Q38 30 100 26Z" fill="url(#cdCloak)"/>
+<path d="M100 52 Q140 54 142 104 Q140 146 100 158Z" fill="#14101c"/><path d="M100 52 Q60 54 58 104 Q60 146 100 158Z" fill="#f4eee8"/>
+<path d="M100 50 L96 70 L104 84 L95 100 L105 118 L97 136 L102 160" stroke="#ff4dd2" stroke-width="2.6" fill="none"/>
+<path d="M68 96 L92 104 L70 110Z" fill="#14101c"/><path d="M132 96 L108 104 L130 110Z" fill="#05030a"/>
+<ellipse cx="80" cy="104" rx="14" ry="9" fill="url(#cdVeye)"/><ellipse cx="120" cy="104" rx="14" ry="9" fill="url(#cdVeye)"/>
+<path d="M78 132 Q90 138 100 134" stroke="#2a2030" stroke-width="2" fill="none"/><path d="M100 134 Q112 138 122 132" stroke="#5a4a66" stroke-width="2" fill="none"/>
+<path d="M66 70 Q60 84 64 94" stroke="#c9b8c0" stroke-width="1.4" fill="none"/>
+<g fill="#c43cff" opacity=".7"><circle cx="30" cy="200" r="3"/><circle cx="170" cy="190" r="2.4"/><circle cx="160" cy="236" r="3.4"/></g></svg>`;
+let UQ=0;const U=v=>{UQ++;return v.replace(/cd([A-Z][A-Za-z]*)/g,"cd$1_"+UQ)};
+try{SPEAK.h.svg=N_HOSHI;SPEAK.g.svg=N_HERO;SPEAK.v.svg=N_VILLAIN}catch(_){}
+
+// ---------- CSS ----------
+const css=document.createElement("style");css.textContent=`
+#dlg.vn{background:radial-gradient(ellipse at 50% 30%,var(--sc2,#2a1650) 0%,#05030a 75%)!important;padding:0!important;justify-content:flex-end;overflow:hidden}
+#dlg.vn .vnbg{position:absolute;inset:0;background:repeating-conic-gradient(from 0deg at 50% 38%,#ffffff07 0 4deg,transparent 4deg 9deg);animation:vnspin 40s linear infinite;pointer-events:none}
+#dlg.vn .vnlines{position:absolute;inset:-20%;background:repeating-conic-gradient(from 0deg at 50% 45%,#fff0 0 3deg,#ffffff30 3deg 3.6deg,#fff0 3.6deg 8deg);-webkit-mask:radial-gradient(circle at 50% 45%,transparent 26%,#000 60%);mask:radial-gradient(circle at 50% 45%,transparent 26%,#000 60%);opacity:0;pointer-events:none}
+#dlg.vn .vnlines.on{animation:vnburst .9s ease-out}
+#dlg.vn .vnbust{position:absolute;bottom:150px;width:min(78vw,420px);height:min(98vw,530px);pointer-events:none;filter:drop-shadow(0 0 24px var(--sc));transition:transform .45s cubic-bezier(.2,1.2,.4,1),opacity .35s,filter .35s}
+#dlg.vn .vnbust svg{width:100%;height:100%}
+#dlg.vn .vnbust.l{left:-6%;transform:translateX(-30%);opacity:0}#dlg.vn .vnbust.r{right:-6%;transform:translateX(30%);opacity:0}
+#dlg.vn .vnbust.on{transform:none;opacity:1}
+#dlg.vn .vnbust.dim{opacity:.35;filter:grayscale(.6) brightness(.5);transform:scale(.94)}
+#dlg.vn .vnbox{position:relative;margin:0 10px 24px;background:linear-gradient(160deg,#120d1ef2,#07050cf2);border:1.5px solid var(--sc);border-radius:16px;padding:18px 16px 14px;min-height:110px;box-shadow:0 0 30px #000,0 0 18px color-mix(in srgb,var(--sc) 40%,transparent);animation:vnbox .35s ease-out}
+#dlg.vn .vnname{position:absolute;top:-16px;left:14px;background:var(--sc);color:#0a0610;font:900 13px Inter,sans-serif;letter-spacing:.08em;text-transform:uppercase;padding:5px 14px;transform:skewX(-14deg);box-shadow:4px 4px 0 #000}
+#dlg.vn .vnname span{display:inline-block;transform:skewX(14deg)}
+#dlg.vn .vntxt{color:#f2ecff;font-size:15.5px;line-height:1.5;min-height:46px}
+#dlg.vn .vnnext{position:absolute;right:14px;bottom:8px;color:var(--sc);font-size:12px;animation:vnblink 1s infinite}
+#dlg.vn.shake{animation:vnshake .45s}
+#dlg.vn .vnflash{position:absolute;inset:0;background:#fff;opacity:0;pointer-events:none}
+#dlg.vn .vnflash.on{animation:vnflash .35s}
+@keyframes vnspin{to{transform:rotate(360deg)}}@keyframes vnburst{0%{opacity:.9;transform:scale(1.3)}100%{opacity:0;transform:scale(1)}}
+@keyframes vnbox{from{transform:translateY(20px);opacity:0}}@keyframes vnblink{50%{opacity:.2}}
+@keyframes vnshake{20%{transform:translate(-8px,4px)}40%{transform:translate(7px,-5px)}60%{transform:translate(-5px,3px)}80%{transform:translate(3px,-2px)}}
+@keyframes vnflash{0%{opacity:.85}100%{opacity:0}}
+/* cinématiques */
+#lore .lshot.cam1{animation:lfade .5s ease-out,cam1 4.4s ease-out forwards}
+#lore .lshot.cam2{animation:lfade .5s ease-out,cam2 4.4s ease-in-out forwards}
+#lore .lshot.cam3{animation:lfade .5s ease-out,cam3 4.4s ease-out forwards}
+@keyframes cam1{from{transform:scale(1.25)}to{transform:scale(1)}}
+@keyframes cam2{from{transform:scale(1.15) translateY(6%)}to{transform:scale(1.05) translateY(-3%)}}
+@keyframes cam3{from{transform:scale(1) rotate(-2deg)}to{transform:scale(1.18) rotate(1deg)}}
+#lore .cfx{position:absolute;inset:0;pointer-events:none;z-index:4}
+#lore .cflash{background:#fff;opacity:0}#lore .cflash.on{animation:vnflash .4s}
+#lore .clines{background:repeating-conic-gradient(from 0deg at 50% 50%,#fff0 0 3deg,#ffffff38 3deg 3.5deg,#fff0 3.5deg 7deg);-webkit-mask:radial-gradient(circle,transparent 30%,#000 65%);mask:radial-gradient(circle,transparent 30%,#000 65%);opacity:0}
+#lore .clines.on{animation:vnburst 1.2s ease-out}
+#lore .cember i{position:absolute;bottom:-10px;width:4px;height:4px;border-radius:50%;background:var(--c,#ffb36b);box-shadow:0 0 8px var(--c,#ffb36b);animation:cember linear infinite}
+@keyframes cember{to{transform:translate(var(--dx),-110vh);opacity:0}}
+#lore .cvig{background:radial-gradient(ellipse at center,transparent 45%,#000c 100%)}
+#lore .eyes{position:absolute;left:50%;top:50%;width:190%;max-width:none;transform:translate(-50%,-46%);animation:eyes 4.2s ease-in-out forwards}
+#lore .eyes svg{width:100%;height:auto}
+@keyframes eyes{0%{transform:translate(-50%,-38%) scale(1.15)}60%{transform:translate(-50%,-38%) scale(1)}100%{transform:translate(-50%,-38%) scale(.95)}}
+#lore .ckanji{position:absolute;right:6%;top:16%;font:900 min(34vw,180px)/1 "Noto Sans JP",serif;color:var(--c,#fff);opacity:.12;writing-mode:vertical-rl;animation:ckj 4s ease-out}
+@keyframes ckj{from{opacity:0;transform:translateY(-20px)}}
+#lore .cduo{position:absolute;inset:0;display:flex;align-items:flex-end;justify-content:center;gap:0}
+#lore .cduo>div{width:52%;height:78%}#lore .cduo svg{width:100%;height:100%}
+#lore .cduo .a{animation:cslideL 1.2s cubic-bezier(.2,1,.3,1)}#lore .cduo .b{animation:cslideR 1.2s cubic-bezier(.2,1,.3,1)}
+@keyframes cslideL{from{transform:translateX(-40%);opacity:0}}@keyframes cslideR{from{transform:translateX(40%);opacity:0}}
+#lore .cv{position:absolute;left:50%;bottom:0;width:min(90vw,520px);height:84%;transform:translateX(-50%)}#lore .cv svg{width:100%;height:100%}
+#lore .cv.glitch{animation:glt 2.6s steps(1) infinite}
+@keyframes glt{0%,90%,100%{filter:none;transform:translateX(-50%)}92%{filter:hue-rotate(80deg);transform:translateX(-52%)}95%{filter:invert(.2);transform:translateX(-48%)}}
+#lore .ctitle{position:absolute;left:0;right:0;top:40%;text-align:center;color:#fff;font:900 13px Inter;letter-spacing:.5em;opacity:.8;animation:capin 1s .2s backwards}
+#lore .ctitle b{display:block;font:900 min(10vw,46px)/1.2 "Shippori Mincho B1",serif;letter-spacing:.05em;margin-top:8px;text-shadow:0 0 24px var(--c,#fff)}
+`;document.head.appendChild(css);
+
+// ---------- dialogues façon anime ----------
+const SIDE={h:"l",g:"l",v:"r"};
+dialog=function(lines,done){const o=$("dlg");let i=0,typing=null,full="";o.classList.add("vn");o.style.display="flex";
+ o.innerHTML=`<div class="vnbg"></div><div class="vnlines"></div>${Object.keys(SPEAK).map(k=>`<div class="vnbust ${SIDE[k]||"l"}" data-k="${k}" style="--sc:${SPEAK[k].c}">${U(SPEAK[k].svg)}</div>`).join("")}<div class="vnflash"></div><div class="vnbox"><div class="vnname"><span></span></div><div class="vntxt"></div><span class="vnnext">▼</span></div>`;
+ const box=o.querySelector(".vnbox"),txt=o.querySelector(".vntxt"),nm=o.querySelector(".vnname span");let last=null;
+ const show=()=>{if(typing){clearInterval(typing);typing=null;txt.innerHTML=full;return}
+  if(i>=lines.length){o.style.display="none";o.classList.remove("vn");o.innerHTML="";done&&done();return}
+  const [w,t]=lines[i],sp=SPEAK[w]||SPEAK.h;i++;
+  o.style.setProperty("--sc",sp.c);o.style.setProperty("--sc2",sp.c+"33");
+  o.querySelectorAll(".vnbust").forEach(b=>{const k=b.dataset.k;b.classList.toggle("on",k===w);b.classList.toggle("dim",k!==w&&b.classList.contains("on")||k!==w&&b.dataset.seen==="1");if(k===w)b.dataset.seen="1";if(k!==w&&b.dataset.seen!=="1")b.classList.remove("on")});
+  // un seul personnage par côté
+  o.querySelectorAll(".vnbust").forEach(b=>{if(b.dataset.k!==w&&SIDE[b.dataset.k]===SIDE[w]){b.classList.remove("on","dim");b.style.opacity=""}});
+  if(w!==last){const L=o.querySelector(".vnlines");L.classList.remove("on");void L.offsetWidth;L.classList.add("on")}
+  if(w==="v"){o.classList.remove("shake");void o.offsetWidth;o.classList.add("shake");const f=o.querySelector(".vnflash");f.classList.remove("on");void f.offsetWidth;f.classList.add("on");try{sfx.glitch&&sfx.glitch()}catch(_){}}
+  else try{sfx.select()}catch(_){}
+  last=w;nm.textContent=sp.n;box.style.animation="none";void box.offsetWidth;box.style.animation="";
+  full=t;const plain=t.replace(/<[^>]+>/g,"");let n=0;txt.textContent="";
+  typing=setInterval(()=>{n+=2;if(n>=plain.length){clearInterval(typing);typing=null;txt.innerHTML=full}else txt.textContent=plain.slice(0,n)},22)};
+ o.onclick=show;show()};
+
+// ---------- cinématiques de fin de chapitre ----------
+const ember=(c,n)=>`<div class="cfx cember">${[...Array(n||16)].map(()=>`<i style="left:${Math.random()*100}%;--c:${c};--dx:${(Math.random()*80-40)|0}px;animation-duration:${3+Math.random()*4}s;animation-delay:${-Math.random()*5}s"></i>`).join("")}</div>`;
+const KJ=["覚","失","沈","誓","影","裂","壁","核"];
+const _shots=loreShots;
+loreShots=function(ch,boss){const base=_shots(ch,boss);const col=ECOL[ch%8];
+ if(ch>=CHAP){
+  base[0].h=`<div class="eyes">${U(N_VILLAIN)}</div><div class="cfx clines on"></div>`+base[0].h.replace(P_VILLAIN,U(N_VILLAIN));base[0].cam="cam3";
+  base[3].h=`<div class="lsun"></div><div class="cduo"><div class="a">${U(N_HERO)}</div><div class="b">${U(N_HOSHI)}</div></div>${ember("#ffd34d",22)}`;base[3].cam="cam2";
+  base[1].cam="cam1";base[2].cam="cam1";return base}
+ base[0].h+=ember(col,18);base[0].cam="cam1";base[0].flash=1;
+ base[1].h=`<div class="stars"></div><div class="ckanji" style="--c:${col}">${KJ[ch]||"光"}</div><div class="lshard" style="--c:${col}"></div><div class="cduo"><div class="a">${U(N_HERO)}</div><div class="b">${U(N_HOSHI)}</div></div>${ember(col,10)}`;base[1].cam="cam2";
+ base[2].cam="cam3";base[2].flash=1;
+ base[3].h=`<div class="eyes">${U(N_VILLAIN)}</div><div class="bolt"></div>`;base[3].cam="cam1";base[3].flash=1;base[3].lines=1;
+ // plan supplémentaire : le Brise-Paires en pied, masque qui se fissure
+ base.splice(4,0,{bg:"radial-gradient(circle at 50% 30%,#2a0a3a,#000 70%)",h:`<div class="cv glitch">${U(N_VILLAIN)}</div>${ember("#c43cff",14)}`,cap:base[3].cap,snd:null,cam:"cam2"});
+ base[3].cap="";
+ const nx=base[base.length-1];nx.h=`<div class="portal" style="--c:${ECOL[(ch+1)%8]}"><i></i><i></i><i></i></div><div class="ctitle" style="--c:${ECOL[(ch+1)%8]}">${ch+1<CHAP?"CHAPITRE "+(ch+2):"FINAL"}<b>${ch+1<CHAP?CH_NAMES[ch+1]:"Le Cœur du Néant"}</b></div>`;nx.cam="cam1";nx.lines=1;
+ return base};
+const _lc=loreCine;
+loreCine=function(ch,boss,done){_lc(ch,boss,done);const o=$("lore");if(!o)return;
+ const fx=document.createElement("div");fx.className="cfx cflash";o.appendChild(fx);const ln=document.createElement("div");ln.className="cfx clines";o.appendChild(ln);const vg=document.createElement("div");vg.className="cfx cvig";o.appendChild(vg);
+ const shots=loreShots(ch,boss);const st=$("lst");if(!st)return;let k=-1;
+ const mo=new MutationObserver(()=>{const sh=st.querySelector(".lshot");if(!sh||sh.dataset.cam)return;k++;const s=shots[k]||{};sh.dataset.cam=1;sh.classList.add(s.cam||"cam1");
+  if(s.flash){fx.classList.remove("on");void fx.offsetWidth;fx.classList.add("on")}
+  if(s.lines){ln.classList.remove("on");void ln.offsetWidth;ln.classList.add("on")}
+  if(k>0&&s.flash){o.style.animation="none";void o.offsetWidth;o.style.animation="vnshake .4s"}});
+ mo.observe(st,{childList:true})};
 })();
 </script></body>
 </html>
