@@ -1383,6 +1383,18 @@ header .hsp{flex:1}
 .hsum .hn{position:relative;font:700 12px Inter;color:hsl(var(--h) 62% 70%);white-space:nowrap}.hsum .hgo{position:relative;font-size:22px;color:var(--muted)}
 .mdesc{font-size:12px;color:var(--muted);margin:10px 4px 0;line-height:1.4}
 .holi{display:flex;align-items:center;gap:12px;margin-top:14px;padding:12px 14px;border-radius:16px;background:linear-gradient(90deg,#3a1d0c,#171513 70%);border:1px solid #c9a45c66;cursor:pointer}.holi .hic{font-size:30px}.holi div{flex:1;min-width:0}.holi b{display:block;font:800 16px var(--min)}.holi small{font-size:12px;color:var(--muted)}.holi .hgo{color:var(--gold);font-size:22px}
+#battle .bside{gap:8px 10px;align-items:flex-end}
+#battle .bu{width:min(28vw,11.8vh)}
+#battle .bu.boss{width:min(34vw,14.5vh)}
+#battle .bu.titan{width:min(48vw,21vh)}
+#battle .bcard{border-radius:12px;border-width:3px}
+#battle .bnm{font-size:11px;font-weight:800;text-shadow:0 1px 3px #000}
+#battle .bbar{height:6px;margin-top:4px;box-shadow:0 0 0 1px #0008}
+#battle .bbar.en{height:4px}
+#battle .bel{font-size:13px;padding:1px 4px}
+#battle #bbg.abg{animation:abgZoom 24s ease-in-out infinite alternate;filter:saturate(1.15)}
+@keyframes abgZoom{from{transform:scale(1.02)}to{transform:scale(1.12) translateY(-1.5%)}}
+@media (min-width:900px){#battle .bu{width:min(160px,17vh)}#battle .bu.boss{width:min(190px,20vh)}#battle .bu.titan{width:min(260px,27vh)}#battle .bnm{font-size:13px}}
 </style>
 
 <link rel="manifest" href="manifest.webmanifest"><meta name="theme-color" content="#09090c"><link rel="icon" href="icon-192.png"><link rel="apple-touch-icon" href="icon-192.png"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="description" content="Shōkan · jeu gratuit de cartes anime : ouvre des mangas, collectionne, combats, guildes et arène."></head>
@@ -1428,7 +1440,7 @@ header .hsp{flex:1}
  <div id="modal" class="ovl"><div class="mbox" id="mbox"></div></div>
  <div id="toast"></div>
 </div>
-<script>window.SHK_VER="02/11 22h00"
+<script>window.SHK_VER="03/11 06h00"
 
 const BETA=true;const PUBLIC=true;
 
@@ -2054,6 +2066,9 @@ async function animePage(p){if(MPAGE[p])return MPAGE[p];const key="otaku_mp3_"+p
   chars:(m.characters.nodes||[]).filter(c=>c.image&&c.image.large).map(c=>{const rid=rarFromFav(c.favourites||0,T);return{id:c.id,name:c.name.full,img:c.image.large,fav:c.favourites||0,series:m.title.english||m.title.romaji,rarity:rid,rank:rankFromFav(c.favourites||0,rid,T)}})})).filter(m=>m.chars.length>=3);
  MPAGE[p]=list;try{localStorage.setItem(key,JSON.stringify({t:Date.now(),list}))}catch(_){}return list}
 async function pickAnime(seed,page){const L=await animePage(page);return L[hash(seed)%L.length]}
+async function animeBattleBg(cfg){try{const bg=$("bbg");bg.classList.remove("abg");if(typeof DEMO!=="undefined"&&DEMO)return;let url=cfg.enemies&&cfg.enemies.anime&&cfg.enemies.anime.bg;
+ if(!url){const cs=[...(cfg.enemies||[]).map(e=>e.card),...teamCards()].filter(c=>c&&+c.id>0);for(const c of cs.slice(0,4)){try{url=await loadBg(c)}catch(_){}if(url)break}}
+ if(!url||!B||B.cfg!==cfg)return;const im=new Image();im.referrerPolicy="no-referrer";im.onload=()=>{if(!B||B.cfg!==cfg)return;bg.style.background=`linear-gradient(180deg,#09090ce0 0%,#09090c55 20%,#09090c30 50%,#09090c55 80%,#09090ce6 100%),url("${url}") center/cover`;bg.classList.add("abg")};im.src=url}catch(e){console.warn(e)}}
 function battleBg(url){return url?`linear-gradient(180deg,#09090cee 0%,#09090c66 30%,#09090c66 65%,#09090cee 100%),url("${url}") center/cover`:null}
 async function animeFoes(an,n,boss,seed){// le boss = le perso le plus aimé de l'anime, les autres = seconds rôles
  const pool=an.chars.slice(boss?1:0);const out=[];for(let i=0;i<n;i++)out.push(pool[(hash(seed+i*13)%Math.min(pool.length,8)+i)%pool.length]);
@@ -3462,7 +3477,7 @@ function startBattle(cfg){const tm=teamCards();if(!tm.length){toast("Ajoute des 
  const SY=synergies(tm);const allies=tm.map(c=>{const s=stats(c);const hp=Math.round(s.hp*(1+SY.hp/100)),atk=Math.round(s.atk*(1+SY.atk/100));return{side:"a",card:c,name:c.name,img:c.img,rarity:c.rarity,el:elOf(c),cls:clsOf(c),maxhp:hp,hp,atk,spd:s.spd+SY.spd,en:0,shield:0,cd:2,taunt:0,awk:c.star>=5}});
  const enemies=cfg.enemies.map(e=>Object.assign({side:"e",hp:e.maxhp,en:0,shield:0,cd:3,taunt:0},e));
  B={cfg,allies,enemies,round:0,over:false,dmg:0,skip:false};
- $("battle").style.display="flex";setBattleScene(cfg.loc||"night");
+ $("battle").style.display="flex";setBattleScene(cfg.loc||"night");animeBattleBg(cfg);
  $("btitle").textContent=cfg.title;$("bSkip").textContent="Passer ⏩";$("bSpeed").textContent="Vitesse ×"+speed;
  drawSide("bEnemy",enemies);drawSide("bAlly",allies);setTimeout(fxInit,50);if(cfg.corrupt)enemies.forEach(e=>e.dom&&e.dom.classList.add("corr"));
  allies.forEach(a=>{if(canUlt(a))loadBg(a.card).then(u=>{a.bg=u}).catch(()=>{})});enemies.forEach(e=>{if(canUlt(e))e.bg=(cfg.enemies.anime&&cfg.enemies.anime.bg)||e.bg});if(cfg.enemies.anime)enemies.forEach(e=>e.bg=cfg.enemies.anime.bg);music("battle");$("blog").textContent=SY.list.length?"🔗 "+SY.list.map(x=>x.ic+" "+x.t).join(" · "):"Le combat commence !";B.syn=SY;sfx.start();
@@ -3487,8 +3502,8 @@ function hitUnit(src,t,mult){const _hp0=t.hp;try{queueMicrotask(()=>{if(B&&_hp0>
  if(canUlt(t))t.en=Math.min(100,t.en+10);upd(t);return d}
 function popTag(u,txt,col){if(B.skip||!u.dom)return;const d=document.createElement("div");d.className="btag";d.textContent=txt;d.style.color=col;u.dom.appendChild(d);setTimeout(()=>d.remove(),900)}
 function shakeScreen(p){if(B.skip)return;$("battle").animate([{transform:"none"},{transform:`translate(${p}px,${-p/2}px)`},{transform:`translate(${-p}px,${p/2}px)`},{transform:"none"}],{duration:220})}
-async function lunge(u,t){if(B.skip||!u.dom||!t)return;const a=center(u),b=center(t);const dx=(b.x-a.x)*.55,dy=(b.y-a.y)*.55;
- await u.dom.animate([{transform:"none"},{transform:`translate(${dx}px,${dy}px) scale(1.12)`,offset:.45},{transform:"none"}],{duration:380/speed,easing:"cubic-bezier(.5,0,.3,1)"}).finished.catch(()=>{})}
+async function lunge(u,t){if(B.skip||!u.dom||!t)return;if(u.cls&&(u.cls.id==="mag"||u.cls.id==="hea")){if(t.dom)await orb(u,t,u.el.c);return}const a=center(u),b=center(t);const dx=(b.x-a.x)*.86,dy=(b.y-a.y)*.86+(b.y>a.y?-14:14);
+ u.dom.style.zIndex=40;await u.dom.animate([{transform:"none"},{transform:`translate(${dx}px,${dy}px) scale(1.14) rotate(${dx>0?6:-6}deg)`,offset:.42},{transform:`translate(${dx}px,${dy}px) scale(1.1) rotate(${dx>0?4:-4}deg)`,offset:.62},{transform:"none"}],{duration:520/speed,easing:"cubic-bezier(.5,0,.3,1)"}).finished.catch(()=>{});u.dom.style.zIndex=""}
 function slash(t,col,n){if(B.skip||!t.dom)return;for(let i=0;i<(n||1);i++){const s=document.createElement("div");s.className="slash";s.style.setProperty("--sc",col);s.style.setProperty("--rot",(i%2?135:45)+(Math.random()*20-10)+"deg");s.style.animationDelay=i*70+"ms";t.dom.querySelector(".bcard").appendChild(s);setTimeout(()=>s.remove(),500+i*70)}}
 async function orb(u,t,col,big){if(B.skip||!u.dom||!t.dom)return;const a=center(u),b=center(t);const o=document.createElement("div");o.className="orb"+(big?" big":"");o.style.setProperty("--oc",col);$("battle").appendChild(o);
  await o.animate([{transform:`translate(${a.x}px,${a.y}px) scale(.4)`},{transform:`translate(${b.x}px,${b.y}px) scale(1)`}],{duration:320/speed,easing:"ease-in"}).finished.catch(()=>{});o.remove();
