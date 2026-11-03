@@ -1472,7 +1472,7 @@ header .hsp{flex:1}
  <div id="modal" class="ovl"><div class="mbox" id="mbox"></div></div>
  <div id="toast"></div>
 </div>
-<script>window.SHK_VER="03/11 18h40"
+<script>window.SHK_VER="03/11 20h05"
 
 const BETA=true;const PUBLIC=true;
 
@@ -3043,7 +3043,6 @@ const ACH=[
  {id:"arO",ic:"🥇",n:"Rang Or",d:"Atteindre le rang Or en arène",f:()=>S.arena?S.arena.best:0,t:1250,rw:{boosters:4}},
  {id:"arL",ic:"👑",n:"Légende de l'arène",d:"Atteindre le rang Légende en arène",f:()=>S.arena?S.arena.best:0,t:2300,rw:{card:"D"},title:"Légende de l'arène"},
  {id:"g5",ic:"🏯",n:"Esprit d'équipe",d:"Guilde niveau 5",f:()=>S.guild?S.guild.lvl:0,t:5,rw:{boosters:3}},
- {id:"gr1",ic:"🐉",n:"Chasseur de titans",d:"Vaincre un boss de raid de guilde",f:()=>S.graidKills||0,t:1,rw:{frag:2}},
  {id:"gr5",ic:"🐉",n:"Tueur de titans",d:"Vaincre 5 boss de raid de guilde",f:()=>S.graidKills||0,t:5,rw:{card:"M"},title:"Tueur de titans"},
  {id:"ps",ic:"🎟️",n:"Saison accomplie",d:"Atteindre le palier 40 du passe",f:()=>passLvl(),t:40,rw:{frag:3}},
  {id:"pl20",ic:"⬆️",n:"Otaku confirmé",d:"Atteindre le niveau de compte 20",f:()=>(S.prof||{}).lvl||1,t:20,rw:{boosters:5},title:"Otaku confirmé"},
@@ -3900,7 +3899,7 @@ function v2Top(){initProfile();const P=S.prof;
  d[1].style.display=Object.values(S.coll).some(c=>canEvolve(c))&&view!=="coll"?"block":"none";
  d[2].style.display="none";d[3].style.display="none";
  d[4].style.display=moreAlerts()>0?"block":"none"}
-function moreAlerts(){let n=0;try{if(mkAlert())n++;if(S.guild&&Date.now()>=S.guild.chestAt)n++;if(questsReady()||passReady()||achReady())n++;n+=(S.gifts||[]).length;n+=(typeof FR!=="undefined"&&FR.pend)||0;n+=typeof chatTotal==="function"?chatTotal():0}catch(_){}return n}
+function moreAlerts(){let n=0;try{if(mkAlert())n++;if(questsReady()||passReady()||achReady())n++;n+=(S.gifts||[]).length;n+=(typeof FR!=="undefined"&&FR.pend)||0;n+=typeof chatTotal==="function"?chatTotal():0}catch(_){}return n}
 function hideMore(){$("more").classList.remove("on")}
 function showMore(){const gn=(S.gifts||[]).length,fp=((typeof FR!=="undefined"&&FR.pend)||0)+(typeof chatTotal==="function"?chatTotal():0);let qR=false,mkR=false,gR=false,pR=false,aR=false;try{qR=questsReady()||!S.daily.login;mkR=mkAlert();gR=S.guild&&Date.now()>=S.guild.chestAt;pR=passReady();aR=achReady()}catch(_){}
  const nb=n=>n?`<span class="nb">${n}</span>`:"",nd=b=>b?`<span class="nd"></span>`:"";
@@ -4033,7 +4032,6 @@ const STEPS=[
  {sel:'#moreIn [data-a="v:evt"]',at:()=>{go("hub");try{showMore()}catch(_){}},t:"Missions et événements",v:"Dans le menu, passe ici chaque jour : missions du jour, raid du Titan et bonus. C'est la façon la plus simple de gagner des récompenses… même pour les flemmards."},
  {sel:['#moreIn [data-a="pass"]','#moreIn [data-a="ach"]'],at:()=>{go("hub");try{showMore()}catch(_){}},t:"Passe et Succès",v:"Le Passe saisonnier te donne des récompenses à chaque palier, gratuitement. Et les Succès récompensent tes exploits. Oui, même celui de perdre dix fois de suite. Je plaisante… presque."},
  {sel:'#moreIn [data-a="v:mk"]',at:()=>{go("hub");try{showMore()}catch(_){}},t:"Le Marché",v:"Le Marché, c'est l'endroit des bonnes affaires : achète, vends, fais des enchères ou échange tes cartes avec les autres joueurs. Méfie-toi des marchands trop souriants."},
- {sel:'#moreIn [data-a="v:guild"]',at:()=>{go("hub");try{showMore()}catch(_){}},t:"La Guilde",v:"Rejoins une guilde ! Coffre commun, boss de guilde à battre ensemble, et des duels de guilde contre guilde, en temps réel. Seul on va vite, en guilde on tape plus fort."},
  {sel:['#moreIn [data-a="friends"]','#moreIn [data-a="gifts"]'],at:()=>{go("hub");try{showMore()}catch(_){}},t:"Amis et cadeaux",v:"Ajoute tes amis, discute, envoie des autocollants et lance des combats amicaux. Pense aussi à ta boîte à cadeaux : il y a souvent des surprises dedans."},
  {sel:'#moreIn [data-a="ref"]',at:()=>{go("hub");try{showMore()}catch(_){}},t:"Parrainage",v:"Tu as des amis qui ne jouent pas encore ? Invite-les avec ton lien de parrainage : des récompenses vous attendent. Plus on est de Gardiens, plus on rit."},
  {sel:'#moreIn [data-a="set"]',at:()=>{go("hub");try{showMore()}catch(_){}},t:"Les réglages",v:"Dans les paramètres : ton compte, ta sauvegarde, la musique… et les codes cadeaux. Garde l'œil ouvert, on en partage parfois sur Discord."},
@@ -4773,7 +4771,7 @@ window.gvgState=st;
  ${it("🎵","Musiques japonaises","Chaque menu a sa musique traditionnelle. Nouveau réglage pour couper les effets sonores sans couper la musique.")}
  </div>`;
  setTimeout(()=>{try{const busy=["tuto","duel"].some(id=>{const e=document.getElementById(id);return e&&e.classList.contains("on")});if(busy)return;
-  modal(H,[["Compris !",()=>{mark()}],["Voir la guilde ▶",()=>{mark();view="guild";setNav();render()}]]);mark()}catch(e){console.warn(e)}},1600)})();
+  modal(H,[["Compris !",()=>{mark()}]]);mark()}catch(e){console.warn(e)}},1600)})();
 
 
 // ---- petit mot de remerciement + bouton de soutien (une seule fois) ----
@@ -4880,5 +4878,15 @@ async function showStats(){const p=$("picker");p.style.display="flex";p.innerHTM
  <div class="box"><b>Derniers joueurs actifs</b>${rows.slice(0,40).map(x=>`<div class="syn"><span><i style="display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:6px;background:${age(x)<10*M?"#3ddc84":age(x)<D?"#ffd34d":"#6b6b78"}"></i><b>${esc(x.name||"Joueur")}</b> · niv. ${x.lvl||1}</span><span class="muted" style="font-size:11.5px">${ago(x)}</span></div>`).join("")||'<div class="muted">Aucun joueur.</div>'}</div></div>`;
  $("ssX").onclick=()=>{p.style.display="none"};$("ssR").onclick=showStats}
 </script>
-<script>if("serviceWorker"in navigator)addEventListener("load",()=>navigator.serviceWorker.register("sw.js").catch(()=>{}))</script></body>
+<script>if("serviceWorker"in navigator)addEventListener("load",()=>navigator.serviceWorker.register("sw.js").catch(()=>{}))</script><script>
+// ================= PAS DE BOTS DÉGUISÉS EN JOUEURS =================
+// Guildes masquées (pas encore de vraies guildes entre joueurs) · Arène classée réservée aux vrais joueurs (connexion) · l'entraînement 🤖 reste.
+(function(){
+const _sm=showMore;showMore=function(){const r=_sm.apply(this,arguments);try{document.querySelectorAll('#moreIn [data-a="v:guild"]').forEach(e=>e.remove())}catch(_){}return r};
+const _r=render;render=function(){if(view==="guild")view="hub";const r=_r.apply(this,arguments);try{document.querySelectorAll('#main [data-t="v:guild"]').forEach(e=>e.remove())}catch(_){}return r};
+const _sa=showArena;showArena=function(practice){if(practice===true||pvpOn())return _sa.apply(this,arguments);
+ modal(`<h3 style="margin:0 0 6px">🏟️ Arène classée</h3><p class="muted">L'Arène classée oppose uniquement de <b>vrais joueurs</b>. Connecte-toi pour y participer et apparaître au classement.</p><p class="muted" style="font-size:12.5px">En attendant, tu peux t'entraîner contre des bots 🤖 (sans classement).</p>`,
+ [["Fermer"],["🤖 Entraînement",()=>_sa(true)],["Se connecter",()=>{try{cloudLogin()}catch(_){showSettings()}}]])};
+})();
+</script></body>
 </html>
