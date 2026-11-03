@@ -4142,7 +4142,7 @@ window.startTuto=function(){run(STEPS)};
 // bouton « Revoir le tutoriel » dans les réglages
 const _st=showSettings;showSettings=function(){const r=_st.apply(this,arguments);try{const p=$("picker"),box=p.firstElementChild;if(box&&!p.querySelector(".tutobox")){const d=document.createElement("div");d.className="box tutobox";d.innerHTML=`<b>🧭 Tutoriel</b><button class="btn ghost sm" id="stTuto" style="margin-top:8px">Revoir le tutoriel</button><div class="muted" style="font-size:11px;margin-top:8px;text-align:center">Version du jeu : ${window.SHK_VER||"?"}</div>`;box.insertBefore(d,box.children[1]||null);d.querySelector("#stTuto").onclick=()=>{p.style.display="none";startTuto()}}}catch(e){console.warn(e)}return r};
 // nouveau joueur : aucune carte ouverte et tutoriel jamais vu
-setTimeout(startTuto,900);
+setTimeout(function w(){if(document.getElementById("titleS"))return setTimeout(w,400);startTuto()},1500);
 })();
 
 
