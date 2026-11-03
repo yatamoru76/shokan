@@ -1472,7 +1472,7 @@ header .hsp{flex:1}
  <div id="modal" class="ovl"><div class="mbox" id="mbox"></div></div>
  <div id="toast"></div>
 </div>
-<script>window.SHK_VER="03/11 07h45"
+<script>window.SHK_VER="03/11 08h30"
 
 const BETA=true;const PUBLIC=true;
 
@@ -2946,7 +2946,9 @@ function cloudUI(){const cf=$("cFriends");if(cf){cf.style.display=CL.ready?"":"n
 
 // ================= PARAMÈTRES + CODES CADEAUX =================
 const CODE_ERR={login:"Connecte ton compte Discord pour utiliser un code.",invalid:"Ce code n'existe pas.",expired:"Ce code a expiré.",full:"Ce code a déjà été utilisé par trop de joueurs.",used:"Tu as déjà utilisé ce code."};
+const LOCAL_CODES={ONIGIRI30:{oni:30}};
 async function redeemCode(raw){const c=(raw||"").trim().toUpperCase();if(!c){toast("Écris un code");return}
+ if(LOCAL_CODES[c]){S.codes=S.codes||[];if(S.codes.includes(c)){sfx.lose&&sfx.lose();toast("❌ Tu as déjà utilisé ce code");return}const rw=Object.assign({},LOCAL_CODES[c]);S.codes.push(c);save();await giveRw(rw,"🎁 Code « "+c+" »");toast("🎁 Code « "+c+" » : "+rwLabel(rw));try{cloudPush(true)}catch(_){}showSettings();return}
  if(!CL.ready){toast("Les codes marchent depuis le lien du jeu : yatamoru76.github.io/shokan");return}
  if(!CL.user){modal(`<h3>🎁 Code cadeau</h3><p class="muted">${CODE_ERR.login}</p>`,[["Annuler"],["🎮 Se connecter",cloudLogin]]);return}
  const {data,error}=await CL.sb.rpc("redeem_code",{c});
