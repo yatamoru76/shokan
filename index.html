@@ -1472,7 +1472,7 @@ header .hsp{flex:1}
  <div id="modal" class="ovl"><div class="mbox" id="mbox"></div></div>
  <div id="toast"></div>
 </div>
-<script>window.SHK_VER="03/11 17h30"
+<script>window.SHK_VER="03/11 17h40"
 
 const BETA=true;const PUBLIC=true;
 
@@ -4048,17 +4048,8 @@ const FIGHT=[
 const WIN=[{welcome:1,t:"Victoire !",v:"Victoire ! Je savais que tu avais du potentiel… enfin, je l'espérais. Tu gagnes des Éclats, des onigiri et de l'expérience. Continue le premier monde pour débloquer la suite. Je ne suis jamais loin !",btn:"Merci Kiko !"}];
 const LOSE=[{welcome:1,t:"Aïe…",v:"Aïe… Bon, ça arrive aux meilleurs. Nourris tes persos avec des onigiri, fais-les évoluer avec les doublons, puis retente ta chance. Je crois en toi !",btn:"Compris !"}];
 STEPS.concat(FIGHT0,FIGHT,WIN,LOSE).forEach(s=>s.d=`<p>${s.v}</p>${s.x||""}`);
-// ---- Kiko : voix de synthèse ----
-const KV={on:localStorage.getItem("shk_kvoice")!=="0",voice:null};
-function pickVoice(){try{const vs=speechSynthesis.getVoices().filter(v=>/^fr/i.test(v.lang));if(!vs.length)return null;
- const fem=/am[ée]lie|audrey|marie|julie|hortense|denise|c[ée]line|l[ée]a|aur[ée]lie|virginie|chantal|florence|elsa|eloise|vivienne|female|femme|google fran/i;
- return vs.find(v=>fem.test(v.name)&&/fr-FR/i.test(v.lang))||vs.find(v=>fem.test(v.name))||vs.find(v=>/fr-FR/i.test(v.lang))||vs[0]}catch(_){return null}}
-try{speechSynthesis.onvoiceschanged=()=>{KV.voice=pickVoice()};KV.voice=pickVoice()}catch(_){}
-function say(t){return;const f=el.querySelector(".kiko");try{speechSynthesis.cancel()}catch(_){}
- if(!KV.on||!("speechSynthesis"in window)){f&&f.classList.remove("talk");return}
- const u=new SpeechSynthesisUtterance(t.replace(/…/g,"... "));u.lang="fr-FR";KV.voice=KV.voice||pickVoice();if(KV.voice)u.voice=KV.voice;u.pitch=1.35;u.rate=1.05;
- u.onstart=()=>f&&f.classList.add("talk");u.onend=u.onerror=()=>f&&f.classList.remove("talk");
- try{speechSynthesis.speak(u)}catch(_){}}
+// Kiko : sans voix
+const KV={on:false};function say(){}
 const KIKO=`<div class="kiko"><svg viewBox="0 0 120 140" width="100%" height="100%">
 <defs><radialGradient id="kgl" cx=".5" cy=".5" r=".5"><stop offset="0" stop-color="#fff6c8" stop-opacity=".9"/><stop offset="1" stop-color="#ffd34d" stop-opacity="0"/></radialGradient>
 <linearGradient id="kwg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#bff3ff" stop-opacity=".95"/><stop offset="1" stop-color="#c9a6ff" stop-opacity=".55"/></linearGradient></defs>
@@ -4097,7 +4088,7 @@ const kcss=document.createElement("style");kcss.textContent=`
 #tuto .kel{text-align:center;font-size:20px;line-height:1.6;background:#ffffff0d;border-radius:12px;padding:6px;margin:6px 0}
 `;document.head.appendChild(kcss);
 let L=STEPS,LEND=null,i=0;const KT={pause:false,fight:false,battle:false};
-function finish(){el.classList.remove("on");try{speechSynthesis.cancel()}catch(_){}const f=LEND;LEND=null;if(L===STEPS){S.tuto=1;try{save()}catch(_){}try{go("home")}catch(_){}}if(f)f()}
+function finish(){el.classList.remove("on");const f=LEND;LEND=null;if(L===STEPS){S.tuto=1;try{save()}catch(_){}try{go("home")}catch(_){}}if(f)f()}
 function targets(s){const ss=s.sel?[].concat(s.sel):[];return ss.map(q=>document.querySelector(q)).filter(t=>t&&t.offsetParent!==null)}
 function place(){const s=L[i];const ts=targets(s);
  bub.style.maxHeight="";bub.style.overflowY="";
