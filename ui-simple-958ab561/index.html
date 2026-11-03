@@ -4895,6 +4895,7 @@ body.simple #nav button .lb{display:block!important;font:600 10.5px Inter,sans-s
 body.simple #nav button.on .lb{font-weight:800!important;opacity:1}
 body.simple .smp-hide{display:none!important}
 body.simple .today .tx small,body.simple .modes .mode small,body.simple #altar .mdesc,body.simple #altar .pd{display:none!important}
+body.simple .card .sr,body.simple .greet{display:none!important}
 body.simple .today .trow{padding-top:11px!important;padding-bottom:11px!important}
 `;document.head.appendChild(css);
 const hide=e=>e&&e.classList.add("smp-hide");
@@ -4908,7 +4909,13 @@ function prune(){const m=$("main");if(!m)return;const kids=[...m.children];
   kids.forEach((k,i)=>{const p=kids[i-1];if(k.matches(".muted")&&p&&p.matches(".stats"))hide(k);if(k.matches(".box")&&/Cosmos/.test(txt(k))){hide(k);hide(p)}})}
  if(view==="coll"){kids.forEach(k=>{if(k.matches(".sec,.muted,p.muted"))hide(k)})}
  if(view==="team"){kids.forEach(k=>{if(k.matches(".box")&&/Conseils|tips/i.test(txt(k)))hide(k)})}
- if(view==="adv"){kids.forEach(k=>{if(k.matches(".muted"))hide(k)});secBefore("#storyBtn")}}
+ if(view==="adv"){kids.forEach(k=>{if(k.matches(".muted"))hide(k)});secBefore("#storyBtn")}
+ if(view==="hub"){const t=m.querySelector(".today");if(t)[...t.children].slice(2).forEach(hide);
+  kids.forEach((k,i)=>{if(k.matches(".hrow")){hide(k);const a=kids[i-1],b=kids[i-2];if(a&&a.matches(".muted"))hide(a);if(b&&b.matches(".sec"))hide(b)}})}
+ if(view==="home"){kids.forEach((k,i)=>{if(k.id==="packs"){hide(k);const a=kids[i-1];if(a&&a.matches(".sec"))hide(a)}})}
+ if(view==="team"){kids.forEach(k=>{if(k.matches(".muted")&&!/⚡|\d/.test(txt(k)))hide(k);if(k.matches(".box")&&/Synerg/i.test(txt(k)))k.querySelectorAll(".muted,small,p").forEach(x=>{if(!/[+%]/.test(txt(x)))hide(x)})})}
+ if(view==="adv"){let first=true;kids.forEach(k=>{if(k.matches(".world.lock")){if(first)first=false;else hide(k)}})}
+}
 const _r=render;render=function(){const r=_r.apply(this,arguments);try{prune()}catch(e){console.warn(e)}return r};
 try{prune()}catch(_){}
 })();
