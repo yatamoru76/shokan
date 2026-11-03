@@ -1472,7 +1472,7 @@ header .hsp{flex:1}
  <div id="modal" class="ovl"><div class="mbox" id="mbox"></div></div>
  <div id="toast"></div>
 </div>
-<script>window.SHK_VER="03/11 07h15"
+<script>window.SHK_VER="03/11 07h30"
 
 const BETA=true;const PUBLIC=true;
 
@@ -4740,6 +4740,43 @@ el.addEventListener("click",go);addEventListener("keydown",key);
 <script>(function(){try{const _sd=showDetail;showDetail=function(){const r=_sd.apply(this,arguments);try{if(IS_ADMIN){const id=String(arguments[0]),cc=S.coll[id],fv=$("dFav");if(cc&&fv&&!isLive(cc)&&!document.getElementById("admMax")){const b=document.createElement("button");b.id="admMax";b.className="btn gold sm";b.style.marginTop="8px";b.textContent="🛠️ Admin : améliorer au maximum (★5 · Nv max)";fv.insertAdjacentElement("afterend",b);b.onclick=()=>{cc.star=5;cc.lvl=maxLvl(cc);cc.xp=0;save();try{checkMaster(cc)}catch(_){}try{cloudPush&&cloudPush(true)}catch(_){}showDetail(id)}}}}catch(e){console.warn(e)}try{const c=$("detail").querySelector(".card.live");if(c&&c.parentElement&&!c.parentElement.querySelector(".kiaura")){const h=c.parentElement;h.classList.add("kiw");const lc=c.style.getPropertyValue("--lc")||"#ffd34d";const a=document.createElement("div");a.className="kiaura";a.style.setProperty("--lc",lc);
  let fl="";for(let i=0;i<11;i++){const x=(i/10)*86-3;fl+=`<i class="kf" style="left:${x}%;animation-delay:${-(i*.37)%1.25}s;animation-duration:${1.05+(i%4)*.12}s;height:${(i===0||i===10?80:i%2?56:66)+(i%3)*8}%"></i>`}for(let i=0;i<7;i++)fl+=`<i class="ks" style="left:${10+i*12}%;animation-delay:${-(i*.41)%1.1}s"></i>`;a.innerHTML=`<i class="kb"></i>${fl}`;h.insertBefore(a,c)}}catch(e){console.warn(e)}try{const c=$("detail").querySelector(".card.live");if(c&&!c.dataset.tilt){c.dataset.tilt=1;const w=c.parentElement||c;w.style.transition="transform .2s ease-out";w.style.transformStyle="preserve-3d";
  const mv=e=>{const b=w.getBoundingClientRect();const x=(e.clientX-b.left)/b.width-.5,y=(e.clientY-b.top)/b.height-.5;w.style.transform=`perspective(800px) rotateY(${x*18}deg) rotateX(${-y*14}deg)`};w.addEventListener("pointermove",mv);w.addEventListener("pointerleave",()=>w.style.transform="");w.addEventListener("pointerup",()=>w.style.transform="")}}catch(e){console.warn(e)}return r}}catch(e){console.warn(e)}})();
+</script>
+<script>// ================= PARRAINAGE =================
+(function(){
+const BASE="https://yatamoru76.github.io/shokan/",PER=[{b:3,s:200}],MAXF=10,LVL_OK=5,WELCOME={b:5,s:300};
+// 1. lien reçu : on le garde (même si la connexion Discord recharge la page)
+try{const m=location.search.match(/[?&]ref=([0-9a-f-]{20,})/i);if(m){localStorage.setItem("shk_ref",m[1]);history.replaceState(null,"",location.pathname+location.hash)}}catch(_){}
+// 2. nouveau joueur invité : cadeau de bienvenue, une seule fois
+function welcome(){let ref=null;try{ref=localStorage.getItem("shk_ref")}catch(_){}if(!ref||S.refBy||S.refDone)return;
+ const fresh=(S.opened||0)<=8&&Object.keys(S.coll||{}).length<=15;S.refDone=1;if(!fresh){save();return}
+ if(typeof CL!=="undefined"&&CL.user&&CL.user.id===ref){save();return}
+ S.refBy=ref;S.boosters+=WELCOME.b;S.shards+=WELCOME.s;save();try{updateTop()}catch(_){}
+ const showW=()=>{const t=document.getElementById("tuto");if((t&&t.classList.contains("on"))||document.getElementById("titleS")||$("modal").style.display==="flex")return setTimeout(showW,900);try{modal(`<div style="text-align:center"><div style="font:900 38px 'Noto Sans JP',serif;color:#ffd34d">招</div><h3 style="margin:2px 0 8px">Un ami t'a invité !</h3><p class="muted" style="font-size:13px;line-height:1.5">Cadeau de bienvenue : <b>+${WELCOME.b} 🎴 boosters</b> et <b>+${WELCOME.s} 💠</b>.</p><p class="muted" style="font-size:12px">Connecte-toi avec Discord (Réglages → Sauvegarde) et atteins le <b>niveau ${LVL_OK}</b> : ton parrain recevra lui aussi une récompense.</p></div>`,[["Super !"]])}catch(_){}};setTimeout(showW,2600)}
+welcome();
+// 3. le parrain est enregistré dans le profil public du filleul
+try{const _pp=publicProfile;publicProfile=function(){const o=_pp.apply(this,arguments)||{};if(S.refBy)o.ref=S.refBy;return o}}catch(e){console.warn(e)}
+// 4. écran parrainage
+async function showRef(){const on=typeof pvpOn==="function"&&pvpOn();const link=on?BASE+"?ref="+CL.user.id:"";S.refClaimed=S.refClaimed||[];
+ const p=$("picker");p.style.display="flex";const close=()=>{p.style.display="none"};
+ const draw=list=>{const ok=list.filter(x=>(x.lvl||1)>=LVL_OK),claimable=ok.filter(x=>!S.refClaimed.includes(x.user_id)&&S.refClaimed.length<MAXF);
+  p.innerHTML=`<div style="width:100%;max-width:440px"><div style="display:flex;justify-content:space-between;align-items:center;margin:4px 0 10px"><div style="font-weight:900;font-size:19px">招 Parrainage</div><button class="btn ghost sm" style="width:auto" id="rfX">Fermer</button></div>
+  <div class="box"><b>Invite tes amis, gagnez tous les deux !</b><div class="muted" style="font-size:12.5px;line-height:1.5;margin-top:6px">🎁 <b>Ton ami</b> reçoit ${WELCOME.b} boosters et ${WELCOME.s} 💠 dès son arrivée.<br>🎁 <b>Toi</b>, tu reçois ${PER[0].b} boosters et ${PER[0].s} 💠 quand il atteint le <b>niveau ${LVL_OK}</b> (connecté avec Discord).<br>Jusqu'à ${MAXF} amis récompensés.</div></div>
+  ${on?`<div class="box"><b>Ton lien</b><input class="adin" id="rfL" readonly value="${esc(link)}" style="margin-top:8px;font-size:12px"><div class="row2" style="margin-top:8px"><button class="btn gold sm" id="rfC">📋 Copier</button><button class="btn ghost sm" id="rfS">📤 Partager</button></div></div>`
+   :`<div class="box"><b>Connecte-toi pour avoir ton lien</b><div class="muted" style="font-size:12.5px;margin:6px 0">Le parrainage a besoin de ton compte Discord pour savoir qui tu as invité.</div><button class="btn gold sm" id="rfLog">🎮 Se connecter</button></div>`}
+  <div class="box"><b>Tes filleuls (${list.length})</b>${list.length?list.map(x=>{const done=S.refClaimed.includes(x.user_id),good=(x.lvl||1)>=LVL_OK;return`<div class="syn"><span>${frAv(x)} <b>${esc(x.name||"Joueur")}</b> · niv. ${x.lvl||1}</span><span>${done?"✅ récupéré":good?"🎁 prêt":`⏳ niv. ${LVL_OK}`}</span></div>`}).join(""):`<div class="muted" style="font-size:12.5px;margin-top:6px">Personne pour l'instant. Partage ton lien !</div>`}
+  ${claimable.length?`<button class="btn gold" id="rfG" style="margin-top:10px">🎁 Récupérer ${claimable.length} récompense${claimable.length>1?"s":""}</button>`:""}</div></div>`;
+  $("rfX").onclick=close;
+  if($("rfC"))$("rfC").onclick=async()=>{try{await navigator.clipboard.writeText(link);toast("📋 Lien copié !")}catch(_){const i=$("rfL");i.select();toast("Sélectionne et copie le lien")}};
+  if($("rfS"))$("rfS").onclick=async()=>{const txt="Viens jouer à Shōkan, un jeu gratuit de cartes anime ! Avec mon lien tu reçois 5 boosters et 300 éclats :";try{if(navigator.share){await navigator.share({title:"Shōkan · 召喚",text:txt,url:link});return}}catch(_){return}try{await navigator.clipboard.writeText(txt+" "+link);toast("📋 Message et lien copiés !")}catch(_){toast("Copie le lien ci-dessus")}};
+  if($("rfLog"))$("rfLog").onclick=()=>{close();try{cloudLogin()}catch(_){}};
+  if($("rfG"))$("rfG").onclick=()=>{let n=0;for(const x of claimable){if(S.refClaimed.length>=MAXF)break;S.refClaimed.push(x.user_id);S.boosters+=PER[0].b;S.shards+=PER[0].s;n++}save();try{updateTop();cloudPush&&cloudPush(true)}catch(_){}sfx.win&&sfx.win();toast(`🎁 +${n*PER[0].b} boosters et +${n*PER[0].s} 💠 · merci d'avoir invité tes amis !`);draw(list)}};
+ p.innerHTML=`<div class="muted" style="padding:40px">Chargement…</div>`;let list=[];
+ if(on){try{const {data}=await CL.sb.from("players").select("user_id,name,avatar,lvl").eq("profile->>ref",CL.user.id).limit(60);list=(data||[]).filter(x=>x.user_id!==CL.user.id)}catch(e){console.warn(e)}}
+ draw(list)}
+window.showRef=showRef;
+// 5. accès : Menu → Social
+try{const _sm=showMore;showMore=function(){const r=_sm.apply(this,arguments);try{const d=document.querySelector('#moreIn [data-a="discord"]');if(d&&!document.querySelector('#moreIn [data-a="ref"]')){const b=document.createElement("button");b.className="mr";b.dataset.a="ref";b.innerHTML=`<span class="mi" style="--mc:#d97706">招</span><span class="mt2"><b>🤝 Parrainage</b><small>Invite tes amis : boosters pour vous deux</small></span><span class="chev">›</span>`;d.insertAdjacentElement("beforebegin",b);b.onclick=()=>{try{sfx.select()}catch(_){}hideMore();showRef()}}}catch(e){console.warn(e)}return r}}catch(e){console.warn(e)}
+})();
 </script>
 <script>if("serviceWorker"in navigator)addEventListener("load",()=>navigator.serviceWorker.register("sw.js").catch(()=>{}))</script></body>
 </html>
