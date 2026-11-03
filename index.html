@@ -1472,7 +1472,7 @@ header .hsp{flex:1}
  <div id="modal" class="ovl"><div class="mbox" id="mbox"></div></div>
  <div id="toast"></div>
 </div>
-<script>window.SHK_VER="03/11 17h40"
+<script>window.SHK_VER="03/11 18h35"
 
 const BETA=true;const PUBLIC=true;
 
@@ -3444,7 +3444,7 @@ async function storyFoes(ch,st,d){d=d||0;const an=await chapterData(ch);const A=
  scaleFoes(list,.42+.06*st+.055*ch+(st===STAGES-1?.12:0)+DIFFS[d].add,enemyP(3+ch*4+st+d*3)*.2);list.anime=an;list.boss=A[n-1];return list}
 function villainFoes(){const img="data:image/svg+xml,"+encodeURIComponent(P_VILLAIN);const v={id:-999,name:"Brise-Paires",img,series:"Le Néant",rarity:"X",rank:1,fav:0};
  const f=mkFoe(v,1,true);f.el=ELS.find(e=>e.id==="dark");f.cls=CLS[1];const top=(pageCache[1]||(DEMO?demoPage(1):[])).slice(0,3).filter(c=>c&&!c.adult).map((c,i)=>mkFoe(Object.assign({},c,{rank:i+1,rarity:"X"}),1,false));
- const list=[...top.slice(0,1),f,...top.slice(1,2)];scaleFoes(list,1.6,enemyP(50)*.3);f.maxhp=Math.round(f.maxhp*2.2);f.villain=true;return list}
+ const list=[...top.slice(0,1),f,...top.slice(1,2)];scaleFoes(list,1.45,enemyP(50)*.3);f.maxhp=Math.round(f.maxhp*1.9);f.villain=true;return list}
 // --- dialogues ---
 function dialog(lines,done){const o=$("dlg");let i=0;o.style.display="flex";
  const show=()=>{if(i>=lines.length){o.style.display="none";done&&done();return}const [w,t]=lines[i],sp=SPEAK[w];
