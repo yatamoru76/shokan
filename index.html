@@ -1472,7 +1472,7 @@ header .hsp{flex:1}
  <div id="modal" class="ovl"><div class="mbox" id="mbox"></div></div>
  <div id="toast"></div>
 </div>
-<script>window.SHK_VER="03/11 20h05"
+<script>window.SHK_VER="03/11 20h30"
 
 const BETA=true;const PUBLIC=true;
 
@@ -4887,6 +4887,76 @@ const _r=render;render=function(){if(view==="guild")view="hub";const r=_r.apply(
 const _sa=showArena;showArena=function(practice){if(practice===true||pvpOn())return _sa.apply(this,arguments);
  modal(`<h3 style="margin:0 0 6px">🏟️ Arène classée</h3><p class="muted">L'Arène classée oppose uniquement de <b>vrais joueurs</b>. Connecte-toi pour y participer et apparaître au classement.</p><p class="muted" style="font-size:12.5px">En attendant, tu peux t'entraîner contre des bots 🤖 (sans classement).</p>`,
  [["Fermer"],["🤖 Entraînement",()=>_sa(true)],["Se connecter",()=>{try{cloudLogin()}catch(_){showSettings()}}]])};
+})();
+</script><script>// ================= VRAI MARCHÉ ENTRE JOUEURS (Supabase : table market + fonctions market_buy / market_cancel / market_collect) =================
+(function(){
+const MK={tab:"buy",list:[],mine:[],q:"",r:"",loading:false,err:null,at:0};
+const MAXL=10;
+const myName=()=>{try{initProfile()}catch(_){}return (S.prof&&S.prof.name)||"Joueur"};
+mkAlert=function(){return false};
+// anciennes ventes locales (marché simulé) : on rend les cartes une seule fois
+function migrate(){if(S.mkMig)return;const m=S.mk;let n=0;if(m){(m.sales||[]).forEach(s=>{if(s.c){addCard(s.c);n++}});(m.auctions||[]).filter(a=>a.own&&a.c).forEach(a=>{addCard(a.c);n++});m.sales=[];m.auctions=[];m.offers=[];m.listings=[]}
+ S.mkMig=1;save();if(n)setTimeout(()=>toast(`🏷️ ${n} carte${n>1?"s":""} de l'ancien marché te ${n>1?"sont rendues":"est rendue"}`),800)}
+const isMissing=e=>e&&(/relation|does not exist|schema cache|not find|404/i.test(e.message||"")||e.code==="42P01"||e.code==="PGRST205"||e.code==="PGRST202");
+async function load(){if(MK.loading)return;MK.loading=true;MK.err=null;
+ try{const {data,error}=await CL.sb.from("market").select("*").eq("status","open").order("created_at",{ascending:false}).limit(120);if(error)throw error;
+  MK.list=data||[];
+  if(pvpOn()){const r=await CL.sb.from("market").select("*").eq("seller",CL.user.id).in("status",["open","sold"]).order("created_at",{ascending:false}).limit(40);if(r.error)throw r.error;MK.mine=r.data||[];await collect()}
+  MK.at=Date.now()}catch(e){MK.err=isMissing(e)?"missing":(e.message||"erreur")}
+ MK.loading=false;if(view==="mk")draw()}
+async function collect(){try{const {data,error}=await CL.sb.rpc("market_collect");if(error)throw error;if(data&&data.length){let g=0;data.forEach(r=>g+=Math.round(r.price*(1-TAX)));S.shards+=g;save();updateTop();
+  sfx.coin&&sfx.coin();modal(`<h3 style="margin:0 0 6px">💰 Ventes réussies !</h3><p class="muted">${data.map(r=>`<b>${esc(r.card.name)}</b> achetée par ${esc(r.buyer_name||"un joueur")} · ${fmt(r.price)} 💠`).join("<br>")}</p><p>Tu reçois <b>+${fmt(g)} 💠</b> <span class="muted">(taxe ${Math.round(TAX*100)} %)</span></p>`,[["Super !"]]);
+  MK.mine=MK.mine.filter(x=>x.status!=="sold")}}catch(_){}}
+function itemHTML(r,btn){const c=r.card||{};return`<div class="mki" style="display:flex;gap:10px;align-items:center;padding:10px;border-radius:14px;background:#ffffff08;margin-bottom:8px">
+ <div style="width:58px;flex:none">${cardHTML(Object.assign({lvl:0,n:1,star:1},c))}</div>
+ <div style="flex:1;min-width:0"><b style="display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(c.name||"?")}</b><div class="muted" style="font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(c.series||"")}</div>
+ <div style="font-size:12px;margin-top:2px">${c.rarity?rarTag(c):""} · <span class="muted">${esc(r.seller_name||"Joueur")}</span></div></div>
+ <div style="text-align:right;flex:none"><div style="font-weight:900">${fmt(r.price)} 💠</div>${btn}</div></div>`}
+function draw(){const b=$("mkBody");if(!b)return;
+ if(MK.err==="missing"){b.innerHTML=`<div class="box" style="text-align:center"><b>🛠️ Marché en préparation</b><p class="muted">Le marché entre joueurs ouvre très bientôt.</p></div>`;return}
+ if(MK.err){b.innerHTML=`<div class="box" style="text-align:center"><b>Marché indisponible</b><p class="muted">${esc(MK.err)}</p><button class="btn ghost sm" id="mkRe">Réessayer</button></div>`;$("mkRe").onclick=()=>load();return}
+ if(MK.tab==="buy"){const me=pvpOn()?CL.user.id:null;const q=MK.q.toLowerCase();
+  const L=MK.list.filter(r=>r.seller!==me&&(!q||(r.card.name+" "+(r.card.series||"")).toLowerCase().includes(q))&&(!MK.r||r.card.rarity===MK.r));
+  b.innerHTML=`<input id="mkQ" placeholder="Chercher un perso ou un anime" value="${esc(MK.q)}" style="margin-bottom:8px;width:100%;box-sizing:border-box;background:#ffffff0d;border:1px solid #ffffff22;border-radius:12px;padding:11px 12px;color:#f2ece2;font:500 14px Inter,sans-serif">
+  <div class="filters" style="margin-bottom:10px">${[["","Toutes"]].concat(RAR.map(r=>[r.id||r.k,r.name])).map(([k,n])=>`<button data-r="${k}" class="${MK.r===k?"on":""}">${n}</button>`).join("")}</div>
+  ${MK.loading&&!MK.at?`<p class="muted" style="text-align:center">Chargement…</p>`:L.length?L.map(r=>itemHTML(r,`<button class="btn gold sm" data-buy="${r.id}" style="margin-top:4px;width:auto;padding:6px 12px">Acheter</button>`)).join(""):
+   `<div class="box" style="text-align:center"><b>Aucune carte en vente${q||MK.r?" pour ce filtre":""}</b><p class="muted">Le marché se remplit au fil des ventes des joueurs. Reviens plus tard, ou mets une de tes cartes en vente !</p></div>`}
+  <button class="btn ghost sm" id="mkRef" style="margin-top:6px">🔄 Actualiser</button>`;
+  const qi=$("mkQ");qi.oninput=()=>{MK.q=qi.value;clearTimeout(draw.t);draw.t=setTimeout(()=>{draw();const n=$("mkQ");if(n){n.focus();n.setSelectionRange(n.value.length,n.value.length)}},250)};
+  b.querySelectorAll("[data-r]").forEach(x=>x.onclick=()=>{MK.r=x.dataset.r;draw()});$("mkRef").onclick=()=>load();
+  b.querySelectorAll("[data-buy]").forEach(x=>x.onclick=()=>buy(MK.list.find(r=>r.id===x.dataset.buy)));return}
+ if(MK.tab==="sell"){const C=Object.values(S.coll).sort((a,b)=>RI[a.rarity]-RI[b.rarity]||cardValue(b)-cardValue(a));
+  b.innerHTML=`<p class="muted" style="margin:0 0 10px">Touche une carte pour la vendre à un autre joueur${pvpOn()?"":" (connexion nécessaire)"} ou au marchand du jeu.</p><div class="grid">${C.map(c=>`<div data-sell="${c.id}">${cardHTML(c)}${c.n>1?`<div class="muted" style="text-align:center;font-size:11px">×${c.n}</div>`:""}</div>`).join("")}</div>`;
+  b.querySelectorAll("[data-sell]").forEach(x=>x.onclick=()=>sellPrompt(S.coll[x.dataset.sell]));return}
+ if(MK.tab==="mine"){if(!pvpOn()){b.innerHTML=loginBox();bindLogin();return}
+  const L=MK.mine.filter(r=>r.status==="open");
+  b.innerHTML=`<p class="muted" style="margin:0 0 10px">${L.length} / ${MAXL} ventes en cours. Quand un joueur achète, tu reçois les éclats ici automatiquement.</p>${L.length?L.map(r=>itemHTML(r,`<button class="btn ghost sm" data-cancel="${r.id}" style="margin-top:4px;width:auto;padding:6px 10px">Retirer</button>`)).join(""):`<div class="box" style="text-align:center"><b>Aucune vente en cours</b><p class="muted">Va dans « Vendre » pour proposer une carte aux autres joueurs.</p></div>`}`;
+  b.querySelectorAll("[data-cancel]").forEach(x=>x.onclick=()=>cancel(x.dataset.cancel))}}
+const loginBox=()=>`<div class="box" style="text-align:center"><b>Connecte-toi pour échanger avec les autres joueurs</b><p class="muted">Le Marché réunit uniquement de vrais joueurs : il faut un compte pour acheter et vendre.</p><button class="btn gold sm" id="mkLog">Se connecter</button></div>`;
+function bindLogin(){const l=$("mkLog");if(l)l.onclick=()=>{try{cloudLogin()}catch(_){showSettings()}}}
+async function buy(r){if(!r)return;if(!pvpOn()){modal(loginBox(),[["Fermer"]]);bindLogin();return}
+ if(S.shards<r.price){toast("Pas assez d'éclats 💠");return}
+ modal(`<h3 style="margin:0 0 6px">Acheter ${esc(r.card.name)} ?</h3><div style="width:110px;margin:8px auto">${cardHTML(Object.assign({lvl:0,n:1},r.card))}</div><p class="muted" style="text-align:center">Vendu par ${esc(r.seller_name)} · <b>${fmt(r.price)} 💠</b></p>`,
+ [["Annuler"],["Acheter",async()=>{try{const {data,error}=await CL.sb.rpc("market_buy",{p_id:r.id,p_name:myName()});if(error)throw error;
+   S.shards-=r.price;addCard(r.card);save();updateTop();sfx.coin&&sfx.coin();toast("🎉 "+r.card.name+" rejoint ta collection !");MK.list=MK.list.filter(x=>x.id!==r.id);draw()}
+  catch(e){toast("❌ "+((e&&e.message)||"Achat impossible"));load()}}]])}
+function sellPrompt(c){if(!c)return;const v=cardValue(c),shop=Math.round(v*.6);const open=MK.mine.filter(r=>r.status==="open").length;
+ modal(`<h3 style="margin:0 0 6px">Vendre ${esc(c.name)}</h3><div style="width:110px;margin:8px auto">${cardHTML(c)}</div>
+ <p class="muted" style="margin:0">Valeur estimée : <b>${fmt(v)} 💠</b>${c.n<=1?"<br><span style='color:var(--M)'>⚠️ C'est ton dernier exemplaire</span>":""}</p>
+ ${pvpOn()?`<div class="priceIn" style="margin-top:8px"><input id="pIn" type="number" inputmode="numeric" value="${v}"></div><p class="muted" style="font-size:12px">Prix pour les autres joueurs. Tu recevras le prix moins ${Math.round(TAX*100)} % de taxe. ${open}/${MAXL} ventes en cours.</p>`:`<p class="muted" style="font-size:12.5px">Connecte-toi pour la vendre aux autres joueurs.</p>`}
+ <p class="muted" style="font-size:12.5px">Ou revends-la tout de suite au marchand du jeu pour <b>${fmt(shop)} 💠</b>.</p>`,
+ [["Annuler"],["Au marchand",()=>{const cc=takeCard(c.id);if(!cc)return;S.shards+=shop;save();sfx.coin&&sfx.coin();toast("+"+fmt(shop)+" 💠");updateTop();draw()}]].concat(pvpOn()?[["Mettre en vente",async()=>{
+   if(open>=MAXL){toast("Maximum "+MAXL+" ventes en même temps");return}
+   const pr=Math.max(1,Math.min(10000000,Math.round(+($("pIn")||{}).value||v)));const cc=takeCard(c.id);if(!cc)return;save();
+   try{const {data,error}=await CL.sb.from("market").insert({seller:CL.user.id,seller_name:myName(),card:cc,price:pr}).select().single();if(error)throw error;
+    MK.mine.unshift(data);MK.list.unshift(data);toast("🏷️ En vente pour "+fmt(pr)+" 💠");MK.tab="mine";rMarket()}
+   catch(e){addCard(cc);save();toast("❌ "+(isMissing(e)?"Marché pas encore ouvert":(e.message||"Mise en vente impossible")));draw()}}]]:[]))}
+async function cancel(id){try{const {data,error}=await CL.sb.rpc("market_cancel",{p_id:id});if(error)throw error;addCard(data.card);save();MK.mine=MK.mine.filter(x=>x.id!==id);MK.list=MK.list.filter(x=>x.id!==id);toast("Carte retirée de la vente");draw()}
+ catch(e){toast("❌ "+(e.message||"Impossible"));load()}}
+rMarket=function(){migrate();const tabs=[["buy","Acheter"],["sell","Vendre"],["mine","Mes ventes",MK.mine.filter(r=>r.status==="open").length]];
+ $("main").innerHTML=`${sec("01","Marché","市場")}<div class="muted" style="margin:-4px 0 10px;font-size:12.5px">👥 Uniquement de vrais joueurs</div><div class="subtabs">${tabs.map(([k,n,c])=>`<button data-mt="${k}" class="${MK.tab===k?"on":""}">${n}${c?`<span class="n">${c}</span>`:""}</button>`).join("")}</div><div id="mkBody"></div>`;
+ $("main").querySelectorAll("[data-mt]").forEach(x=>x.onclick=()=>{MK.tab=x.dataset.mt;rMarket()});
+ if(!CL.ready){$("mkBody").innerHTML=`<p class="muted" style="text-align:center">Connexion au marché…</p>`;clearTimeout(rMarket.t);rMarket.t=setTimeout(()=>{if(view==="mk")rMarket()},1500);return}draw();if(Date.now()-MK.at>30000)load()};
 })();
 </script></body>
 </html>
