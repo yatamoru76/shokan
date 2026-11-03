@@ -1472,7 +1472,7 @@ header .hsp{flex:1}
  <div id="modal" class="ovl"><div class="mbox" id="mbox"></div></div>
  <div id="toast"></div>
 </div>
-<script>window.SHK_VER="03/11 08h30"
+<script>window.SHK_VER="03/11 17h30"
 
 const BETA=true;const PUBLIC=true;
 
@@ -4022,33 +4022,127 @@ const el=document.createElement("div");el.id="tuto";el.innerHTML=`<div class="tc
 const spot=el.querySelector(".tspot"),bub=el.querySelector(".tbub");
 const go=v=>{try{$("more").classList.remove("on");["picker","detail","modal"].forEach(id=>{const o=$(id);if(o)o.style.display="none"});view=v;setNav();render();$("main").scrollTop=0}catch(e){console.warn(e)}};
 const STEPS=[
- {kj:"召",welcome:1,t:"Bienvenue, Gardien !",d:`<p>Le Brise-Paires a corrompu les <b>Échos</b> : les héros de tes animes préférés. Ton rôle : les invoquer, former une équipe et libérer les univers.</p><p>Une petite visite d'une minute pour découvrir le jeu ?</p>`},
- {kj:"財",sel:"#wallet",at:()=>go("hub"),t:"Tes ressources",d:`<ul><li>🎴 <b>Invocations gratuites</b> : une réserve de ${MAXB}, une de plus toutes les 20 minutes.</li><li>💠 <b>Éclats</b> : pour invoquer davantage et faire évoluer tes cartes.</li><li>🍙 <b>Onigiri</b> : nourris tes persos pour les faire monter de niveau.</li></ul>`},
- {kj:"召",sel:'#nav [data-v="home"]',at:()=>go("home"),t:"Invoquer",d:`<p>Ouvre des boosters de <b>5 cartes</b> : glisse le doigt le long du haut pour les déchirer.</p><p>Sept raretés, de <b>Commun</b> à <b>Cosmos</b>. Une Mythique est garantie au bout de ${PITY} cartes sans en avoir eu.</p>`},
- {kj:"蔵",sel:'#nav [data-v="coll"]',at:()=>go("coll"),t:"Ta collection",d:`<p>Toutes tes cartes, classées par rareté ou par anime. Touche une carte pour voir ses stats, sa classe et son élément.</p><p>Les <b>doublons</b> ne sont pas perdus : ils servent à faire <b>évoluer</b> la carte (★), ce qui la rend bien plus forte.</p>`},
- {kj:"隊",sel:"#main .slots",at:()=>go("team"),t:"Ton équipe",d:`<p>5 persos partent au combat. Chacun a une classe :</p><ul><li>⚔️ Guerrier · 🔮 Mage · 🗡️ Assassin : ils font les dégâts</li><li>🛡️ Tank : encaisse et protège</li><li>💚 Soigneur : soigne l'équipe</li></ul><p><b>Astuce :</b> mélange les classes. Trop de tanks, et le combat traîne jusqu'au dernier tour.</p>`},
- {kj:"戦",sel:'#nav [data-v="adv"]',at:()=>go("adv"),t:"Combat",d:`<p>Traverse les mondes étape par étape, avec un boss à la fin de chacun. Tu y trouveras aussi le <b>mode Histoire</b>, la <b>Tour</b> et l'<b>Arène</b> contre d'autres joueurs.</p><p>Les éléments comptent : 🔥 bat 🌪️, 🌪️ bat ⚡, ⚡ bat 💧, 💧 bat 🔥, et ☀️ et 🌑 se battent entre eux.</p>`},
- {kj:"他",sel:'#nav [data-v="more"]',at:()=>go("hub"),t:"Le menu",d:`<p>Ici, tout le reste : <b>Marché</b> pour échanger des cartes, <b>Guilde</b> avec un boss commun chaque semaine, <b>Événements</b>, <b>Passe</b> de saison et <b>Succès</b>.</p><p>Les <b>Réglages</b> te permettent de couper la musique ou les effets sonores et de changer de langue.</p>`},
- {kj:"始",welcome:1,end:1,at:()=>go("home"),t:"À toi de jouer !",d:`<p>Tu as déjà <b>${MAXB} invocations gratuites</b> qui t'attendent. Ouvre ton premier booster et forme ton équipe !</p><p style="font-size:12px;color:#a99fbd">Tu peux revoir ce tutoriel à tout moment dans Réglages.</p>`}];
-let i=0;
-function finish(){el.classList.remove("on");S.tuto=1;try{save()}catch(_){}try{go("home")}catch(_){}}
-function place(){const s=STEPS[i];const t=s.sel&&document.querySelector(s.sel);
- if(!t||s.welcome){spot.className="tspot full";Object.assign(spot.style,{left:"50%",top:"50%",width:"0px",height:"0px"});bub.style.top="50%";bub.style.bottom="auto";bub.style.transform="translateY(-50%)";return}
- const r=t.getBoundingClientRect(),pad=6;spot.className="tspot";Object.assign(spot.style,{left:r.left-pad+"px",top:r.top-pad+"px",width:r.width+pad*2+"px",height:r.height+pad*2+"px"});
- bub.style.transform="none";const below=r.top+r.height/2<innerHeight/2;
- if(below){bub.style.top=Math.min(innerHeight-bub.offsetHeight-10,r.bottom+16)+"px";bub.style.bottom="auto"}else{bub.style.top="auto";bub.style.bottom=Math.max(10,innerHeight-r.top+16)+"px"}}
-function show(n){i=n;const s=STEPS[i];if(s.at)s.at();const dots=STEPS.map((_,k)=>`<i class="${k===i?"on":""}"></i>`).join("");
- bub.innerHTML=s.welcome&&!s.end?`<div class="twel"><span class="tk">${s.kj}</span><h3>${s.t}</h3>${s.d}<div class="trow" style="margin-top:12px"><button class="btn ghost" data-a="skip">Passer le tutoriel</button><button class="btn gold" data-a="next">C'est parti !</button></div></div>`
- :s.end?`<div class="twel"><span class="tk">${s.kj}</span><h3>${s.t}</h3>${s.d}<div class="tdots">${dots}</div><div class="trow"><button class="btn ghost" data-a="prev">◀</button><button class="btn gold" data-a="done" style="flex:3">🎴 Invoquer maintenant</button></div></div>`
- :`<span class="tk">${s.kj}</span><h3>${s.t}</h3>${s.d}<div class="tdots">${dots}</div><div class="trow"><button class="btn ghost" data-a="prev" ${i<=1?"disabled":""}>◀</button><button class="btn gold" data-a="next" style="flex:3">Suivant ▶</button></div><button class="tskip" data-a="skip">Passer le tutoriel</button>`;
- bub.querySelectorAll("[data-a]").forEach(b=>b.onclick=()=>{try{sfx.select()}catch(_){}const a=b.dataset.a;if(a==="next")show(i+1);else if(a==="prev")show(Math.max(1,i-1));else finish()});
- requestAnimationFrame(()=>requestAnimationFrame(place))}
+ {welcome:1,t:"Coucou, Gardien !",v:"Coucou, Gardien ! Moi c'est Kiko, la fée des Échos. Oui, je suis petite, non, ce n'est pas le moment d'en parler. Le Brise-Paires a corrompu les héros de tes animes préférés, et toi, tu vas les sauver. Suis-moi, je te montre tout !"},
+ {sel:"#wallet",at:()=>go("hub"),t:"Tes ressources",v:"En haut, tes trésors. Les invocations : tu en stockes dix, et il en revient une toutes les vingt minutes. Les Éclats, pour invoquer et faire évoluer. Et les onigiri… non, ce n'est pas mon goûter. Ils font monter tes persos de niveau."},
+ {sel:'#nav [data-v="home"]',at:()=>go("home"),t:"Invoquer",v:"Le meilleur moment : ouvrir un booster ! Cinq cartes, sept raretés, de Commun à Cosmos. Glisse le doigt pour le déchirer. Et si la chance te boude, pas de panique : au bout de cent vingt invocations, une Mythique est garantie."},
+ {sel:'#nav [data-v="coll"]',at:()=>go("coll"),t:"Ta collection",v:"Voici ta collection. Un doublon ? Ne fais pas cette tête ! Les doublons font gagner des étoiles à tes cartes, et chaque étoile augmente leur niveau maximum. Rien ne se perd, tout s'invoque."},
+ {sel:"#main .slots",at:()=>go("team"),t:"Ton équipe",v:"Cinq persos par équipe. Le guerrier, le mage et l'assassin tapent, le tank encaisse, le soigneur répare les bêtises des autres. Une équipe avec cinq tanks, c'est solide… mais très, très long. Mélange les classes !"},
+ {sel:"#main .slots",at:()=>go("team"),t:"Les éléments",v:"Petit cours de magie, écoute bien. Le Feu bat le Vent, le Vent bat la Foudre, la Foudre bat l'Eau, et l'Eau éteint le Feu. Lumière et Ombre se battent entre elles. Un bon élément, et ton combat devient beaucoup plus simple.",x:`<div class="kel">🔥 › 🌪️ › ⚡ › 💧 › 🔥<br>☀️ ⇄ 🌑</div>`},
+ {sel:"#storyBtn",at:()=>go("adv"),t:"Le mode Histoire",v:"Le mode Histoire, c'est le cœur de l'aventure : huit univers à libérer, chacun avec son boss. Bats-le en mode Cauchemar pour que son Écho rejoigne ta collection pour de bon. Et oui, le Brise-Paires parle beaucoup. On s'y fait."},
+ {sel:["#tower","#arenaBtn"],at:()=>go("adv"),t:"Tour et Arène",v:"Tu veux de la difficulté ? Grimpe la Tour, étage par étage. Tu préfères écraser des vrais joueurs ? L'Arène est là pour ça. Gentiment, hein."},
+ {sel:'#moreIn [data-a="v:evt"]',at:()=>{go("hub");try{showMore()}catch(_){}},t:"Missions et événements",v:"Dans le menu, passe ici chaque jour : missions du jour, raid du Titan et bonus. C'est la façon la plus simple de gagner des récompenses… même pour les flemmards."},
+ {sel:['#moreIn [data-a="pass"]','#moreIn [data-a="ach"]'],at:()=>{go("hub");try{showMore()}catch(_){}},t:"Passe et Succès",v:"Le Passe saisonnier te donne des récompenses à chaque palier, gratuitement. Et les Succès récompensent tes exploits. Oui, même celui de perdre dix fois de suite. Je plaisante… presque."},
+ {sel:'#moreIn [data-a="v:mk"]',at:()=>{go("hub");try{showMore()}catch(_){}},t:"Le Marché",v:"Le Marché, c'est l'endroit des bonnes affaires : achète, vends, fais des enchères ou échange tes cartes avec les autres joueurs. Méfie-toi des marchands trop souriants."},
+ {sel:'#moreIn [data-a="v:guild"]',at:()=>{go("hub");try{showMore()}catch(_){}},t:"La Guilde",v:"Rejoins une guilde ! Coffre commun, boss de guilde à battre ensemble, et des duels de guilde contre guilde, en temps réel. Seul on va vite, en guilde on tape plus fort."},
+ {sel:['#moreIn [data-a="friends"]','#moreIn [data-a="gifts"]'],at:()=>{go("hub");try{showMore()}catch(_){}},t:"Amis et cadeaux",v:"Ajoute tes amis, discute, envoie des autocollants et lance des combats amicaux. Pense aussi à ta boîte à cadeaux : il y a souvent des surprises dedans."},
+ {sel:'#moreIn [data-a="ref"]',at:()=>{go("hub");try{showMore()}catch(_){}},t:"Parrainage",v:"Tu as des amis qui ne jouent pas encore ? Invite-les avec ton lien de parrainage : des récompenses vous attendent. Plus on est de Gardiens, plus on rit."},
+ {sel:'#moreIn [data-a="set"]',at:()=>{go("hub");try{showMore()}catch(_){}},t:"Les réglages",v:"Dans les paramètres : ton compte, ta sauvegarde, la musique… et les codes cadeaux. Garde l'œil ouvert, on en partage parfois sur Discord."},
+ {welcome:1,end:1,at:()=>go("home"),t:"À toi de jouer !",v:"Et voilà, tu connais l'essentiel ! Maintenant, ouvre ton premier booster. Ensuite, je t'emmène faire ton premier combat… Je te regarde !",btn:"🎴 Invoquer maintenant"}];
+// ---- combat guidé, après la première invocation ----
+const FIGHT0=[{welcome:1,t:"Bravo, tes premiers Échos !",v:"Pas mal du tout ! Maintenant, on passe aux choses sérieuses : un petit combat. Je place tes meilleurs persos dans l'équipe, et on y va.",btn:"⚔️ Au combat !",go:()=>tutoFight()}];
+const FIGHT=[
+ {sel:"#bAlly",t:"Ton équipe",v:"En bas, c'est ton équipe. Chaque carte a sa barre de vie. Tes persos attaquent tout seuls, chacun son tour : les plus rapides jouent en premier."},
+ {sel:"#bEnemy",t:"Les ennemis",v:"En haut, les Échos corrompus. Fais tomber toute leur vie à zéro pour gagner. Et attention, eux aussi savent taper !"},
+ {sel:"#bAlly",t:"L'attaque ultime",v:"En se battant, tes persos chargent leur énergie. Quand elle est pleine, boum : attaque ultime ! Les cartes les plus rares ont même une attaque signature. Spectaculaire, tu verras."},
+ {sel:"#bctrl",t:"Les commandes",v:"Ici, tu accélères le combat, ou tu le passes pour voir directement le résultat. Allez, place au spectacle !",btn:"▶ Lancer le combat"}];
+const WIN=[{welcome:1,t:"Victoire !",v:"Victoire ! Je savais que tu avais du potentiel… enfin, je l'espérais. Tu gagnes des Éclats, des onigiri et de l'expérience. Continue le premier monde pour débloquer la suite. Je ne suis jamais loin !",btn:"Merci Kiko !"}];
+const LOSE=[{welcome:1,t:"Aïe…",v:"Aïe… Bon, ça arrive aux meilleurs. Nourris tes persos avec des onigiri, fais-les évoluer avec les doublons, puis retente ta chance. Je crois en toi !",btn:"Compris !"}];
+STEPS.concat(FIGHT0,FIGHT,WIN,LOSE).forEach(s=>s.d=`<p>${s.v}</p>${s.x||""}`);
+// ---- Kiko : voix de synthèse ----
+const KV={on:localStorage.getItem("shk_kvoice")!=="0",voice:null};
+function pickVoice(){try{const vs=speechSynthesis.getVoices().filter(v=>/^fr/i.test(v.lang));if(!vs.length)return null;
+ const fem=/am[ée]lie|audrey|marie|julie|hortense|denise|c[ée]line|l[ée]a|aur[ée]lie|virginie|chantal|florence|elsa|eloise|vivienne|female|femme|google fran/i;
+ return vs.find(v=>fem.test(v.name)&&/fr-FR/i.test(v.lang))||vs.find(v=>fem.test(v.name))||vs.find(v=>/fr-FR/i.test(v.lang))||vs[0]}catch(_){return null}}
+try{speechSynthesis.onvoiceschanged=()=>{KV.voice=pickVoice()};KV.voice=pickVoice()}catch(_){}
+function say(t){return;const f=el.querySelector(".kiko");try{speechSynthesis.cancel()}catch(_){}
+ if(!KV.on||!("speechSynthesis"in window)){f&&f.classList.remove("talk");return}
+ const u=new SpeechSynthesisUtterance(t.replace(/…/g,"... "));u.lang="fr-FR";KV.voice=KV.voice||pickVoice();if(KV.voice)u.voice=KV.voice;u.pitch=1.35;u.rate=1.05;
+ u.onstart=()=>f&&f.classList.add("talk");u.onend=u.onerror=()=>f&&f.classList.remove("talk");
+ try{speechSynthesis.speak(u)}catch(_){}}
+const KIKO=`<div class="kiko"><svg viewBox="0 0 120 140" width="100%" height="100%">
+<defs><radialGradient id="kgl" cx=".5" cy=".5" r=".5"><stop offset="0" stop-color="#fff6c8" stop-opacity=".9"/><stop offset="1" stop-color="#ffd34d" stop-opacity="0"/></radialGradient>
+<linearGradient id="kwg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#bff3ff" stop-opacity=".95"/><stop offset="1" stop-color="#c9a6ff" stop-opacity=".55"/></linearGradient></defs>
+<circle cx="60" cy="70" r="58" fill="url(#kgl)" opacity=".55"/>
+<g class="kw kwl"><path d="M52 78 C20 40 4 62 14 84 C22 100 44 92 52 82Z" fill="url(#kwg)" stroke="#fff" stroke-opacity=".7"/><path d="M52 84 C30 96 26 116 40 118 C52 118 54 100 54 88Z" fill="url(#kwg)" stroke="#fff" stroke-opacity=".6"/></g>
+<g class="kw kwr"><path d="M68 78 C100 40 116 62 106 84 C98 100 76 92 68 82Z" fill="url(#kwg)" stroke="#fff" stroke-opacity=".7"/><path d="M68 84 C90 96 94 116 80 118 C68 118 66 100 66 88Z" fill="url(#kwg)" stroke="#fff" stroke-opacity=".6"/></g>
+<path d="M50 84 Q60 78 70 84 L76 116 Q60 122 44 116Z" fill="#ff7ab8"/><path d="M44 116 Q60 122 76 116 L72 110 Q60 114 48 110Z" fill="#ffb3d6"/>
+<circle cx="60" cy="58" r="24" fill="#ffe2cc"/>
+<path d="M35 58 C32 30 54 24 64 30 C78 24 92 40 84 60 C80 46 70 40 60 42 C52 40 40 46 35 58Z" fill="#7b5cff"/>
+<path d="M60 30 Q66 18 74 22" stroke="#7b5cff" stroke-width="5" fill="none" stroke-linecap="round"/><circle cx="76" cy="21" r="5" fill="#ffd34d"/>
+<g class="keye"><ellipse cx="51" cy="60" rx="3.6" ry="4.6" fill="#2a1b4a"/><ellipse cx="69" cy="60" rx="3.6" ry="4.6" fill="#2a1b4a"/><circle cx="52.3" cy="58.4" r="1.3" fill="#fff"/><circle cx="70.3" cy="58.4" r="1.3" fill="#fff"/></g>
+<ellipse cx="45" cy="67" rx="4" ry="2.4" fill="#ff8fb0" opacity=".55"/><ellipse cx="75" cy="67" rx="4" ry="2.4" fill="#ff8fb0" opacity=".55"/>
+<path class="kmc" d="M55 69 Q60 73 65 69" stroke="#a33a5a" stroke-width="2" fill="none" stroke-linecap="round"/>
+<ellipse class="kmo" cx="60" cy="70.5" rx="3.6" ry="3" fill="#a33a5a"/>
+<g class="ksp"><path d="M98 30 l2 6 6 2 -6 2 -2 6 -2 -6 -6 -2 6 -2Z" fill="#fff6c8"/><path d="M18 34 l1.5 4 4 1.5 -4 1.5 -1.5 4 -1.5 -4 -4 -1.5 4 -1.5Z" fill="#bff3ff"/></g>
+</svg></div>`;
+const kcss=document.createElement("style");kcss.textContent=`
+#tuto .tbub{padding-top:18px}#tuto .tbub>h3{margin-bottom:12px}
+#tuto .kiko{position:absolute;width:62px;height:72px;left:4px;top:2px;pointer-events:none;animation:kfloat 2.6s ease-in-out infinite;filter:drop-shadow(0 4px 10px rgba(255,211,77,.35))}
+#tuto .twel .kiko{position:relative;left:auto;top:auto;margin:-6px auto 2px;width:110px;height:128px}
+#tuto .kw{transform-box:fill-box;animation:kflap .32s ease-in-out infinite alternate}#tuto .kwl{transform-origin:100% 50%}#tuto .kwr{transform-origin:0% 50%}
+#tuto .kmo{opacity:0}#tuto .kiko.talk .kmo{animation:ktalk .22s ease-in-out infinite alternate}#tuto .kiko.talk .kmc{opacity:0}
+#tuto .keye{transform-box:fill-box;transform-origin:center;animation:kblink 4s infinite}
+#tuto .ksp{animation:ksp 1.6s ease-in-out infinite}
+@keyframes kfloat{50%{transform:translateY(-7px) rotate(-3deg)}}
+@keyframes kflap{to{transform:scaleX(.55)}}
+@keyframes ktalk{from{opacity:1;transform:scaleY(.35)}to{opacity:1;transform:scaleY(1.1)}}
+#tuto .kmo{transform-box:fill-box;transform-origin:center}
+@keyframes kblink{0%,92%,100%{transform:scaleY(1)}95%{transform:scaleY(.1)}}
+@keyframes ksp{50%{opacity:.2}}
+#tuto .kname{font:800 11px inherit;color:#ff9ad1;letter-spacing:.06em;text-transform:uppercase;margin:0 0 2px 62px}
+#tuto .twel .kname{margin:0 0 4px}
+#tuto .kvb{position:absolute;right:10px;top:10px;background:#ffffff14;border:1px solid #ffffff22;color:#fff;border-radius:999px;width:32px;height:32px;font-size:15px;cursor:pointer}
+#tuto .twel .kvb{top:10px}
+#tuto .tbub h3{margin-left:62px}#tuto .twel h3{margin-left:0}
+#tuto .kel{text-align:center;font-size:20px;line-height:1.6;background:#ffffff0d;border-radius:12px;padding:6px;margin:6px 0}
+`;document.head.appendChild(kcss);
+let L=STEPS,LEND=null,i=0;const KT={pause:false,fight:false,battle:false};
+function finish(){el.classList.remove("on");try{speechSynthesis.cancel()}catch(_){}const f=LEND;LEND=null;if(L===STEPS){S.tuto=1;try{save()}catch(_){}try{go("home")}catch(_){}}if(f)f()}
+function targets(s){const ss=s.sel?[].concat(s.sel):[];return ss.map(q=>document.querySelector(q)).filter(t=>t&&t.offsetParent!==null)}
+function place(){const s=L[i];const ts=targets(s);
+ bub.style.maxHeight="";bub.style.overflowY="";
+ if(!ts.length||s.welcome){spot.className="tspot full";Object.assign(spot.style,{left:"50%",top:"50%",width:"0px",height:"0px"});bub.style.top="50%";bub.style.bottom="auto";bub.style.transform="translateY(-50%)";return}
+ const rs=ts.map(t=>t.getBoundingClientRect()),pad=6;
+ const r={left:Math.min(...rs.map(x=>x.left)),top:Math.min(...rs.map(x=>x.top)),right:Math.max(...rs.map(x=>x.right)),bottom:Math.max(...rs.map(x=>x.bottom))};
+ spot.className="tspot";Object.assign(spot.style,{left:r.left-pad+"px",top:r.top-pad+"px",width:r.right-r.left+pad*2+"px",height:r.bottom-r.top+pad*2+"px"});
+ bub.style.transform="none";const gap=14,h=bub.offsetHeight,up=r.top-pad-gap-8,down=innerHeight-(r.bottom+pad)-gap-8;
+ const below=h<=down?true:h<=up?false:down>=up;const room=below?down:up;
+ if(h>room){bub.style.maxHeight=Math.max(150,room)+"px";bub.style.overflowY="auto"}
+ if(below){bub.style.top=(r.bottom+pad+gap)+"px";bub.style.bottom="auto"}else{bub.style.top="auto";bub.style.bottom=(innerHeight-(r.top-pad)+gap)+"px"}}
+function show(n){i=n;const s=L[i];if(s.at)s.at();const many=L.length>1,dots=many?`<div class="tdots">${L.map((_,k)=>`<i class="${k===i?"on":""}"></i>`).join("")}</div>`:"";
+ const nextLbl=s.btn||(i===L.length-1?"OK":"Suivant ▶");
+ const head=`${KIKO}<div class="kname">Kiko · fée des Échos</div><h3>${s.t}</h3>${s.d}`;
+ bub.innerHTML=(s.welcome?`<div class="twel">${head}${dots}`:head+dots)
+  +(L===STEPS&&i===0?`<div class="trow" style="margin-top:12px"><button class="btn ghost" data-a="skip">Passer le tutoriel</button><button class="btn gold" data-a="next">C'est parti !</button></div>`
+   :`<div class="trow">${i>0&&L===STEPS?`<button class="btn ghost" data-a="prev">◀</button>`:""}<button class="btn gold" data-a="next" style="flex:3">${nextLbl}</button></div>${L===STEPS&&!s.end?`<button class="tskip" data-a="skip">Passer le tutoriel</button>`:""}`)
+  +(s.welcome?`</div>`:"");
+ bub.querySelectorAll("[data-a]").forEach(b=>b.onclick=()=>{try{sfx.select()}catch(_){}const a=b.dataset.a;
+  if(a==="voice"){KV.on=!KV.on;try{localStorage.setItem("shk_kvoice",KV.on?"1":"0")}catch(_){}b.textContent=KV.on?"🔊":"🔇";say(KV.on?L[i].v:"");return}
+  if(a==="prev")return show(Math.max(1,i-1));
+  if(a==="skip"){KT.fight=false;return finish()}
+  if(s.go){const g=s.go;finish();return g()}
+  if(i<L.length-1)show(i+1);else{if(L===STEPS)KT.fight=true;finish()}});
+ say(s.v);
+ const ts=targets(s);if(ts[0]&&!s.welcome)try{ts[0].scrollIntoView({block:"center"})}catch(_){}
+ requestAnimationFrame(()=>requestAnimationFrame(place));setTimeout(place,350)}
+function run(list,onEnd){L=list;LEND=onEnd||null;el.classList.add("on");show(0)}
+// fermer l'écran des cartes après la 1re invocation → proposer le combat
+const _done=$("btnDone").onclick;$("btnDone").onclick=function(){const r=_done.apply(this,arguments);if(KT.fight&&Object.keys(S.coll).length){KT.fight=false;setTimeout(()=>run(FIGHT0),500)}return r};
+// pause du combat pendant les explications
+const _act=act;act=async function(u){while(KT.pause)await new Promise(r=>setTimeout(r,120));return _act.apply(this,arguments)};
+const _end=endBattle;endBattle=function(){const b=B,tut=b&&b.cfg&&b.cfg.tuto;const won=b&&alive(b.allies).length>0&&!alive(b.enemies).length;const r=_end.apply(this,arguments);
+ if(tut)setTimeout(()=>{const fin=b.timeUp?alive(b.allies).length>0:won;run(fin?WIN:LOSE)},900);return r};
+async function tutoFight(){if((S.team||[]).length<5){S.team=Object.values(S.coll).sort((a,b)=>power(b)-power(a)).slice(0,5).map(c=>c.id);try{save()}catch(_){}}
+ let en;try{toast("Les adversaires arrivent…");en=await makeEnemies(0,1)}catch(e){toast("Impossible de charger le combat");return}
+ KT.pause=true;startBattle({type:"stage",w:0,s:1,enemies:en,title:WORLDS[0].ic+" 1-1 · Combat guidé",loc:WLOC[0],tuto:1});
+ setTimeout(()=>run(FIGHT,()=>{KT.pause=false}),900)}
+window.tutoFight=tutoFight;
 addEventListener("resize",()=>{if(el.classList.contains("on"))place()});
-window.startTuto=function(){el.classList.add("on");show(0)};
+window.startTuto=function(){run(STEPS)};
 // bouton « Revoir le tutoriel » dans les réglages
 const _st=showSettings;showSettings=function(){const r=_st.apply(this,arguments);try{const p=$("picker"),box=p.firstElementChild;if(box&&!p.querySelector(".tutobox")){const d=document.createElement("div");d.className="box tutobox";d.innerHTML=`<b>🧭 Tutoriel</b><button class="btn ghost sm" id="stTuto" style="margin-top:8px">Revoir le tutoriel</button><div class="muted" style="font-size:11px;margin-top:8px;text-align:center">Version du jeu : ${window.SHK_VER||"?"}</div>`;box.insertBefore(d,box.children[1]||null);d.querySelector("#stTuto").onclick=()=>{p.style.display="none";startTuto()}}}catch(e){console.warn(e)}return r};
 // nouveau joueur : aucune carte ouverte et tutoriel jamais vu
-if(!S.tuto&&!S.opened&&!Object.keys(S.coll).length)setTimeout(startTuto,900);
+if(!S.tuto&&!S.opened&&!Object.keys(S.coll).length)setTimeout(function w(){if(document.getElementById("titleS"))return setTimeout(w,400);startTuto()},1500);
 })();
 
 
