@@ -1458,7 +1458,7 @@ header .hsp{flex:1}
  <div id="modal" class="ovl"><div class="mbox" id="mbox"></div></div>
  <div id="toast"></div>
 </div>
-<script>window.SHK_VER="03/11 06h30"
+<script>window.SHK_VER="03/11 06h40"
 
 const BETA=true;const PUBLIC=true;
 
@@ -4723,7 +4723,7 @@ function key(e){if(["Enter"," ","Escape"].includes(e.key)){e.preventDefault();go
 el.addEventListener("click",go);addEventListener("keydown",key);
 })();
 </script>
-<script>(function(){try{const _sd=showDetail;showDetail=function(){const r=_sd.apply(this,arguments);try{const c=$("detail").querySelector(".card.live");if(c&&!c.dataset.tilt){c.dataset.tilt=1;const w=c.parentElement||c;w.style.transition="transform .2s ease-out";w.style.transformStyle="preserve-3d";
+<script>(function(){try{const _sd=showDetail;showDetail=function(){const r=_sd.apply(this,arguments);try{if(IS_ADMIN){const id=String(arguments[0]),cc=S.coll[id],fv=$("dFav");if(cc&&fv&&!isLive(cc)&&!document.getElementById("admMax")){const b=document.createElement("button");b.id="admMax";b.className="btn gold sm";b.style.marginTop="8px";b.textContent="🛠️ Admin : améliorer au maximum (★5 · Nv max)";fv.insertAdjacentElement("afterend",b);b.onclick=()=>{cc.star=5;cc.lvl=maxLvl(cc);cc.xp=0;save();try{checkMaster(cc)}catch(_){}try{cloudPush&&cloudPush(true)}catch(_){}showDetail(id)}}}}catch(e){console.warn(e)}try{const c=$("detail").querySelector(".card.live");if(c&&!c.dataset.tilt){c.dataset.tilt=1;const w=c.parentElement||c;w.style.transition="transform .2s ease-out";w.style.transformStyle="preserve-3d";
  const mv=e=>{const b=w.getBoundingClientRect();const x=(e.clientX-b.left)/b.width-.5,y=(e.clientY-b.top)/b.height-.5;w.style.transform=`perspective(800px) rotateY(${x*18}deg) rotateX(${-y*14}deg)`};w.addEventListener("pointermove",mv);w.addEventListener("pointerleave",()=>w.style.transform="");w.addEventListener("pointerup",()=>w.style.transform="")}}catch(e){console.warn(e)}return r}}catch(e){console.warn(e)}})();
 </script>
 <script>if("serviceWorker"in navigator)addEventListener("load",()=>navigator.serviceWorker.register("sw.js").catch(()=>{}))</script></body>
