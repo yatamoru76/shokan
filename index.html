@@ -1472,7 +1472,7 @@ header .hsp{flex:1}
  <div id="modal" class="ovl"><div class="mbox" id="mbox"></div></div>
  <div id="toast"></div>
 </div>
-<script>window.SHK_VER="03/11 07h30"
+<script>window.SHK_VER="03/11 07h45"
 
 const BETA=true;const PUBLIC=true;
 
@@ -2959,12 +2959,12 @@ function showSettings(){const p=$("picker");p.style.display="flex";
  <div class="box"><b>🎁 Code cadeau</b><div class="muted" style="font-size:12px;margin:3px 0 8px">Des codes sont partagés sur le <a href="${DISCORD}" target="_blank" style="color:#8ea1ff">Discord Shōkan</a> (salon #cadeaux).</div>
  <div style="display:flex;gap:8px"><input id="codeIn" maxlength="24" placeholder="EX : SHOKAN" autocapitalize="characters" style="flex:1;min-width:0;background:var(--bg);border:1px solid var(--line);border-radius:10px;color:var(--ink);font-size:16px;font-weight:800;letter-spacing:.06em;padding:10px;text-transform:uppercase;user-select:text"><button class="btn gold sm" id="codeGo" style="width:auto">Valider</button></div>
  ${(S.codes||[]).length?`<div class="muted" style="font-size:11px;margin-top:6px">Codes déjà utilisés : ${S.codes.map(esc).join(", ")}</div>`:""}</div>
- ${IS_ADMIN?`<button class="btn gold" id="stAdm" style="margin-bottom:10px">🛠️ Admin · Envoyer un cadeau à un joueur</button>`:""}<div class="cloudslot">${cloudBox()}</div>
+ ${IS_ADMIN?`<button class="btn gold" id="stAdm" style="margin-bottom:8px">🛠️ Admin · Envoyer un cadeau à un joueur</button><button class="btn gold" id="stStat" style="margin-bottom:10px">📊 Admin · Statistiques des joueurs</button>`:""}<div class="cloudslot">${cloudBox()}</div>
  <div class="box"><b>🔊 Son et vidéos</b><div class="row2" style="margin-top:8px"><button class="btn ghost sm" id="stMus">${M_.on?"🎵 Musique : activée":"🔇 Musique : coupée"}</button><button class="btn ghost sm" id="stSfx">${SFX_ON?"🔔 Effets sonores : activés":"🔕 Effets sonores : coupés"}</button><button class="btn ghost sm" id="stVid">${sceneOn()?"🎬 Vidéos d'anime : oui":"🎴 Vidéos d'anime : non"}</button></div><div class="muted" style="font-size:11.5px;margin-top:6px">Vidéos d'anime = fonds animés des cartes et Legendary Finish. Si elles s'affichent mal sur ton appareil, coupe-les : une cinématique dessinée les remplace.</div></div>
  ${discordBox()}
  <div class="box"><b>⚠️ Zone dangereuse</b><div class="muted" style="font-size:12px;margin:3px 0 8px">Efface la partie de ce téléphone.${CL.user?" Ta sauvegarde en ligne Discord n'est pas supprimée.":""}</div><button class="btn ghost sm" id="stReset">Effacer ma progression</button></div>
  <div class="muted" style="text-align:center;font-size:11px;margin:10px 0 30px">Shōkan · 召喚 · jeu de fan gratuit et non commercial<br>Données et images : AniList · les personnages appartiennent à leurs auteurs</div></div>`;
- $("stClose").onclick=()=>{p.style.display="none";render()};cloudBind(p);const sa=$("stAdm");if(sa)sa.onclick=showAdmin;
+ $("stClose").onclick=()=>{p.style.display="none";render()};cloudBind(p);const sa=$("stAdm");if(sa)sa.onclick=showAdmin;const st2=$("stStat");if(st2)st2.onclick=showStats;
  $("codeGo").onclick=async()=>{const b=$("codeGo");b.disabled=true;await redeemCode($("codeIn").value);if($("codeGo"))$("codeGo").disabled=false};
  $("codeIn").onkeydown=e=>{if(e.key==="Enter")$("codeGo").click()};
  $("stMus").onclick=()=>{$("cMusic").click();setTimeout(showSettings,50)};$("stSfx").onclick=()=>{SFX_ON=!SFX_ON;try{localStorage.setItem("otaku_sfx",SFX_ON?"1":"0")}catch(_){}if(SFXO)SFXO.gain.value=SFX_ON?1:0;sfx.select();showSettings()};$("stVid").onclick=()=>{try{localStorage.setItem("otaku_scene",sceneOn()?"0":"1")}catch(_){}sfx.select();showSettings()};
@@ -4777,6 +4777,21 @@ window.showRef=showRef;
 // 5. accès : Menu → Social
 try{const _sm=showMore;showMore=function(){const r=_sm.apply(this,arguments);try{const d=document.querySelector('#moreIn [data-a="discord"]');if(d&&!document.querySelector('#moreIn [data-a="ref"]')){const b=document.createElement("button");b.className="mr";b.dataset.a="ref";b.innerHTML=`<span class="mi" style="--mc:#d97706">招</span><span class="mt2"><b>🤝 Parrainage</b><small>Invite tes amis : boosters pour vous deux</small></span><span class="chev">›</span>`;d.insertAdjacentElement("beforebegin",b);b.onclick=()=>{try{sfx.select()}catch(_){}hideMore();showRef()}}}catch(e){console.warn(e)}return r}}catch(e){console.warn(e)}
 })();
+</script>
+<script>
+// ================= STATISTIQUES (admin) =================
+async function showStats(){const p=$("picker");p.style.display="flex";p.innerHTML=`<div class="muted" style="padding:40px">Chargement des statistiques…</div>`;
+ let rows=[],total=null,err="";try{const r=await CL.sb.from("players").select("user_id,name,avatar,lvl,power,updated_at",{count:"exact"}).order("updated_at",{ascending:false}).limit(1000);if(r.error)throw r.error;rows=r.data||[];total=r.count!=null?r.count:rows.length}catch(e){err=e.message||String(e)}
+ const now=Date.now(),age=x=>now-new Date(x.updated_at||0).getTime(),M=60000,H=60*M,D=24*H;
+ const on=rows.filter(x=>age(x)<10*M),day=rows.filter(x=>age(x)<D),week=rows.filter(x=>age(x)<7*D),month=rows.filter(x=>age(x)<30*D);
+ const ago=x=>{const a=age(x);return a<2*M?"à l'instant":a<H?`il y a ${Math.round(a/M)} min`:a<D?`il y a ${Math.round(a/H)} h`:`il y a ${Math.round(a/D)} j`};
+ const tile=(n,l,c)=>`<div style="flex:1;min-width:70px;background:#ffffff0a;border:1px solid #ffffff14;border-radius:12px;padding:10px 6px;text-align:center"><div style="font:900 24px sans-serif;color:${c}">${n}</div><div class="muted" style="font-size:11px">${l}</div></div>`;
+ p.innerHTML=`<div style="width:100%;max-width:460px"><div style="display:flex;justify-content:space-between;align-items:center;margin:4px 0 10px"><div style="font-weight:900;font-size:19px">📊 Statistiques</div><div style="display:flex;gap:6px"><button class="btn ghost sm" style="width:auto" id="ssR">↻</button><button class="btn ghost sm" style="width:auto" id="ssX">Fermer</button></div></div>
+ ${err?`<div class="box" style="color:#ff8a8a">Impossible de lire les joueurs : ${esc(err)}</div>`:""}
+ <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px">${tile(on.length,"en ligne<br>(10 min)","#3ddc84")}${tile(day.length,"aujourd'hui<br>(24 h)","#ffd34d")}${tile(week.length,"cette<br>semaine","#7fd4ff")}${tile(total==null?"?":total,"comptes<br>au total","#c084ff")}</div>
+ <div class="muted" style="font-size:11.5px;margin-bottom:8px">Actifs sur 30 jours : <b>${month.length}</b>. Seuls les joueurs connectés avec Discord sont comptés ; « en ligne » = a joué dans les 10 dernières minutes.</div>
+ <div class="box"><b>Derniers joueurs actifs</b>${rows.slice(0,40).map(x=>`<div class="syn"><span><i style="display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:6px;background:${age(x)<10*M?"#3ddc84":age(x)<D?"#ffd34d":"#6b6b78"}"></i><b>${esc(x.name||"Joueur")}</b> · niv. ${x.lvl||1}</span><span class="muted" style="font-size:11.5px">${ago(x)}</span></div>`).join("")||'<div class="muted">Aucun joueur.</div>'}</div></div>`;
+ $("ssX").onclick=()=>{p.style.display="none"};$("ssR").onclick=showStats}
 </script>
 <script>if("serviceWorker"in navigator)addEventListener("load",()=>navigator.serviceWorker.register("sw.js").catch(()=>{}))</script></body>
 </html>
