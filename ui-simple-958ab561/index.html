@@ -4895,6 +4895,12 @@ body.simple #nav button .lb{display:block!important;font:600 10.5px Inter,sans-s
 body.simple #nav button.on .lb{font-weight:800!important;opacity:1}
 body.simple .smp-hide{display:none!important}
 body.simple .today .tx small,body.simple .modes .mode small,body.simple #altar .mdesc,body.simple #altar .pd{display:none!important}
+body.simple .smpc{margin:4px 0 12px;padding:16px;border-radius:18px;background:linear-gradient(135deg,#2a1d12,#16110d);box-shadow:inset 0 0 0 1px #c9a45c55;cursor:pointer}
+body.simple .smpc-t{display:flex;justify-content:space-between;align-items:baseline;font:700 14px Inter,sans-serif;color:#e8dcc8}
+body.simple .smpc-t b{font:800 30px 'Shippori Mincho B1',serif;color:#ffd34d}
+body.simple .smpc-b{height:10px;border-radius:6px;background:#ffffff14;margin:10px 0 8px;overflow:hidden}
+body.simple .smpc-b i{display:block;height:100%;border-radius:6px;background:linear-gradient(90deg,#ff7a3d,#ffd34d)}
+body.simple .smpc-s{font:600 12px Inter,sans-serif;color:#a99f90}
 body.simple .card .sr,body.simple .greet{display:none!important}
 body.simple .today .trow{padding-top:11px!important;padding-bottom:11px!important}
 `;document.head.appendChild(css);
@@ -4910,7 +4916,9 @@ function prune(){const m=$("main");if(!m)return;const kids=[...m.children];
  if(view==="coll"){kids.forEach(k=>{if(k.matches(".sec,.muted,p.muted"))hide(k)})}
  if(view==="team"){kids.forEach(k=>{if(k.matches(".box")&&/Conseils|tips/i.test(txt(k)))hide(k)})}
  if(view==="adv"){kids.forEach(k=>{if(k.matches(".muted"))hide(k)});secBefore("#storyBtn")}
- if(view==="hub"){const t=m.querySelector(".today");if(t)[...t.children].slice(2).forEach(hide);hide(m.querySelector("#hSum"));
+ if(view==="hub"){const t=m.querySelector(".today");if(t)[...t.children].slice(2).forEach(hide);hide(m.querySelector("#hSum"));if(!m.querySelector(".smpc")){const L=Object.values(S.coll),u=L.length,tot=(RAR[0]&&RAR[0].max)||3100,pc=Math.min(100,u/tot*100);
+  const d=document.createElement("div");d.className="smpc";d.innerHTML=`<div class="smpc-t"><span>集 Collection</span><b>${pc.toFixed(1).replace(".",",")} %</b></div><div class="smpc-b"><i style="width:${Math.max(pc,.6)}%"></i></div><div class="smpc-s">${fmt(u)} / ${fmt(tot)} personnages</div>`;
+  d.onclick=()=>{view="coll";setNav();render();$("main").scrollTop=0};const duo=m.querySelector(".duo");m.insertBefore(d,duo||m.firstChild)}
   kids.forEach((k,i)=>{if(k.matches(".hrow")){hide(k);const a=kids[i-1],b=kids[i-2];if(a&&a.matches(".muted"))hide(a);if(b&&b.matches(".sec"))hide(b)}})}
  if(view==="home"){kids.forEach((k,i)=>{if(k.id==="packs"){hide(k);const a=kids[i-1];if(a&&a.matches(".sec"))hide(a)}})}
  if(view==="team"){kids.forEach(k=>{if(k.matches(".muted")&&!/⚡|\d/.test(txt(k)))hide(k);if(k.matches(".box")&&/Synerg/i.test(txt(k)))k.querySelectorAll(".muted,small,p").forEach(x=>{if(!/[+%]/.test(txt(x)))hide(x)})})}
