@@ -1472,7 +1472,7 @@ header .hsp{flex:1}
  <div id="modal" class="ovl"><div class="mbox" id="mbox"></div></div>
  <div id="toast"></div>
 </div>
-<script>window.SHK_VER="04/11 13h10"
+<script>window.SHK_VER="04/11 16h10"
 
 const BETA=true;const PUBLIC=true;
 
@@ -5068,7 +5068,7 @@ const css=document.createElement("style");css.textContent=`#cine.gal .p1 img{tra
 const _c=cinematic;
 cinematic=function(u){const pr=_c.apply(this,arguments);
  try{const c=$("cine"),L=u&&u.card&&G[String(u.card.id)];c.classList.remove("gal");
-  if(L&&L.length){const a=L.slice().sort(()=>Math.random()-.5);const p1=c.querySelector(".p1 img"),p2=c.querySelector(".p2 img");
+  if(L&&L.length){const a=(L.length>2?L.slice(1):L.slice()).sort(()=>Math.random()-.5);const p1=c.querySelector(".p1 img"),p2=c.querySelector(".p2 img");
    const set=(im,src)=>{if(!im||!src)return;im.onerror=()=>{im.onerror=null;im.src=u.img};im.src=src};
    if(a.length>=2){set(p1,a[0]);set(p2,a[1])}else set(p2,a[0]);c.classList.add("gal")}
   else if(u&&u.card)want(u.card)}catch(_){}
