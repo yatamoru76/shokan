@@ -1472,7 +1472,7 @@ header .hsp{flex:1}
  <div id="modal" class="ovl"><div class="mbox" id="mbox"></div></div>
  <div id="toast"></div>
 </div>
-<script>window.SHK_VER="04/11 12h55"
+<script>window.SHK_VER="04/11 13h10"
 
 const BETA=true;const PUBLIC=true;
 
@@ -5076,6 +5076,28 @@ cinematic=function(u){const pr=_c.apply(this,arguments);
 const _sb=startBattle;
 startBattle=function(cfg){const r=_sb.apply(this,arguments);try{if(B){B.allies.forEach(x=>want(x.card));B.enemies.forEach(x=>want(x.card))}}catch(_){}return r};
 setTimeout(()=>{try{(S.team||[]).forEach(id=>want(S.coll[id]))}catch(_){}},6000);
+})();
+</script><script>// ================= 12 COSMOS SUPPLÉMENTAIRES (héros principaux / êtres surpuissants) =================
+(function(){
+const NAMES=["Son Goku","Naruto Uzumaki","Luffy","Ichigo Kurosaki","Saitama","Ryoumen Sukuna","Madara Uchiha","Gilgamesh","Rimuru Tempest","Ainz Ooal Gown","Shigeo Kageyama","Joutarou Kuujou"];
+const KEY="shk_cosmos12",VER=1;let EXT=[];try{const o=JSON.parse(localStorage.getItem(KEY)||"null");if(o&&o.v===VER)EXT=o.list||[]}catch(_){}
+const PROMO=new Set(EXT.map(c=>c.id));
+const QS=`query($s:String){Page(perPage:1){characters(search:$s,sort:FAVOURITES_DESC){id name{full} image{large} favourites media(perPage:3,sort:POPULARITY_DESC){nodes{isAdult title{romaji english}}}}}}`;
+async function load(){if(EXT.length>=NAMES.length||DEMO)return;const out=EXT.slice();
+ for(const n of NAMES){if(out.some(c=>c.q===n))continue;try{const res=await fetch(API,{method:"POST",headers:{"Content-Type":"application/json",Accept:"application/json"},body:JSON.stringify({query:QS,variables:{s:n}})});
+  if(res.status===429){await sleep(4000);continue}if(!res.ok)continue;const j=await res.json();const c=j.data&&j.data.Page.characters[0];if(!c)continue;const m=(c.media&&c.media.nodes)||[];
+  out.push({q:n,id:c.id,name:c.name.full,img:c.image.large,fav:c.favourites,adult:m.some(x=>x.isAdult),series:m[0]?(m[0].title.english||m[0].title.romaji):"???"})}catch(_){}await sleep(700)}
+ EXT=out.filter(c=>!c.adult&&c.img);EXT.forEach(c=>PROMO.add(c.id));try{localStorage.setItem(KEY,JSON.stringify({v:VER,list:EXT}))}catch(_){}upgrade()}
+function upgrade(){let n=[];EXT.forEach(e=>{const c=S.coll[e.id];if(c&&c.rarity!=="X"){c.rarity="X";c.rank=3;n.push(c.name)}});
+ if(n.length){save();setTimeout(()=>{try{addGift("🌌","Nouvelles cartes Cosmos !","Ces personnages deviennent Cosmos : "+n.join(", ")+". Tes exemplaires ont été améliorés.",{shards:0})}catch(_){toast("🌌 "+n.join(", ")+" deviennent Cosmos !")}},1500)}}
+const _ca=charAt;
+charAt=async function(rank,r){
+ if(r&&r.id==="X"&&EXT.length&&Math.random()<EXT.length/(EXT.length+(r.max-r.min+1))){const c=EXT[Math.floor(Math.random()*EXT.length)];const{q,...cc}=c;return Object.assign({rarity:"X",rank:3},cc)}
+ let rk=rank,c=null;for(let k=0;k<10;k++){c=await _ca(rk,r);if(!PROMO.has(c.id)||(r&&r.id==="X"))return c;if(c.rank>=r.max){rk=r.min+Math.floor(Math.random()*(r.max-r.min+1))}else rk=c.rank+1}
+ return c};
+if(EXT.length)setTimeout(upgrade,2500);
+setTimeout(load,4000);
+window.COSMOS_EXTRA=()=>EXT.map(c=>c.name);
 })();
 </script></body>
 </html>
