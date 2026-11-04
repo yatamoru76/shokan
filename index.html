@@ -1472,7 +1472,7 @@ header .hsp{flex:1}
  <div id="modal" class="ovl"><div class="mbox" id="mbox"></div></div>
  <div id="toast"></div>
 </div>
-<script>window.SHK_VER="03/11 20h30"
+<script>window.SHK_VER="04/11 12h30"
 
 const BETA=true;const PUBLIC=true;
 
@@ -3020,6 +3020,7 @@ function showPass(){const si=seasonInfo(),P=passState(),l=passLvl(P),p=$("picker
 
 // ================= SUCCÈS & TITRES =================
 const ACH=[
+ {id:"gr1",ic:"🐉",n:"Chasseur de titans",d:"Vaincre un boss de raid de guilde",f:()=>S.graidKills||0,t:1,rw:{frag:2}},
  {id:"o10",ic:"📦",n:"Premiers pas",d:"Ouvrir 10 boosters",f:()=>S.opened,t:10,rw:{boosters:2}},
  {id:"o100",ic:"📦",n:"Collectionneur",d:"Ouvrir 100 boosters",f:()=>S.opened,t:100,rw:{boosters:5,frag:1}},
  {id:"o500",ic:"📚",n:"Bibliothécaire",d:"Ouvrir 500 boosters",f:()=>S.opened,t:500,rw:{card:"M"},title:"Bibliothécaire"},
@@ -3899,7 +3900,7 @@ function v2Top(){initProfile();const P=S.prof;
  d[1].style.display=Object.values(S.coll).some(c=>canEvolve(c))&&view!=="coll"?"block":"none";
  d[2].style.display="none";d[3].style.display="none";
  d[4].style.display=moreAlerts()>0?"block":"none"}
-function moreAlerts(){let n=0;try{if(mkAlert())n++;if(questsReady()||passReady()||achReady())n++;n+=(S.gifts||[]).length;n+=(typeof FR!=="undefined"&&FR.pend)||0;n+=typeof chatTotal==="function"?chatTotal():0}catch(_){}return n}
+function moreAlerts(){let n=0;try{if(mkAlert())n++;if(S.guild&&Date.now()>=S.guild.chestAt)n++;if(questsReady()||passReady()||achReady())n++;n+=(S.gifts||[]).length;n+=(typeof FR!=="undefined"&&FR.pend)||0;n+=typeof chatTotal==="function"?chatTotal():0}catch(_){}return n}
 function hideMore(){$("more").classList.remove("on")}
 function showMore(){const gn=(S.gifts||[]).length,fp=((typeof FR!=="undefined"&&FR.pend)||0)+(typeof chatTotal==="function"?chatTotal():0);let qR=false,mkR=false,gR=false,pR=false,aR=false;try{qR=questsReady()||!S.daily.login;mkR=mkAlert();gR=S.guild&&Date.now()>=S.guild.chestAt;pR=passReady();aR=achReady()}catch(_){}
  const nb=n=>n?`<span class="nb">${n}</span>`:"",nd=b=>b?`<span class="nd"></span>`:"";
@@ -4032,6 +4033,7 @@ const STEPS=[
  {sel:'#moreIn [data-a="v:evt"]',at:()=>{go("hub");try{showMore()}catch(_){}},t:"Missions et événements",v:"Dans le menu, passe ici chaque jour : missions du jour, raid du Titan et bonus. C'est la façon la plus simple de gagner des récompenses… même pour les flemmards."},
  {sel:['#moreIn [data-a="pass"]','#moreIn [data-a="ach"]'],at:()=>{go("hub");try{showMore()}catch(_){}},t:"Passe et Succès",v:"Le Passe saisonnier te donne des récompenses à chaque palier, gratuitement. Et les Succès récompensent tes exploits. Oui, même celui de perdre dix fois de suite. Je plaisante… presque."},
  {sel:'#moreIn [data-a="v:mk"]',at:()=>{go("hub");try{showMore()}catch(_){}},t:"Le Marché",v:"Le Marché, c'est l'endroit des bonnes affaires : achète, vends, fais des enchères ou échange tes cartes avec les autres joueurs. Méfie-toi des marchands trop souriants."},
+ {sel:'#moreIn [data-a="v:guild"]',at:()=>{go("hub");try{showMore()}catch(_){}},t:"La Guilde",v:"Rejoins une guilde ! Avec de vrais joueurs : coffre commun et boss de raid à battre ensemble. Seul on va vite, en guilde on tape plus fort."},
  {sel:['#moreIn [data-a="friends"]','#moreIn [data-a="gifts"]'],at:()=>{go("hub");try{showMore()}catch(_){}},t:"Amis et cadeaux",v:"Ajoute tes amis, discute, envoie des autocollants et lance des combats amicaux. Pense aussi à ta boîte à cadeaux : il y a souvent des surprises dedans."},
  {sel:'#moreIn [data-a="ref"]',at:()=>{go("hub");try{showMore()}catch(_){}},t:"Parrainage",v:"Tu as des amis qui ne jouent pas encore ? Invite-les avec ton lien de parrainage : des récompenses vous attendent. Plus on est de Gardiens, plus on rit."},
  {sel:'#moreIn [data-a="set"]',at:()=>{go("hub");try{showMore()}catch(_){}},t:"Les réglages",v:"Dans les paramètres : ton compte, ta sauvegarde, la musique… et les codes cadeaux. Garde l'œil ouvert, on en partage parfois sur Discord."},
@@ -4880,10 +4882,8 @@ async function showStats(){const p=$("picker");p.style.display="flex";p.innerHTM
 </script>
 <script>if("serviceWorker"in navigator)addEventListener("load",()=>navigator.serviceWorker.register("sw.js").catch(()=>{}))</script><script>
 // ================= PAS DE BOTS DÉGUISÉS EN JOUEURS =================
-// Guildes masquées (pas encore de vraies guildes entre joueurs) · Arène classée réservée aux vrais joueurs (connexion) · l'entraînement 🤖 reste.
+// Arène classée réservée aux vrais joueurs (connexion) · l'entraînement 🤖 reste.
 (function(){
-const _sm=showMore;showMore=function(){const r=_sm.apply(this,arguments);try{document.querySelectorAll('#moreIn [data-a="v:guild"]').forEach(e=>e.remove())}catch(_){}return r};
-const _r=render;render=function(){if(view==="guild")view="hub";const r=_r.apply(this,arguments);try{document.querySelectorAll('#main [data-t="v:guild"]').forEach(e=>e.remove())}catch(_){}return r};
 const _sa=showArena;showArena=function(practice){if(practice===true||pvpOn())return _sa.apply(this,arguments);
  modal(`<h3 style="margin:0 0 6px">🏟️ Arène classée</h3><p class="muted">L'Arène classée oppose uniquement de <b>vrais joueurs</b>. Connecte-toi pour y participer et apparaître au classement.</p><p class="muted" style="font-size:12.5px">En attendant, tu peux t'entraîner contre des bots 🤖 (sans classement).</p>`,
  [["Fermer"],["🤖 Entraînement",()=>_sa(true)],["Se connecter",()=>{try{cloudLogin()}catch(_){showSettings()}}]])};
@@ -4957,6 +4957,95 @@ rMarket=function(){migrate();const tabs=[["buy","Acheter"],["sell","Vendre"],["m
  $("main").innerHTML=`${sec("01","Marché","市場")}<div class="muted" style="margin:-4px 0 10px;font-size:12.5px">👥 Uniquement de vrais joueurs</div><div class="subtabs">${tabs.map(([k,n,c])=>`<button data-mt="${k}" class="${MK.tab===k?"on":""}">${n}${c?`<span class="n">${c}</span>`:""}</button>`).join("")}</div><div id="mkBody"></div>`;
  $("main").querySelectorAll("[data-mt]").forEach(x=>x.onclick=()=>{MK.tab=x.dataset.mt;rMarket()});
  if(!CL.ready){$("mkBody").innerHTML=`<p class="muted" style="text-align:center">Connexion au marché…</p>`;clearTimeout(rMarket.t);rMarket.t=setTimeout(()=>{if(view==="mk")rMarket()},1500);return}draw();if(Date.now()-MK.at>30000)load()};
+})();
+</script><script>// ================= VRAIES GUILDES EN LIGNE (Supabase : guilds, guild_members, guild_feed + fonctions guild_*) =================
+(function(){
+const GL={at:0,busy:false,err:null,pend:0,ft:null,list:[],q:"",raid:null};
+const ME=()=>CL.user&&CL.user.id;
+const myName=()=>{try{initProfile()}catch(_){}return (S.prof&&S.prof.name)||"Joueur"};
+const isMissing=e=>e&&(/relation|does not exist|schema cache|not find|404/i.test(e.message||"")||["42P01","PGRST205","PGRST202"].includes(e.code));
+const errTxt=e=>{const m=(e&&e.message)||"Erreur";return/duplicate|unique/i.test(m)?"Ce nom de guilde est déjà pris":m};
+function lvlOf(x){let l=1;x=+x||0;while(l<200&&x>=gNeed(l)){x-=gNeed(l);l++}return[l,x]}
+const css=document.createElement("style");css.textContent=`.gvg{display:none!important}`;document.head.appendChild(css);
+
+// plus aucune activité simulée
+gfeed=function(){};
+const _gxp=gxp;
+gxp=function(n,mine){const g=S.guild;if(!g||!g.sid)return;if(mine){g.my+=n;GL.pend+=n;clearTimeout(GL.ft);GL.ft=setTimeout(flush,4000)}};
+async function flush(){const n=Math.round(GL.pend);GL.pend=0;if(!n||!pvpOn()||!S.guild||!S.guild.sid)return;try{const {error}=await CL.sb.rpc("guild_contrib",{p_n:n});if(error)GL.pend+=n}catch(_){GL.pend+=n}}
+addEventListener("pagehide",()=>{try{flush()}catch(_){}});
+guildTick=function(){const g=S.guild;if(!g)return;const cb=$("gChest");if(cb&&cb.disabled)cb.textContent="Prochain coffre dans "+fmtT(g.chestAt-Date.now());
+ if(view==="guild"&&g.sid&&Date.now()-GL.at>45000&&!GL.busy&&!document.querySelector("#modal[style*='flex']"))sync(true)};
+
+// ---- raid de guilde commun ----
+const _gs=graidState,_gh=graidHit;
+graidState=function(){const g=S.guild;if(!g)return null;if(g.raid)g.raid.last=Date.now();const fresh=!g.raid||g.raid.wk!==weekId();const R=_gs.apply(this,arguments);
+ if(R&&g.sid&&fresh&&pvpOn())setTimeout(()=>raidPush(0),0);return R};
+graidHit=function(d,mine){if(mine&&S.guild&&S.guild.sid&&pvpOn()){raidPush(d);return}return _gh.apply(this,arguments)};
+async function raidPush(d){const g=S.guild;if(!g||!g.raid)return;const R=g.raid;
+ try{const {data,error}=await CL.sb.rpc("guild_raid",{p_wk:R.wk,p_max:Math.round(R.max),p_b:R.b,p_dmg:Math.round(d||0),p_pname:myName()});if(error)throw error;GL.raid=data;applyRaid();save();if(view==="guild")gRefresh()}
+ catch(e){if(d)_gh(d,true)}}
+function applyRaid(){const g=S.guild,sr=GL.raid;if(!g||!g.raid||!sr||+sr.wk!==g.raid.wk)return;const R=g.raid;R.max=+sr.max||R.max;
+ const dm=sr.dmg||{},nm=sr.names||{},me=ME();let tot=0;R.npc={};for(const k in dm){tot+=+dm[k];if(k!==me)R.npc[nm[k]||"Joueur"]=+dm[k]}
+ R.me=+(dm[me]||0);const hp=Math.max(0,R.max-tot);if(hp<R.hp&&!R.dead)_gh(R.hp-hp,false);else R.hp=hp;if(sr.dead&&!R.dead)_gh(R.hp||1,false)}
+
+// ---- synchronisation ----
+async function sync(redraw){if(!pvpOn()||!CL.ready)return;GL.busy=true;
+ try{const {data:m,error}=await CL.sb.from("guild_members").select("guild_id,contrib").eq("user_id",ME()).maybeSingle();if(error)throw error;
+  if(!m){if(S.guild){if(!S.guild.sid&&!S.gOld)S.gOld={name:S.guild.name,emblem:S.guild.emblem,color:S.guild.color,leader:S.guild.leader};S.gKeep={unl:S.guild.unl||{},equip:S.guild.equip||{}};S.guild=null;save()}}
+  else{const [a,b,c]=await Promise.all([CL.sb.from("guilds").select("*").eq("id",m.guild_id).single(),
+    CL.sb.from("guild_members").select("user_id,name,contrib").eq("guild_id",m.guild_id).order("contrib",{ascending:false}).limit(150),
+    CL.sb.from("guild_feed").select("txt,at").eq("guild_id",m.guild_id).order("at",{ascending:false}).limit(25)]);
+   if(a.error)throw a.error;apply(a.data,b.data||[],c.data||[],+m.contrib||0)}
+  await loadList();GL.at=Date.now();GL.err=null}
+ catch(e){GL.err=isMissing(e)?"missing":errTxt(e)}
+ GL.busy=false;if(redraw&&view==="guild")rGuild()}
+function apply(g,mem,fd,myc){let G=S.guild;const isNew=!G||G.sid!==g.id;const[L,xin]=lvlOf(g.xp);
+ if(isNew){const k=S.gKeep||(G?{unl:G.unl||{},equip:G.equip||{}}:{unl:{},equip:{}});
+  G=S.guild={sid:g.id,name:g.name,emblem:g.emblem,color:g.color,leader:false,lvl:L,xp:xin,members:[],feed:[],last:Date.now(),chestAt:(G&&G.chestAt)||Date.now(),my:0,unl:k.unl||{},equip:k.equip||{},created:Date.now()};delete S.gKeep;delete S.gOld}
+ G.name=g.name;G.emblem=g.emblem;G.color=g.color;G.leader=g.leader===ME();
+ while(G.lvl<L){G.lvl++;const nd=DECOS.filter(d=>d.lvl===G.lvl);nd.forEach(d=>G.unl[d.id]=1);const rw=bonusRw({boosters:2+Math.floor(G.lvl/2),shards:100*G.lvl,oni:5+G.lvl});
+  addGift(G.emblem,"Guilde niveau "+G.lvl+" !","Ta guilde progresse grâce à l'activité de ses membres"+(G.leader?" (bonus de chef +10 %)":"")+(nd.length?". Débloqué : "+nd.map(d=>d.n).join(", "):"."),rw);notify(G.emblem,"Ta guilde passe niveau "+G.lvl+" !")}
+ G.lvl=L;G.xp=xin;DECOS.forEach(d=>{if(d.lvl<=G.lvl)G.unl[d.id]=1});
+ G.members=mem.filter(x=>x.user_id!==ME()).map(x=>({n:x.name,c:+x.contrib||0,j:0}));G.my=Math.max(myc+GL.pend,0);
+ G.feed=fd.map(f=>({t:Date.parse(f.at),x:f.txt}));
+ if(g.raid&&g.raid.wk!=null){GL.raid=g.raid;graidState();applyRaid()}
+ try{applyDeco()}catch(_){}save()}
+async function loadList(){let r=CL.sb.from("guilds").select("id,name,emblem,color,xp,guild_members(count)").order("xp",{ascending:false}).limit(30);
+ if(GL.q)r=r.ilike("name","%"+GL.q.replace(/[%_]/g,"")+"%");const {data,error}=await r;if(error)throw error;GL.list=(data||[]).map(x=>({...x,n:(x.guild_members&&x.guild_members[0]&&x.guild_members[0].count)||0,l:lvlOf(x.xp)[0]}))}
+
+// ---- écrans ----
+guildRank=function(){const g=S.guild;const L=GL.list.slice(0,15);if(!L.length)return"";
+ return`<div class="sec"><span class="no">順</span><span class="t">Classement des guildes</span><span class="jp">順位</span></div><div class="grank">${L.map((x,i)=>{const me=g&&g.sid===x.id;return`<div class="gr ${me?"me":""}" style="--gc:${x.color}"><span class="gp">${i+1}</span><div class="gem2">${esc(x.emblem)}</div><div style="flex:1;min-width:0"><b>${esc(x.name)}</b><div class="muted" style="font-size:12px">Niveau ${x.l} · ${x.n} membre${x.n>1?"s":""}${me?" · ta guilde":""}</div></div></div>`}).join("")}</div>`};
+const _gr=gRefresh;
+gRefresh=function(){const r=_gr.apply(this,arguments);const g=S.guild,b=$("gLeave");
+ if(g&&g.sid){const st=document.querySelector("#gBody .gstats div b");if(st)st.textContent="👥 "+(g.members.length+1);const sp=document.querySelector("#gBody .gstats div span");if(sp)sp.textContent="membres / "+Math.min(150,13+6*g.lvl);
+  if(b){b.textContent="Quitter la guilde";b.onclick=()=>modal(`<h3>Quitter la guilde ?</h3><p class="muted">${g.leader?"Le membre le plus actif deviendra chef. Si tu es seul, la guilde sera supprimée.":"Tu pourras en rejoindre une autre."}</p>`,
+   [["Annuler"],["Quitter",async()=>{try{await flush();const {error}=await CL.sb.rpc("guild_leave");if(error)throw error;S.gKeep={unl:g.unl,equip:g.equip};S.guild=null;save();toast("Tu as quitté la guilde");GL.at=0;sync(true)}catch(e){toast("❌ "+errTxt(e))}}]])}}
+ return r};
+const _rg=rGuild;
+rGuild=function(){const head=sec("01","Guilde","ギルド");const M=$("main");
+ if(!pvpOn()){M.innerHTML=head+`<div class="box" style="text-align:center"><b>🏯 Les guildes sont en ligne</b><p class="muted">Rejoins de vrais joueurs dans une guilde : coffre, boss de raid commun et classement. Connecte-toi pour commencer.</p><button class="btn gold sm" id="gLog">Se connecter</button></div>`;
+  $("gLog").onclick=()=>{try{cloudLogin()}catch(_){showSettings()}};return}
+ if(GL.err==="missing"){M.innerHTML=head+`<div class="box" style="text-align:center"><b>🛠️ Guildes en préparation</b><p class="muted">Les guildes entre joueurs ouvrent très bientôt.</p></div>`;return}
+ if(!GL.at){M.innerHTML=head+`<p class="muted" style="text-align:center;padding:30px">${GL.err?esc(GL.err)+` <br><button class="btn ghost sm" id="gRe" style="margin-top:10px;width:auto">Réessayer</button>`:"Connexion aux guildes…"}</p>`;
+  if(GL.err)$("gRe").onclick=()=>{GL.err=null;sync(true);rGuild()};else if(!GL.busy)sync(true);return}
+ if(S.guild&&S.guild.sid)return _rg.apply(this,arguments);
+ const old=S.gOld;
+ M.innerHTML=head+`${old&&old.leader?`<div class="box"><b>${esc(old.emblem)} Ta guilde « ${esc(old.name)} »</b><p class="muted" style="font-size:12.5px;margin:4px 0 10px">Les guildes sont maintenant en ligne, avec de vrais joueurs. Recrée-la en un clic pour que d'autres puissent la rejoindre.</p><button class="btn gold" id="gRe2">Recréer ma guilde en ligne</button></div>`:""}
+ <div class="box"><b>🏯 Fonde ta guilde</b><div class="muted" style="margin:4px 0 10px">Le fondateur devient <b>chef</b> et reçoit <b>+10 %</b> sur les récompenses de guilde.</div><button class="btn" id="gCreate">Créer une guilde</button></div>
+ <div class="sec"><span class="no">02</span><span class="t">Ou rejoins une guilde</span><span class="jp">参加</span></div>
+ <input id="gQ" placeholder="Chercher une guilde" value="${esc(GL.q)}" style="width:100%;box-sizing:border-box;margin-bottom:10px;background:#ffffff0d;border:1px solid #ffffff22;border-radius:12px;padding:11px 12px;color:#f2ece2;font:500 14px Inter,sans-serif">
+ ${GL.list.length?GL.list.map(x=>{const full=x.n>=Math.min(150,13+6*x.l);return`<div class="gl" style="--gc:${x.color}"><div class="gem2">${esc(x.emblem)}</div><div style="flex:1;min-width:0"><b>${esc(x.name)}</b><div class="muted" style="font-size:12px">Niveau ${x.l} · ${x.n} membre${x.n>1?"s":""}</div></div><button class="btn ghost sm" data-gj="${x.id}" style="width:auto" ${full?"disabled":""}>${full?"Complète":"Rejoindre"}</button></div>`}).join(""):`<div class="box" style="text-align:center"><p class="muted" style="margin:0">${GL.q?"Aucune guilde trouvée.":"Aucune guilde pour l'instant : fonde la première !"}</p></div>`}
+ <div class="muted" style="margin-top:10px;font-size:11.5px">👥 Uniquement de vrais joueurs</div>`;
+ $("gCreate").onclick=createGuild;
+ const r2=$("gRe2");if(r2)r2.onclick=()=>newGuild(old,true);
+ const q=$("gQ");q.onchange=async()=>{GL.q=q.value.trim();try{await loadList()}catch(_){}rGuild()};
+ M.querySelectorAll("[data-gj]").forEach(b=>b.onclick=async()=>{b.disabled=true;try{const {error}=await CL.sb.rpc("guild_join",{p_id:b.dataset.gj,p_pname:myName()});if(error)throw error;toast("🤝 Bienvenue dans la guilde !");GL.at=0;sync(true)}catch(e){b.disabled=false;toast("❌ "+errTxt(e))}})};
+newGuild=function(o,leader){if(!pvpOn()){toast("Connecte-toi d'abord");return}
+ CL.sb.rpc("guild_create",{p_name:o.name,p_emblem:o.emblem,p_color:o.color,p_pname:myName()}).then(({error})=>{if(error){toast("❌ "+errTxt(error));return}toast((o.emblem||"🏯")+" Guilde fondée !");GL.at=0;sync(true)},e=>toast("❌ "+errTxt(e)))};
+// synchro au démarrage (après la connexion)
+let tries=0;const boot=setInterval(()=>{tries++;if(pvpOn()){clearInterval(boot);sync(false)}else if(tries>40)clearInterval(boot)},1500);
 })();
 </script></body>
 </html>
