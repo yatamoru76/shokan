@@ -1472,7 +1472,7 @@ header .hsp{flex:1}
  <div id="modal" class="ovl"><div class="mbox" id="mbox"></div></div>
  <div id="toast"></div>
 </div>
-<script>window.SHK_VER="04/11 12h30"
+<script>window.SHK_VER="04/11 12h55"
 
 const BETA=true;const PUBLIC=true;
 
@@ -5046,6 +5046,36 @@ newGuild=function(o,leader){if(!pvpOn()){toast("Connecte-toi d'abord");return}
  CL.sb.rpc("guild_create",{p_name:o.name,p_emblem:o.emblem,p_color:o.color,p_pname:myName()}).then(({error})=>{if(error){toast("❌ "+errTxt(error));return}toast((o.emblem||"🏯")+" Guilde fondée !");GL.at=0;sync(true)},e=>toast("❌ "+errTxt(e)))};
 // synchro au démarrage (après la connexion)
 let tries=0;const boot=setInterval(()=>{tries++;if(pvpOn()){clearInterval(boot);sync(false)}else if(tries>40)clearInterval(boot)},1500);
+})();
+</script><script>// ================= ULTIMES : images différentes du perso dans les 2 cases du haut (galerie MyAnimeList via Jikan) =================
+(function(){
+const GK="shk_gal";let G={};try{G=JSON.parse(localStorage.getItem(GK)||"{}")}catch(_){G={}}
+const store=()=>{try{const k=Object.keys(G);if(k.length>500)k.slice(0,k.length-500).forEach(x=>delete G[x]);localStorage.setItem(GK,JSON.stringify(G))}catch(_){}};
+const norm=s=>(s||"").toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g,"").replace(/[^a-z0-9]/g,"");
+const parts=s=>(s||"").split(/[\s,]+/).map(norm).filter(Boolean).sort().join("|");
+const wait=ms=>new Promise(r=>setTimeout(r,ms));
+const Q=[];let run=false;
+function want(card){if(!card||card.id==null||card.id<0||!card.name)return;const k=String(card.id);if(G[k]!==undefined||Q.some(c=>String(c.id)===k))return;Q.push(card);pump()}
+async function pump(){if(run)return;run=true;while(Q.length){const c=Q.shift();await fetchGal(c);await wait(900)}run=false}
+async function fetchGal(card){const k=String(card.id);
+ try{const r=await fetch("https://api.jikan.moe/v4/characters?q="+encodeURIComponent(card.name)+"&order_by=favorites&sort=desc&limit=15");if(r.status===429){await wait(3000);Q.push(card);return}if(!r.ok)return;
+  const j=await r.json(),n=norm(card.name),p=parts(card.name);
+  const m=(j.data||[]).find(x=>norm(x.name)===n||parts(x.name)===p);if(!m){G[k]=[];store();return}
+  await wait(700);const q=await fetch("https://api.jikan.moe/v4/characters/"+m.mal_id+"/pictures");if(q.status===429){await wait(3000);Q.push(card);return}if(!q.ok)return;
+  const pj=await q.json();const urls=(pj.data||[]).map(x=>x.jpg&&(x.jpg.large_image_url||x.jpg.image_url)).filter(Boolean).slice(0,10);
+  G[k]=urls;store();urls.slice(0,3).forEach(u=>{const im=new Image();im.referrerPolicy="no-referrer";im.src=u})}catch(_){}}
+const css=document.createElement("style");css.textContent=`#cine.gal .p1 img{transform:scale(1.15);object-position:center 20%}#cine.gal .p2 img{object-position:center 20%}`;document.head.appendChild(css);
+const _c=cinematic;
+cinematic=function(u){const pr=_c.apply(this,arguments);
+ try{const c=$("cine"),L=u&&u.card&&G[String(u.card.id)];c.classList.remove("gal");
+  if(L&&L.length){const a=L.slice().sort(()=>Math.random()-.5);const p1=c.querySelector(".p1 img"),p2=c.querySelector(".p2 img");
+   const set=(im,src)=>{if(!im||!src)return;im.onerror=()=>{im.onerror=null;im.src=u.img};im.src=src};
+   if(a.length>=2){set(p1,a[0]);set(p2,a[1])}else set(p2,a[0]);c.classList.add("gal")}
+  else if(u&&u.card)want(u.card)}catch(_){}
+ return pr};
+const _sb=startBattle;
+startBattle=function(cfg){const r=_sb.apply(this,arguments);try{if(B){B.allies.forEach(x=>want(x.card));B.enemies.forEach(x=>want(x.card))}}catch(_){}return r};
+setTimeout(()=>{try{(S.team||[]).forEach(id=>want(S.coll[id]))}catch(_){}},6000);
 })();
 </script></body>
 </html>
