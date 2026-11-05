@@ -1472,7 +1472,7 @@ header .hsp{flex:1}
  <div id="modal" class="ovl"><div class="mbox" id="mbox"></div></div>
  <div id="toast"></div>
 </div>
-<script>window.SHK_VER="04/11 16h10"
+<script>window.SHK_VER="05/11 13h00"
 
 const BETA=true;const PUBLIC=true;
 
@@ -5098,6 +5098,53 @@ charAt=async function(rank,r){
 if(EXT.length)setTimeout(upgrade,2500);
 setTimeout(load,4000);
 window.COSMOS_EXTRA=()=>EXT.map(c=>c.name);
+})();
+</script><script>// ================= INTERFACE SIMPLIFIÉE =================
+(function(){
+document.body.classList.add("simple");
+const css=document.createElement("style");css.textContent=`
+body.simple .ptop{display:none!important}
+body.simple .sec .no,body.simple .sec .jp{display:none!important}
+body.simple .sec{margin:20px 2px 8px!important}
+body.simple .sec .t{font-size:15px!important}
+body.simple .mr small{display:none}
+body.simple .mr{padding-top:10px!important;padding-bottom:10px!important}
+body.simple #nav button{flex:1!important;flex-direction:column!important;gap:3px!important;padding:6px 0 4px!important;border-radius:14px}
+body.simple #nav button .lb{display:block!important;font:600 10.5px Inter,sans-serif!important;opacity:.8}
+body.simple #nav button.on .lb{font-weight:800!important;opacity:1}
+body.simple .smp-hide{display:none!important}
+body.simple .today .tx small,body.simple .modes .mode small,body.simple #altar .mdesc,body.simple #altar .pd{display:none!important}
+body.simple .smpc{margin:4px 0 12px;padding:16px;border-radius:18px;background:linear-gradient(135deg,#2a1d12,#16110d);box-shadow:inset 0 0 0 1px #c9a45c55;cursor:pointer}
+body.simple .smpc-t{display:flex;justify-content:space-between;align-items:baseline;font:700 14px Inter,sans-serif;color:#e8dcc8}
+body.simple .smpc-t b{font:800 30px 'Shippori Mincho B1',serif;color:#ffd34d}
+body.simple .smpc-b{height:10px;border-radius:6px;background:#ffffff14;margin:10px 0 8px;overflow:hidden}
+body.simple .smpc-b i{display:block;height:100%;border-radius:6px;background:linear-gradient(90deg,#ff7a3d,#ffd34d)}
+body.simple .smpc-s{font:600 12px Inter,sans-serif;color:#a99f90}
+body.simple .card .sr,body.simple .greet{display:none!important}
+body.simple .today .trow{padding-top:11px!important;padding-bottom:11px!important}
+`;document.head.appendChild(css);
+const hide=e=>e&&e.classList.add("smp-hide");
+const txt=e=>(e.innerText||"");
+function prune(){const m=$("main");if(!m)return;const kids=[...m.children];
+ const secBefore=cls=>kids.forEach((k,i)=>{const n=kids[i+1];if(k.classList.contains("sec")&&n&&n.matches(cls))hide(k)});
+ if(view==="hub"){[".mini",".tiles",".cloudslot",".betaft"].forEach(c=>{m.querySelectorAll(c).forEach(hide);secBefore(c)});
+  const t=m.querySelector(".today");if(t)[...t.children].slice(3).forEach(hide);
+  const g=m.querySelector(".greet");if(g&&g.firstElementChild&&g.children.length>1)hide(g.firstElementChild)}
+ if(view==="home"){[".event",".stats",".cloudslot",".dcban",".foot","#hSet"].forEach(c=>m.querySelectorAll(c).forEach(hide));secBefore(".stats");
+  kids.forEach((k,i)=>{const p=kids[i-1];if(k.matches(".muted")&&p&&p.matches(".stats"))hide(k);if(k.matches(".box")&&/Cosmos/.test(txt(k))){hide(k);hide(p)}})}
+ if(view==="coll"){kids.forEach(k=>{if(k.matches(".sec,.muted,p.muted"))hide(k)})}
+ if(view==="team"){kids.forEach(k=>{if(k.matches(".box")&&/Conseils|tips/i.test(txt(k)))hide(k)})}
+ if(view==="adv"){kids.forEach(k=>{if(k.matches(".muted"))hide(k)});secBefore("#storyBtn")}
+ if(view==="hub"){const t=m.querySelector(".today");if(t)[...t.children].slice(2).forEach(hide);hide(m.querySelector("#hSum"));if(!m.querySelector(".smpc")){const L=Object.values(S.coll),u=L.length,tot=(RAR[0]&&RAR[0].max)||3100,pc=Math.min(100,u/tot*100);
+  const d=document.createElement("div");d.className="smpc";d.innerHTML=`<div class="smpc-t"><span>集 Collection</span><b>${pc.toFixed(1).replace(".",",")} %</b></div><div class="smpc-b"><i style="width:${Math.max(pc,.6)}%"></i></div><div class="smpc-s">${fmt(u)} / ${fmt(tot)} personnages</div>`;
+  d.onclick=()=>{view="coll";setNav();render();$("main").scrollTop=0};d.style.marginTop="18px";const td=m.querySelector(".today");if(td)td.after(d);else m.appendChild(d)}
+  kids.forEach((k,i)=>{if(k.matches(".hrow")){hide(k);const a=kids[i-1],b=kids[i-2];if(a&&a.matches(".muted"))hide(a);if(b&&b.matches(".sec"))hide(b)}})}
+ if(view==="home"){kids.forEach((k,i)=>{if(k.id==="packs"){hide(k);const a=kids[i-1];if(a&&a.matches(".sec"))hide(a)}})}
+ if(view==="team"){kids.forEach(k=>{if(k.matches(".muted")&&!/⚡|\d/.test(txt(k)))hide(k);if(k.matches(".box")&&/Synerg/i.test(txt(k)))k.querySelectorAll(".muted,small,p").forEach(x=>{if(!/[+%]/.test(txt(x)))hide(x)})})}
+ if(view==="adv"){let first=true;kids.forEach(k=>{if(k.matches(".world.lock")){if(first)first=false;else hide(k)}})}
+}
+const _r=render;render=function(){const r=_r.apply(this,arguments);try{prune()}catch(e){console.warn(e)}return r};
+try{prune()}catch(_){}
 })();
 </script></body>
 </html>
